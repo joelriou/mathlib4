@@ -165,7 +165,7 @@ noncomputable def homologyIsoNeg (n : ℕ) (m : ℤ)
       (by simp; omega) (by simp; omega) (by simp; omega) (by simp) (by simp)).symm ≪≫
     HomologicalComplex.homologyMapIso h.restrictionLEIso (n + 1)
 
--- TODO: Study `h.cochainComplex.homology k` when `k = 0` or `k = -1`.
+section
 
 variable [K.HasHomology 0] [L.HasHomology 0]
 
@@ -181,11 +181,70 @@ lemma pOpcycles_opcyclesToCycles_iCycles :
 noncomputable def homologyMap₀ : K.homology 0 ⟶ L.homology 0 :=
   K.homologyι 0 ≫ h.opcyclesToCycles ≫ L.homologyπ 0
 
-variable [h.cochainComplex.HasHomology 0]
+noncomputable def dToHomologyZero : K.X 0 ⟶ L.homology 0 :=
+  K.pOpcycles 0 ≫ h.opcyclesToCycles ≫ L.homologyπ 0
 
-def homologyZeroTo : L.homology 0 ⟶ h.cochainComplex.homology 0 := by
-  --have := @fromRestrictionHomologyOfBoundaryGE
+instance (n : ℕ) [L.HasHomology n] :
+    (restriction h.cochainComplex (ComplexShape.embeddingUpIntGE 0)).HasHomology n :=
+  hasHomology_of_iso h.restrictionGEIso.symm n
+
+end
+
+section
+
+variable [h.cochainComplex.HasHomology 0] [L.HasHomology 0]
+
+noncomputable def homologyZeroToHomologyCochainComplex :
+    L.homology 0 ⟶ h.cochainComplex.homology 0 :=
+  homologyMap h.restrictionGEIso.inv 0 ≫ h.cochainComplex.fromRestrictionHomologyOfBoundaryGE
+    (ComplexShape.embeddingUpIntGE 0) 0 1
+      (by simp [ComplexShape.boundaryGE_embeddingUpIntGE_iff]) (by simp) (j' := 0) (k' := 1)
+      (by simp) (by simp) (by simp)
+
+noncomputable def cyclesZeroIso : h.cochainComplex.cycles 0 ≅ L.cycles 0 :=
+  (h.cochainComplex.restrictionCyclesIso (ComplexShape.embeddingUpIntGE 0) 0 1 (by simp)
+    (j' := 0) (k' := 1) (by simp) (by simp) (by simp)).symm ≪≫
+    cyclesMapIso (h.restrictionGEIso) 0
+
+@[reassoc (attr := simp)]
+lemma cyclesZeroIso_iCycles :
+    h.cyclesZeroIso.hom ≫ L.iCycles 0 = h.cochainComplex.iCycles 0 := by
+  simp [cyclesZeroIso]
+
+lemma homologyπ_homologyZeroToHomologyCochainComplex :
+    L.homologyπ 0 ≫ h.homologyZeroToHomologyCochainComplex =
+      h.cyclesZeroIso.inv ≫ h.cochainComplex.homologyπ 0 := by
+  simp [cyclesZeroIso, homologyZeroToHomologyCochainComplex]
+
+variable [K.HasHomology 0]
+
+@[reassoc (attr := simp)]
+lemma dToHomologyZero_homologyZeroToHomologyCochainComplex :
+    h.dToHomologyZero ≫ h.homologyZeroToHomologyCochainComplex = 0 := by
   sorry
+
+/-- The homology of `h.cochainComplex` in degree `0` identifies to the cokernel of
+the map `K.X 0 ⟶ L.homology 0`. -/
+noncomputable def isCokernelHomologyZero :
+    IsColimit (CokernelCofork.ofπ _
+      h.dToHomologyZero_homologyZeroToHomologyCochainComplex) := by
+  have iso :
+    parallelPair (dToRestrictionHomology
+      h.cochainComplex (ComplexShape.embeddingUpIntGE 0) 0 1
+        (by simp) (i' := -1) (j' := 0) (k' := 1) (by simp) (by simp) (by simp)) 0 ≅
+    parallelPair h.dToHomologyZero 0 :=
+      parallelPair.ext (Iso.refl _) (homologyMapIso h.restrictionGEIso 0) sorry sorry
+  refine (IsColimit.precomposeHomEquiv iso _).1 ?_
+  refine IsColimit.ofIsoColimit
+    (h.cochainComplex.isCokernelFromRestrictionHomologyOfBoundaryGE
+      (ComplexShape.embeddingUpIntGE 0) 0 1
+      (by simp only [ComplexShape.boundaryGE_embeddingUpIntGE_iff])
+      (by simp) (i' := -1) (j' := 0) (k' := 1) (by simp) (by simp) (by simp) (by simp))
+        (Cofork.ext (Iso.refl _) sorry)
+
+end
+
+-- TODO: Study `h.cochainComplex.homology k` when `k = 0` or `k = -1`.
 
 end ConnectData
 
