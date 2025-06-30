@@ -3,6 +3,7 @@ Copyright (c) 2024 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joël Riou
 -/
+import Mathlib.Algebra.Homology.Embedding.Boundary
 import Mathlib.Algebra.Homology.Embedding.Restriction
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 
@@ -47,6 +48,8 @@ lemma hasHomology [K.HasHomology j'] : (K.restriction e).HasHomology j :=
     ((K.restriction e).isoSc' i j k hi hk).symm)
 
 end restriction
+
+section
 
 variable (i j k : ι) (hi : c.prev j = i) (hk : c.next j = k)
   {i' j' k' : ι'} (hi' : e.f i = i') (hj' : e.f j = j') (hk' : e.f k = k')
@@ -168,5 +171,77 @@ lemma restrictionHomologyIso_hom_homologyι :
   rw [← cancel_epi (K.restrictionHomologyIso e i j k hi hk hi' hj' hk' hi'' hk'').inv,
     Iso.inv_hom_id_assoc, restrictionHomologyIso_inv_homologyι_assoc,
       Iso.inv_hom_id, comp_id]
+
+end
+
+section
+
+variable (j k : ι) (hj : e.BoundaryGE j) (hk : c.next j = k)
+  (i' : ι') {j' k' : ι'} (hj' : e.f j = j') (hk' : e.f k = k')
+  (hi'' : c'.prev j' = i') (hk'' : c'.next j' = k')
+  [(K.restriction e).HasHomology j]
+
+/-- The map `(K.restriction e).homology j ⟶ K.homology j'` when `e.BoundaryGE j` holds. -/
+noncomputable def fromRestrictionHomologyOfBoundaryGE [K.HasHomology j'] :
+    (K.restriction e).homology j ⟶ K.homology j' :=
+  ((K.restriction e).isoHomologyπ _ j rfl
+      (shape _ _ _ (fun h ↦ e.not_boundaryGE_next h hj))).inv ≫
+    (K.restrictionCyclesIso e j k hk hj' hk' hk'').hom ≫ K.homologyπ j'
+
+@[reassoc (attr := simp)]
+lemma homologyπ_fromRestrictionHomologyOfBoundaryGE [K.HasHomology j']:
+    (K.restriction e).homologyπ j ≫
+      K.fromRestrictionHomologyOfBoundaryGE e j k hj hk hj' hk' hk'' =
+    (K.restrictionCyclesIso e j k hk hj' hk' hk'').hom ≫ K.homologyπ j' := by
+  simp [fromRestrictionHomologyOfBoundaryGE]
+
+variable [K.HasHomology j']
+
+/-- The map `K.X i' ⟶ (K.restriction e).cycles j` that is induced by the differential. -/
+noncomputable def dToRestrictionCycles :
+    K.X i' ⟶ (K.restriction e).cycles j :=
+  K.toCycles i' j' ≫ (K.restrictionCyclesIso e j k hk hj' hk' hk'').inv
+
+@[reassoc (attr := simp)]
+lemma dToRestrictionCycles_iCycles :
+    K.dToRestrictionCycles e j k hk i' hj' hk' hk'' ≫ (K.restriction e).iCycles j =
+      K.d i' j' ≫ (K.restrictionXIso e hj').inv := by
+  simp [dToRestrictionCycles]
+
+/-- The map `K.X i' ⟶ (K.restriction e).homology j` that is induced by the differential. -/
+noncomputable def dToRestrictionHomology :
+    K.X i' ⟶ (K.restriction e).homology j :=
+  K.dToRestrictionCycles e j k hk i' hj' hk' hk'' ≫ (K.restriction e).homologyπ j
+
+@[reassoc (attr := simp)]
+lemma dToRestrictionCycles_restrictionCyclesIso_hom :
+    K.dToRestrictionCycles e j k hk i' hj' hk' hk'' ≫
+      (K.restrictionCyclesIso e j k hk hj' hk' hk'').hom = K.toCycles i' j' := by
+  simp [← cancel_mono (K.iCycles j')]
+
+@[reassoc (attr := simp)]
+lemma dToRestrictionHomology_fromRestrictionHomologyOfBoundaryGE :
+    K.dToRestrictionHomology e j k hk i' hj' hk' hk'' ≫
+      K.fromRestrictionHomologyOfBoundaryGE e j k hj hk hj' hk' hk'' = 0 := by
+  simp [dToRestrictionHomology]
+
+variable {i'}
+
+noncomputable def isCokernelFromRestrictionHomologyOfBoundaryGE :
+    IsColimit (CokernelCofork.ofπ _
+      (K.dToRestrictionHomology_fromRestrictionHomologyOfBoundaryGE
+        e j k hj hk i' hj' hk' hk'')) := by
+  let iso : parallelPair (K.toCycles i' j') 0 ≅
+      parallelPair (K.dToRestrictionHomology e j k hk i' hj' hk' hk'') 0 :=
+    parallelPair.ext (Iso.refl _)
+      ((K.restrictionCyclesIso e j k hk hj' hk' hk'').symm ≪≫
+        ((K.restriction e).isoHomologyπ _ j rfl
+          (shape _ _ _ (fun h ↦ e.not_boundaryGE_next h hj)))) (by
+            simp [dToRestrictionHomology, dToRestrictionCycles]) (by simp)
+  exact (IsColimit.precomposeHomEquiv iso _).1
+    (IsColimit.ofIsoColimit (K.homologyIsCokernel i' j' hi'')
+      (Cofork.ext (Iso.refl _) (by simp [Cofork.π, iso])))
+
+end
 
 end HomologicalComplex

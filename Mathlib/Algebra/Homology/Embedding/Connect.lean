@@ -167,6 +167,26 @@ noncomputable def homologyIsoNeg (n : ℕ) (m : ℤ)
 
 -- TODO: Study `h.cochainComplex.homology k` when `k = 0` or `k = -1`.
 
+variable [K.HasHomology 0] [L.HasHomology 0]
+
+noncomputable def opcyclesToCycles : K.opcycles 0 ⟶ L.cycles 0 :=
+  K.descOpcycles (L.liftCycles h.d₀ 1 (by simp) (by simp)) 1 (by simp) (by
+    rw [← cancel_mono (L.iCycles 0), Category.assoc, liftCycles_i, comp_d₀, zero_comp])
+
+@[reassoc (attr := simp)]
+lemma pOpcycles_opcyclesToCycles_iCycles :
+    K.pOpcycles 0 ≫ h.opcyclesToCycles ≫ L.iCycles 0 = h.d₀ := by
+  simp [opcyclesToCycles]
+
+noncomputable def homologyMap₀ : K.homology 0 ⟶ L.homology 0 :=
+  K.homologyι 0 ≫ h.opcyclesToCycles ≫ L.homologyπ 0
+
+variable [h.cochainComplex.HasHomology 0]
+
+def homologyZeroTo : L.homology 0 ⟶ h.cochainComplex.homology 0 := by
+  --have := @fromRestrictionHomologyOfBoundaryGE
+  sorry
+
 end ConnectData
 
 end CochainComplex
