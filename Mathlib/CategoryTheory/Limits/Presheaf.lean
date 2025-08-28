@@ -93,11 +93,14 @@ def restrictedULiftYonedaHomEquiv' (P : Cᵒᵖ ⥤ Type (max w v₁ v₂)) (E :
     { app _ x := ULift.up (f.app (CostructuredArrow.mk (uliftYonedaEquiv.symm x)))
       naturality _ _ g := by
         ext x
-        let ψ : CostructuredArrow.mk (yonedaEquiv.symm (P.map φ x)) ⟶
-          CostructuredArrow.mk (yonedaEquiv.symm x) := CostructuredArrow.homMk φ.unop (by
-            dsimp [yonedaEquiv]
-            cat_disch )
-        simpa using (f.naturality ψ).symm }
+        let φ : CostructuredArrow.mk (uliftYonedaEquiv.{max w v₂}.symm (P.map g x)) ⟶
+          CostructuredArrow.mk (uliftYonedaEquiv.symm x) :=
+            CostructuredArrow.homMk g.unop (by
+              dsimp
+              rw [uliftYonedaEquiv_symm_map])
+        dsimp
+        congr 1
+        simpa using (f.naturality φ).symm }
   invFun g :=
     { app y := (uliftYonedaEquiv.{max w v₂} (y.hom ≫ g)).down
       naturality y y' f := by
