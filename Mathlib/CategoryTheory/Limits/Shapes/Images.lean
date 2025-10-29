@@ -7,6 +7,7 @@ import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Mono
 import Mathlib.CategoryTheory.Limits.Shapes.StrongEpi
 import Mathlib.CategoryTheory.MorphismProperty.Factorization
+import Mathlib.CategoryTheory.UniqueUpToUniqueIso
 
 /-!
 # Categorical images
@@ -1001,6 +1002,29 @@ noncomputable def functorialEpiMonoFactorizationData :
   p := { app := fun f => image.ι f.hom }
   hi _ := epimorphisms.infer_property _
   hp _ := monomorphisms.infer_property _
+
+open MorphismProperty in
+attribute [local instance] strongEpi_of_epi in
+instance {X Y : C} (f : X ⟶ Y) [StrongEpiCategory C] :
+    IsUniqueUpToUniqueIso
+      (MapFactorizationData (epimorphisms C) (monomorphisms C) f) where
+  nonempty :=
+    ⟨(functorialEpiMonoFactorizationData C).factorizationData f⟩
+  nonempty_iso d₁ d₂ := by
+    have : Epi d₁.i := d₁.hi
+    have : Epi d₂.i := d₂.hi
+    have : Mono d₁.p := d₁.hp
+    have : Mono d₂.p := d₂.hp
+    let e₁ := image.isoStrongEpiMono _ _ d₁.fac
+    let e₂ := image.isoStrongEpiMono _ _ d₂.fac
+    refine ⟨MapFactorizationData.isoMk (e₁ ≪≫ e₂.symm) ?_ ?_⟩
+    · dsimp
+      simp only [← cancel_mono e₂.hom, Category.assoc, e₂.inv_hom_id,
+        Category.comp_id, ← cancel_mono (image.ι _)]
+      simp [e₁, e₂]
+    · dsimp
+      rw [← cancel_epi e₁.inv]
+      simp [e₁, e₂]
 
 end CategoryTheory.Limits
 

@@ -65,6 +65,10 @@ lemma of_eq_top {P : MorphismProperty C} (h : P = ⊤) {X Y : C} (f : X ⟶ Y) :
   simp [h]
 
 @[simp]
+lemma inf_iff (P Q : MorphismProperty C) {X Y : C} (f : X ⟶ Y) :
+    (P ⊓ Q) f ↔ P f ∧ Q f := Iff.rfl
+
+@[simp]
 lemma sSup_iff (S : Set (MorphismProperty C)) {X Y : C} (f : X ⟶ Y) :
     sSup S f ↔ ∃ (W : S), W.1 f := by
   dsimp [sSup, iSup]

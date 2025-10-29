@@ -51,7 +51,64 @@ structure MapFactorizationData {X Y : C} (f : X ⟶ Y) where
   hi : W₁ i
   hp : W₂ p
 
-attribute [reassoc (attr := simp)] MapFactorizationData.fac
+namespace MapFactorizationData
+
+attribute [reassoc (attr := simp)] fac
+
+variable {W₁ W₂} {X Y : C} {f : X ⟶ Y} (d₁ d₂ d₃ : MapFactorizationData W₁ W₂ f)
+
+@[ext]
+structure Hom where
+  m : d₁.Z ⟶ d₂.Z
+  comm_i : d₁.i ≫ m = d₂.i := by cat_disch
+  comm_p : m ≫ d₂.p = d₁.p := by cat_disch
+
+attribute [reassoc (attr := simp)] Hom.comm_i Hom.comm_p
+
+@[simps]
+def Hom.id : Hom d₁ d₁ where
+  m := 𝟙 _
+
+variable {d₁ d₂ d₃} in
+@[simps]
+def Hom.comp (a : Hom d₁ d₂) (b : Hom d₂ d₃) : Hom d₁ d₃ where
+  m := a.m ≫ b.m
+
+instance : Category (MapFactorizationData W₁ W₂ f) where
+  Hom := Hom
+  id := Hom.id
+  comp := Hom.comp
+
+@[simp] lemma id_m : Hom.m (𝟙 d₁) = 𝟙 _ := rfl
+
+variable {d₁ d₂ d₃}
+
+@[simp, reassoc] lemma comp_m (a : d₁ ⟶ d₂) (b : d₂ ⟶ d₃) : (a ≫ b).m = a.m ≫ b.m := rfl
+
+@[ext]
+lemma hom_ext {f g : d₁ ⟶ d₂} (h : f.m = g.m) : f = g := Hom.ext h
+
+@[simps]
+def isoMk (e : d₁.Z ≅ d₂.Z) (comm_i : d₁.i ≫ e.hom = d₂.i := by cat_disch)
+    (comm_p : e.hom ≫ d₂.p = d₁.p := by cat_disch) : d₁ ≅ d₂ where
+  hom := { m := e.hom }
+  inv :=
+    { m := e.inv
+      comm_i := by simp [← comm_i]
+      comm_p := by simp [← comm_p] }
+
+instance {d₁ d₂ : MapFactorizationData (epimorphisms C) (monomorphisms C) f} :
+    Subsingleton (d₁ ⟶ d₂) where
+  allEq f g := by
+    have : Epi d₁.i := d₁.hi
+    ext
+    simp [← cancel_epi d₁.i]
+
+instance {d₁ d₂ : MapFactorizationData (epimorphisms C) (monomorphisms C) f} :
+    Subsingleton (d₁ ≅ d₂) where
+  allEq _ _ := by ext : 1; subsingleton
+
+end MapFactorizationData
 
 /-- The data of a term in `MapFactorizationData W₁ W₂ f` for any morphism `f`. -/
 abbrev FactorizationData := ∀ {X Y : C} (f : X ⟶ Y), MapFactorizationData W₁ W₂ f
