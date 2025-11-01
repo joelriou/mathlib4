@@ -12,7 +12,7 @@ import Mathlib.AlgebraicTopology.SimplicialSet.NerveAdjunction
 universe u
 
 open CategoryTheory MonoidalCategory Simplicial SimplicialObject.Truncated
-  CartesianMonoidalCategory
+  CartesianMonoidalCategory Opposite SimplexCategory.Truncated
 
 namespace CategoryTheory
 
@@ -47,6 +47,51 @@ namespace Truncated
 instance (n : ℕ) : CartesianMonoidalCategory (Truncated.{u} n) :=
   inferInstanceAs (CartesianMonoidalCategory (_ ⥤ Type u))
 
+abbrev Edge {X : Truncated.{u} 2} (x y : X _⦋0⦌₂) := OneTruncation₂.Hom x y
+
+def Edge.id {X : Truncated.{u} 2} (x : X _⦋0⦌₂) : Edge x x where
+  edge := X.map (σ₂ 0).op x
+  src_eq := sorry
+  tgt_eq := sorry
+
+def Edge.prod {X Y : Truncated.{u} 2} {x x' : X _⦋0⦌₂} (e₁ : Edge x x') {y y' : Y _⦋0⦌₂}
+    (e₂ : Edge y y') :
+    Edge (X := X ⊗ Y) (x, y) (x', y') where
+  edge := (e₁.edge, e₂.edge)
+  src_eq := sorry
+  tgt_eq := sorry
+
+@[simps]
+def Edge.map {X Y : Truncated.{u} 2} {x y : X _⦋0⦌₂} (e : Edge x y) (f : X ⟶ Y) :
+    Edge (f.app _ x) (f.app _ y) where
+  edge := f.app _ e.edge
+  src_eq := by rw [← FunctorToTypes.naturality, e.src_eq]
+  tgt_eq := by rw [← FunctorToTypes.naturality, e.tgt_eq]
+
+structure CompStruct {X : Truncated.{u} 2} {x₀ x₁ x₂ : X _⦋0⦌₂}
+    (e₀₁ : Edge x₀ x₁) (e₁₂ : Edge x₁ x₂) (e₀₂ : Edge x₀ x₂) where
+  simplex : X _⦋2⦌₂
+  d₂ : X.map (δ₂ 2).op simplex = e₀₁.edge
+  d₀ : X.map (δ₂ 0).op simplex = e₁₂.edge
+  d₁ : X.map (δ₂ 1).op simplex = e₀₂.edge
+
+def CompStruct.prod {X : Truncated.{u} 2} {x₀ x₁ x₂ : X _⦋0⦌₂}
+    {e₀₁ : Edge x₀ x₁} {e₁₂ : Edge x₁ x₂} {e₀₂ : Edge x₀ x₂}
+    (he : CompStruct e₀₁ e₁₂ e₀₂)
+    {Y : Truncated.{u} 2} {y₀ y₁ y₂ : Y _⦋0⦌₂}
+    {f₀₁ : Edge y₀ y₁} {f₁₂ : Edge y₁ y₂} {f₀₂ : Edge y₀ y₂}
+    (hf : CompStruct f₀₁ f₁₂ f₀₂) :
+    CompStruct (e₀₁.prod f₀₁) (e₁₂.prod f₁₂) (e₀₂.prod f₀₂) := by
+  sorry
+
+def CompStruct.id_comp {X : Truncated.{u} 2} {x₀ x₁ : X _⦋0⦌₂} (e : Edge x₀ x₁) :
+    CompStruct (.id _) e e := by
+  sorry
+
+def CompStruct.comp_id {X : Truncated.{u} 2} {x₀ x₁ : X _⦋0⦌₂} (e : Edge x₀ x₁) :
+    CompStruct e (.id _) e := by
+  sorry
+
 variable (X Y : Truncated.{u} 2)
 
 variable {X Y} in
@@ -61,11 +106,37 @@ def const (y : Y _⦋0⦌₂) : X ⟶ Y where
 
 namespace HomotopyCategory
 
-def hom_induction {motive : ∀ {x x' : X.HomotopyCategory} (f : x ⟶ x'), Prop}
+variable {X}
+
+@[simps]
+def objEquiv : X.HomotopyCategory ≃ X _⦋0⦌₂ where
+  toFun x := x.1.1
+  invFun x := ⟨⟨x⟩⟩
+
+def homMk {x y : X _⦋0⦌₂} (f : Edge x y) :
+    objEquiv.symm x ⟶ objEquiv.symm y :=
+  (Cat.FreeRefl.quotientFunctor _ ⋙ quotientFunctor X).map (Quiver.Hom.toPath f)
+
+@[reassoc]
+lemma homMk_comp {x₀ x₁ x₂ : X _⦋0⦌₂} {f₀₁ : Edge x₀ x₁} {f₁₂ : Edge x₁ x₂}
+    {f₀₂ : Edge x₀ x₂} (h : CompStruct f₀₁ f₁₂ f₀₂) :
+    homMk f₀₁ ≫ homMk f₁₂ = homMk f₀₂ := by
+  exact (CategoryTheory.Quotient.sound HoRel₂
+    (HoRel₂.mk' (V := X) h.simplex f₀₁ f₁₂ f₀₂ sorry sorry sorry)).symm
+
+lemma homMk_square {x₀ x₁ : X _⦋0⦌₂} (f : Edge x₀ x₁) {y₀ y₁ : Y _⦋0⦌₂} (g : Edge y₀ y₁) :
+    homMk (f.prod (Edge.id y₀)) ≫ homMk ((Edge.id x₁).prod g) =
+      homMk ((Edge.id x₀).prod g) ≫ homMk (f.prod (Edge.id y₁)) := by
+  trans homMk (f.prod g)
+  · exact homMk_comp (CompStruct.prod (.comp_id _) (.id_comp _))
+  · exact (homMk_comp (CompStruct.prod (.id_comp _) (.comp_id _))).symm
+
+variable (X)
+
+def hom_induction {motive : ∀ {x x' : X.HomotopyCategory} (_ : x ⟶ x'), Prop}
     (id : ∀ x, motive (𝟙 x))
     (comp : ∀ {x x' x''} (f : x ⟶ x') (g : x' ⟶ x''), motive f → motive g → motive (f ≫ g))
-    (toPath : ∀ {x x' : OneTruncation₂ X} (e : x ⟶ x'),
-      motive ((Cat.FreeRefl.quotientFunctor _ ⋙ quotientFunctor X).map e.toPath))
+    (toPath : ∀ {x x' : X _⦋0⦌₂} (e : OneTruncation₂.Hom x x'), motive (homMk e))
     {x x' : X.HomotopyCategory} (f : x ⟶ x') : motive f := by
   obtain ⟨⟨x⟩⟩ := x
   obtain ⟨⟨x'⟩⟩ := x'
@@ -75,12 +146,6 @@ def hom_induction {motive : ∀ {x x' : X.HomotopyCategory} (f : x ⟶ x'), Prop
   induction f with
   | nil => apply id
   | cons p g hp => exact comp _ _ hp (toPath g)
-
-variable {X} in
-@[simps]
-def objEquiv : X.HomotopyCategory ≃ X _⦋0⦌₂ where
-  toFun x := x.1.1
-  invFun x := ⟨⟨x⟩⟩
 
 namespace BinaryProduct
 
@@ -98,6 +163,16 @@ def ι₁ (y : Y _⦋0⦌₂) : X.HomotopyCategory ⥤ (X ⊗ Y).HomotopyCategor
 variable {X} in
 def ι₂ (x : X _⦋0⦌₂) : Y.HomotopyCategory ⥤ (X ⊗ Y).HomotopyCategory :=
   mapHomotopyCategory (lift (const x) (𝟙 Y))
+
+@[simp]
+lemma ι₁_map_homMk (y : Y _⦋0⦌₂) {x x' : X _⦋0⦌₂} (e : Edge x x') :
+    (ι₁ X y).map (homMk e) = homMk (e.prod (Edge.id y)) := by
+  sorry
+
+@[simp]
+lemma ι₂_map_homMk (x : X _⦋0⦌₂) {y y' : Y _⦋0⦌₂} (e : Edge y y') :
+    (ι₂ Y x).map (homMk e) = homMk ((Edge.id x).prod e) := by
+  sorry
 
 variable {X Y}
 
@@ -123,11 +198,7 @@ lemma comm
     | comp f₁ f₂ h₁ h₂ =>
       dsimp at h₁ h₂ ⊢
       rw [Functor.map_comp_assoc, Functor.map_comp, h₂, reassoc_of% h₁]
-    | @toPath x x' f =>
-      dsimp
-      change (HomotopyCategory.quotientFunctor _).map _ ≫
-        (HomotopyCategory.quotientFunctor _).map _ = _
-      sorry
+    | @toPath x x' f => simp [homMk_square]
 
 end inverse
 
@@ -147,7 +218,6 @@ def equivalence : (X ⊗ Y).HomotopyCategory ≌ (X.HomotopyCategory × Y.Homoto
   inverse := inverse X Y
   unitIso := NatIso.ofComponents (fun _ ↦ Iso.refl _) sorry
   counitIso := NatIso.ofComponents (fun _ ↦ Iso.refl _) sorry
-  functor_unitIso_comp := sorry
 
 end BinaryProduct
 
