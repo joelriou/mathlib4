@@ -3,9 +3,11 @@ Copyright (c) 2019 Sébastien Gouëzel. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sébastien Gouëzel, Yury Kudryashov, Aaron Liu
 -/
-import Mathlib.Topology.MetricSpace.HausdorffDistance
-import Mathlib.Topology.Metrizable.Basic
-import Mathlib.Topology.Separation.GDelta
+module
+
+public import Mathlib.Topology.MetricSpace.HausdorffDistance
+public import Mathlib.Topology.Metrizable.Basic
+public import Mathlib.Topology.Separation.GDelta
 
 /-!
 # `Gδ` sets and metrizable spaces
@@ -16,6 +18,8 @@ We prove that the continuity set of a function from a topological space to a met
 Gδ set.
 
 -/
+
+@[expose] public section
 
 variable {X : Type*} [TopologicalSpace X]
 open TopologicalSpace Metric Set
@@ -34,9 +38,9 @@ instance (priority := 100) [PseudoMetrizableSpace X] : NormalSpace X where
     refine ⟨g ⁻¹' (Ioi 0), g ⁻¹' (Iio 0), isOpen_Ioi.preimage hg, isOpen_Iio.preimage hg,
       fun x hx ↦ ?_, fun x hx ↦ ?_, Ioi_disjoint_Iio_same.preimage g⟩
     · simp [g, infDist_zero_of_mem hx,
-        (ht.not_mem_iff_infDist_pos hte).mp (hst.not_mem_of_mem_left hx)]
+        (ht.notMem_iff_infDist_pos hte).mp (hst.notMem_of_mem_left hx)]
     · simp [g, infDist_zero_of_mem hx,
-        (hs.not_mem_iff_infDist_pos hse).mp (hst.not_mem_of_mem_right hx)]
+        (hs.notMem_iff_infDist_pos hse).mp (hst.notMem_of_mem_right hx)]
 
 instance (priority := 500) [PseudoMetrizableSpace X] : PerfectlyNormalSpace X where
   closed_gdelta s hs := by

@@ -3,8 +3,10 @@ Copyright (c) 2017 Johannes Hölzl. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Johannes Hölzl
 -/
-import Mathlib.Order.BoundedOrder.Basic
-import Mathlib.Order.Lattice
+module
+
+public import Mathlib.Order.BoundedOrder.Basic
+public import Mathlib.Order.Lattice
 
 /-!
 # Bounded lattices
@@ -21,6 +23,8 @@ instances for `Prop` and `fun`.
 * Bounded and distributive lattice. Notated by `[DistribLattice α] [BoundedOrder α]`.
   Typical examples include `Prop` and `Set α`.
 -/
+
+@[expose] public section
 
 open Function OrderDual
 
@@ -153,6 +157,10 @@ theorem min_eq_bot [OrderBot α] {a b : α} : min a b = ⊥ ↔ a = ⊥ ∨ b = 
 @[simp]
 theorem max_eq_top [OrderTop α] {a b : α} : max a b = ⊤ ↔ a = ⊤ ∨ b = ⊤ :=
   @min_eq_bot αᵒᵈ _ _ a b
+
+@[aesop (rule_sets := [finiteness]) safe apply]
+lemma max_ne_top [OrderTop α] {a b : α} (ha : a ≠ ⊤) (hb : b ≠ ⊤) : max a b ≠ ⊤ := by
+  grind [max_eq_top]
 
 end LinearOrder
 

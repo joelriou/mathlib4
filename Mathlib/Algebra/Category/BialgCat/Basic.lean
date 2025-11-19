@@ -3,9 +3,11 @@ Copyright (c) 2024 Amelia Livingston. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Amelia Livingston
 -/
-import Mathlib.Algebra.Category.CoalgCat.Basic
-import Mathlib.Algebra.Category.AlgCat.Basic
-import Mathlib.RingTheory.Bialgebra.Equiv
+module
+
+public import Mathlib.Algebra.Category.CoalgCat.Basic
+public import Mathlib.Algebra.Category.AlgCat.Basic
+public import Mathlib.RingTheory.Bialgebra.Equiv
 
 /-!
 # The category of bialgebras over a commutative ring
@@ -13,9 +15,11 @@ import Mathlib.RingTheory.Bialgebra.Equiv
 We introduce the bundled category `BialgCat` of bialgebras over a fixed commutative ring `R`
 along with the forgetful functors to `CoalgCat` and `AlgCat`.
 
-This file mimics `Mathlib.LinearAlgebra.QuadraticForm.QuadraticModuleCat`.
+This file mimics `Mathlib/LinearAlgebra/QuadraticForm/QuadraticModuleCat.lean`.
 
 -/
+
+@[expose] public section
 
 open CategoryTheory
 
