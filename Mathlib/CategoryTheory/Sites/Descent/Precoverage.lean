@@ -213,8 +213,7 @@ lemma map_hom ⦃i : ι⦄ ⦃Y : C⦄ (q : Y ⟶ X i) ⦃j : ι'⦄
     Presieve.IsSheafFor.isAmalgamation (Presieve.IsSheaf.isSheafFor _
       ((isSheaf_iff_isSheaf_of_type _ _).1 (IsPrestack.isSheaf J _ _)) _
         (by simpa using sieve_mem _ hf' i)) (compatible_familyOfElements w φ i)
-  change (F.map q.op.toLoc).toFunctor.map (F.presheafHomObjHomEquiv.symm s) = _
-  simpa [familyOfElements_eq w φ (Z := Over.mk q) _ a fac,
+  simpa [hom, familyOfElements_eq w φ (Z := Over.mk q) _ a fac,
     presheafHomObjHomEquiv, pullHom, mapComp'_id_comp_hom_app,
     mapComp'_id_comp_inv_app] using hs _ (mem_sieve _ _ fac)
 
