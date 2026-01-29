@@ -6,6 +6,7 @@ Authors: Joël Riou
 module
 
 public import Mathlib.CategoryTheory.Abelian.Refinements
+public import Mathlib.CategoryTheory.MorphismProperty.Limits
 public import Mathlib.Algebra.Homology.CommSq
 
 /-!
@@ -35,8 +36,19 @@ namespace CategoryTheory
 
 open Category Limits
 
-variable {C : Type u} [Category.{v} C] [Abelian C] {X₁ X₂ X₃ X₄ : C}
-  {t : X₁ ⟶ X₂} {l : X₁ ⟶ X₃} {r : X₂ ⟶ X₄} {b : X₃ ⟶ X₄}
+variable {C : Type u} [Category.{v} C] [Abelian C]
+
+namespace Abelian
+
+instance : (MorphismProperty.monomorphisms C).IsStableUnderCobaseChange :=
+  .mk' (fun _ _ _ _ _ _ (_ : Mono _) ↦ inferInstanceAs (Mono _))
+
+instance : (MorphismProperty.epimorphisms C).IsStableUnderBaseChange :=
+  .mk' (fun _ _ _ _ _ _ (_ : Epi _) ↦ inferInstanceAs (Epi _))
+
+end Abelian
+
+variable {X₁ X₂ X₃ X₄ : C} {t : X₁ ⟶ X₂} {l : X₁ ⟶ X₃} {r : X₂ ⟶ X₄} {b : X₃ ⟶ X₄}
 
 namespace IsPushout
 
