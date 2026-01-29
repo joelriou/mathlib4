@@ -22,8 +22,6 @@ characterizations of (pre)stacks.
 
 -/
 
-@[expose] public section
-
 universe t t' v' v u' u
 
 namespace CategoryTheory
@@ -83,16 +81,16 @@ lemma exists_fac : ∃ (j : ι') (a : Z ⟶ X' j), a ≫ f' j = q ≫ f i := by
   exact ⟨j, q, fac⟩
 
 /-- If a morphism `q : Z ⟶ X i` belongs to `sieve f f' i`, this is a choice of
-index `j` such that there exists a factorization `a ≫ f' j = q ≫ f i` for
-some `a`. -/
+index `j` such that there exists a factorization `hom ≫ f' j = q ≫ f i` for
+some `hom`. -/
 noncomputable def idx : ι' := (exists_fac hq).choose
 
 /-- If a morphism `q : Z ⟶ X i` belongs to `sieve f f' i`, this is a choice of
-a morphism `a : Z ⟶ X' j` for some `j` such that `a ≫ f' j = q ≫ f i`. -/
-noncomputable def a : Z ⟶ X' (idx hq) := (exists_fac hq).choose_spec.choose
+a morphism `hom : Z ⟶ X' j` for some `j` such that `hom ≫ f' j = q ≫ f i`. -/
+noncomputable def hom : Z ⟶ X' (idx hq) := (exists_fac hq).choose_spec.choose
 
 @[reassoc]
-lemma fac : a hq ≫ f' (idx hq) = q ≫ f i := (exists_fac hq).choose_spec.choose_spec
+lemma fac : hom hq ≫ f' (idx hq) = q ≫ f i := (exists_fac hq).choose_spec.choose_spec
 
 end sieve
 
@@ -254,7 +252,7 @@ end full_pullFunctor
 
 open full_pullFunctor in
 include w hf' in
-lemma full_pullFunctor :
+public lemma full_pullFunctor :
     (pullFunctor F (f := f) (p := 𝟙 _) (f' := f') (p' := p') (by cat_disch)).Full where
   map_surjective {D₁ D₂} φ :=
     ⟨{ hom := fun i ↦ full_pullFunctor.hom w hf' φ i, comm := comm _ _ _ }, by
