@@ -118,6 +118,10 @@ end InducedCategory
 instance fullSubcategory (Z : ObjectProperty C) : Preadditive Z.FullSubcategory :=
   inferInstanceAs (Preadditive (InducedCategory _ ObjectProperty.FullSubcategory.obj))
 
+@[simp]
+lemma _root_.CategoryTheory.ObjectProperty.hom_zero {Z : ObjectProperty C}
+    (X Y : Z.FullSubcategory) : (0 : X ⟶ Y).hom = 0 := rfl
+
 instance (X : C) : AddCommGroup (End X) := by
   dsimp [End]
   infer_instance

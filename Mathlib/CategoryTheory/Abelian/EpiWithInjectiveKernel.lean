@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Algebra.Homology.ShortComplex.ShortExact
 public import Mathlib.CategoryTheory.MorphismProperty.Composition
+public import Mathlib.CategoryTheory.MorphismProperty.Retract
 
 /-!
 # Epimorphisms with an injective kernel
@@ -89,6 +90,16 @@ instance : (epiWithInjectiveKernel : MorphismProperty C).IsMultiplicative where
               BinaryBicone.inr_fst_assoc, zero_comp, comp_zero, add_zero,
               BinaryBicone.inl_snd_assoc, BinaryBicone.inr_snd_assoc, zero_add]
             abel }
+
+instance : (epiWithInjectiveKernel (C := C)).IsStableUnderRetracts where
+  of_retract := by
+    rintro X' Y' X Y f' f r ⟨_, hf⟩
+    have : Epi f' :=
+      (MorphismProperty.epimorphisms C).of_retract r (.infer_property _)
+    let r' : Retract (kernel f') (kernel f) :=
+      { i := kernel.map _ _ r.left.i r.right.i (by simp)
+        r := kernel.map _ _ r.left.r r.right.r (by simp) }
+    exact ⟨inferInstance, r'.injective⟩
 
 end Abelian
 

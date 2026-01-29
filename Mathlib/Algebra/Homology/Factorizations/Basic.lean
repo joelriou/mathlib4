@@ -53,6 +53,10 @@ instance : (degreewiseEpiWithInjectiveKernel (C := C)).IsMultiplicative where
   id_mem _ _ := MorphismProperty.id_mem _ _
   comp_mem _ _ hf hg n := MorphismProperty.comp_mem _ _ _ (hf n) (hg n)
 
+instance : (degreewiseEpiWithInjectiveKernel (C := C)).IsStableUnderRetracts where
+  of_retract r h i :=
+    MorphismProperty.of_retract (r.map (HomologicalComplex.eval _ _ i)) (h i)
+
 variable {K L : CochainComplex C ℤ} (φ : K ⟶ L)
 
 def monoUpTo (n : ℤ) : Prop := ∀ (i : ℤ) (_ : i ≤ n), Mono (φ.f i)

@@ -305,6 +305,9 @@ end-/
 
 end Injective
 
+lemma Retract.injective {X Y : C} (r : Retract X Y) [Injective Y] : Injective X where
+  factors g f _ := ⟨Injective.factorThru (g ≫ r.i) f ≫ r.r, by simp⟩
+
 namespace Adjunction
 
 variable {D : Type*} [Category* D] {F : C ⥤ D} {G : D ⥤ C}

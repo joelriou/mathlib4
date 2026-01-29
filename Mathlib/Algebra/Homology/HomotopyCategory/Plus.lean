@@ -25,6 +25,25 @@ variable (C : Type _) [Category C] [Preadditive C] [HasZeroObject C] [HasBinaryB
   {D : Type _} [Category D] [Preadditive D] [HasZeroObject D] [HasBinaryBiproducts D]
   (A : Type _) [Category A] [Abelian A]
 
+namespace CochainComplex
+
+protected def plus : ObjectProperty (CochainComplex C ℤ) :=
+  fun K ↦ ∃ (n : ℤ), CochainComplex.IsStrictlyGE K n
+
+abbrev Plus := (CochainComplex.plus C).FullSubcategory
+
+namespace Plus
+
+abbrev ι : Plus C ⥤ CochainComplex C ℤ := (CochainComplex.plus C).ι
+
+def fullyFaithfulι : (ι C).FullyFaithful := ObjectProperty.fullyFaithfulι _
+
+def quasiIso : MorphismProperty (Plus A) := (HomologicalComplex.quasiIso A _).inverseImage (ι A)
+
+end Plus
+
+end CochainComplex
+
 namespace HomotopyCategory
 
 def plus : ObjectProperty (HomotopyCategory C (ComplexShape.up ℤ)) :=
