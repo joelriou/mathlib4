@@ -23,7 +23,7 @@ result in terms of the predicate `IsStackFor` as the lemma
 where `R` is covering, then `F.IsStackFor R` implies `F.IsStackFor R'`.
 
 Now, assume that `J` is a precoverage on `C` which satisfies slightly
-stronger axioms than pretopologies (`HasIsos`, `J.IsStableUnderBaseChange`,
+stronger axioms than pretopologies (`J.HasIsos`, `J.IsStableUnderBaseChange`,
 and `J.IsStableUnderComposition`). We deduce from the
 results above that `F` is a prestack (resp. a stack) for the
 Grothendieck topology associated to `J` if `F` satisfies
@@ -250,8 +250,7 @@ lemma map_hom ⦃i : ι⦄ ⦃Y : C⦄ (q : Y ⟶ X i) ⦃j : ι'⦄
     Presieve.IsSheafFor.isAmalgamation (Presieve.IsSheaf.isSheafFor _
       ((isSheaf_iff_isSheaf_of_type _ _).1 (IsPrestack.isSheaf J _ _)) _
         (by simpa using sieve_mem _ hf' i)) (compatible_familyOfElements w φ i)
-  change (F.map q.op.toLoc).toFunctor.map (F.presheafHomObjHomEquiv.symm s) = _
-  simpa [familyOfElements_eq w φ (Z := Over.mk q) _ a fac,
+  simpa [hom, familyOfElements_eq w φ (Z := Over.mk q) _ a fac,
     presheafHomObjHomEquiv, pullHom, mapComp'_id_comp_hom_app,
     mapComp'_id_comp_inv_app] using hs _ (mem_sieve _ _ fac)
 
@@ -342,6 +341,8 @@ end
 
 end DescentData
 
+public section
+
 /-- If `F` is a prestack for a Grothendieck topology `J` and `F` is a stack
 for a covering presieve `R`, then it is also a stack for `R'` if `R ≤ R'`. -/
 lemma IsStackFor.of_le {S : C} {R : Presieve S}
@@ -402,6 +403,8 @@ lemma IsStack.of_precoverage
   obtain ⟨R', hR', h⟩ := hR
   dsimp at hR'
   exact (hF _ _ hR').of_le _ (Precoverage.generate_mem_toGrothendieck hR') h
+
+end
 
 end
 
