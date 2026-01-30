@@ -12,7 +12,7 @@ public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.Construc
 # The right derivability structure attached to a model category
 
 We show that the inclusion of the full subcategory of fibrant objects
-in a model category is a left derivability structure. This is
+in a model category is a right derivability structure. This is
 Corollaire 10.10 in [the paper by Kahn and Maltsiniotis][KahnMaltsiniotis2008].
 
 ## References
@@ -29,7 +29,7 @@ open CategoryTheory Limits
 
 namespace HomotopicalAlgebra
 
-variable {C : Type*} [Category C] [ModelCategory C]
+variable {C : Type*} [Category* C] [ModelCategory C]
 
 namespace FibrantObject
 
@@ -44,8 +44,7 @@ instance (X : C) : IsConnected ((localizerMorphism C).RightResolution X) := by
       hw := by simpa using mem_weakEquivalences (HoCat.iResolutionObj X) }
   have hR₀ (R) : Nonempty (Zigzag R R₀) := by
     have sq : CommSq R.w R₀.w (terminal.from _) (terminal.from _) := ⟨by simp⟩
-    exact ⟨Zigzag.of_inv
-      { f := homMk (sq.lift) }⟩
+    exact ⟨Zigzag.of_inv { f := homMk sq.lift }⟩
   have : Nonempty ((localizerMorphism C).RightResolution X) := ⟨R₀⟩
   exact zigzag_isConnected (fun R₁ R₂ ↦ (hR₀ R₁).some.trans (hR₀ R₂).some.symm)
 

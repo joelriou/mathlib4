@@ -213,11 +213,12 @@ noncomputable def HoCat.localizerMorphismResolution :
       weakEquivalence_homMk_iff] using h
 
 /-- The map `HoCat.pResolutionObj`, when applied to already cofibrant objects, gives
-a natural transformation `ι ⋙ π.resolution ⟶ toπ`. -/
+a natural transformation `ι ⋙ HoCat.resolution ⟶ toHoCat`. -/
 @[simps]
-noncomputable def HoCat.ιCompResolutionNatTrans : ι ⋙ HoCat.resolution (C := C) ⟶ toHoCat where
+noncomputable def HoCat.ιCompResolutionNatTrans :
+    ι ⋙ HoCat.resolution (C := C) ⟶ toHoCat where
   app X := toHoCat.map { hom := (HoCat.pResolutionObj (ι.obj X)) }
-  naturality _ _ f :=  toHoCat.congr_map (by
+  naturality _ _ f := toHoCat.congr_map (by
     ext : 1
     exact HoCat.resolutionMap_fac f.hom)
 
