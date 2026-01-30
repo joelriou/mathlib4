@@ -128,7 +128,6 @@ def NormalMono.ofArrowIso {X Y : C} {f : X ⟶ Y}
   isLimit := by
     refine (IsLimit.equivOfNatIsoOfIso ?_ _ _ ?_).1 hf.isLimit
     · exact parallelPair.ext (Arrow.rightFunc.mapIso e) (Iso.refl _)
-        (by cat_disch) (by cat_disch)
     · exact Fork.ext (Arrow.leftFunc.mapIso e)
 
 section
@@ -248,7 +247,6 @@ def NormalEpi.ofArrowIso [HasZeroMorphisms C] {X Y : C} {f : X ⟶ Y}
   isColimit := by
     refine (IsColimit.equivOfNatIsoOfIso ?_ _ _ ?_).1 hf.isColimit
     · exact parallelPair.ext (Iso.refl _) (Arrow.leftFunc.mapIso e)
-        (by cat_disch) (by cat_disch)
     · exact Cofork.ext (Arrow.rightFunc.mapIso e) (by simp [Cofork.π])
 
 
