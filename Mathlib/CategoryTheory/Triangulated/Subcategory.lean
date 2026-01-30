@@ -400,7 +400,7 @@ instance [IsTriangulated C] : IsTriangulated P.FullSubcategory :=
   IsTriangulated.of_fully_faithful_triangulated_functor P.ι
 
 instance (F : C ⥤ D) [F.CommShift ℤ] [F.IsTriangulated] [F.Full] :
-    (F.essImage).IsTriangulated where
+    F.essImage.IsTriangulated where
   isStableUnderShiftBy n :=
     { le_shift := by
         rintro Y ⟨X, ⟨e⟩⟩
