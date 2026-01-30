@@ -327,7 +327,7 @@ lemma isEquivalence_toDescentData_of_sieve_le
       ∃ (H : _ ⥤ _) (_ : H.FullyFaithful),
         Nonempty (F.toDescentData f ⋙ H ≅ F.toDescentData f') := by
     refine ⟨pullFunctor F (p := 𝟙 _) (p' := p) (by cat_disch), ?_, ?_⟩
-    · refine fullyFaithfulPullFunctor F hp h₁
+    · exact fullyFaithfulPullFunctor F hp h₁
     · exact ⟨toDescentDataCompPullFunctorIso _ _ ≪≫
           (Functor.isoWhiskerRight (Cat.Hom.toNatIso (F.mapId _)) _) ≪≫
             Functor.leftUnitor _⟩
