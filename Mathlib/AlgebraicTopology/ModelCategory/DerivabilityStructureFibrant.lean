@@ -12,7 +12,7 @@ public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.Construc
 # The right derivability structure attached to a model category
 
 We show that the inclusion of the full subcategory of fibrant objects
-in a model category is a left derivability structure. This is
+in a model category is a right derivability structure. This is
 Corollaire 10.10 in [the paper by Kahn and Maltsiniotis][KahnMaltsiniotis2008].
 
 ## References
