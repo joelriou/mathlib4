@@ -6,6 +6,7 @@ Authors: Joël Riou
 module
 
 public import Mathlib.Algebra.Homology.Factorizations.CM5a
+public import Mathlib.Algebra.Homology.ModelCategory.Lifting
 public import Mathlib.Algebra.Homology.HomotopyCategory.Plus
 public import Mathlib.AlgebraicTopology.ModelCategory.Basic
 
@@ -102,6 +103,53 @@ lemma cofibration_iff {X Y : Plus C} (f : X ⟶ Y) :
 
 variable [EnoughInjectives C]
 
+instance {A B : CochainComplex.Plus C} (i : A ⟶ B) [Cofibration i] :
+    Mono i := by
+  rwa [← cofibration_iff]
+
+/-open HomComplex in
+lemma lifting {A B X Y : CochainComplex.Plus C} (i : A ⟶ B) (p : X ⟶ Y)
+    [Mono i] [Fibration p] (hip : WeakEquivalence i ∨ WeakEquivalence p) :
+    HasLiftingProperty i p where
+  sq_hasLift {t b} sq := by
+    obtain ⟨A, hA⟩ := A
+    obtain ⟨B, hB⟩ := B
+    obtain ⟨X, hX⟩ := X
+    obtain ⟨Y, hY⟩ := Y
+    have := (mono_iff i).1 inferInstance
+    have hp : degreewiseEpiWithInjectiveKernel p.hom :=
+      (fibration_iff p).1 inferInstance
+    obtain ⟨i, rfl⟩ := ObjectProperty.homMk_surjective i
+    obtain ⟨p, rfl⟩ := ObjectProperty.homMk_surjective p
+    obtain ⟨t, rfl⟩ := ObjectProperty.homMk_surjective t
+    obtain ⟨b, rfl⟩ := ObjectProperty.homMk_surjective b
+    dsimp at i p t b hp
+    have : Mono i := by assumption
+    have hip : QuasiIso i ∨ QuasiIso p := by
+      simpa only [weakEquivalence_iff] using hip
+    replace sq : CommSq t i p b := ⟨(ObjectProperty.ι _).congr_map sq.w⟩
+    suffices sq.HasLift from ⟨⟨{ l := ObjectProperty.homMk sq.lift }⟩⟩
+    have sq' (n : ℤ) : CommSq (t.f n) (i.f n) (p.f n) (b.f n) :=
+      (sq.map (HomologicalComplex.eval _ _ n))
+    have (n : ℤ) : (sq' n).HasLift := by
+      have := (hp n).hasLiftingProperty (i.f n)
+      infer_instance
+    let β := Lifting.cocycle₁ sq (fun n ↦ { l := (sq' n).lift })
+      (cokernelIsCokernel i) (kernelIsKernel p) (hπ := by simp) (hι := by simp)
+    obtain ⟨α, hα⟩ : ∃ (α : Cochain (cokernel i) (kernel p) 0), δ 0 1 α = β.1 := sorry
+    exact Lifting.hasLift sq _ (cokernelIsCokernel _) (kernelIsKernel _)
+      (hπ := by simp) (hι := by simp) α hα
+
+instance {A B X Y : CochainComplex.Plus C} (i : A ⟶ B) (p : X ⟶ Y)
+    [Cofibration i] [WeakEquivalence i] [Fibration p] :
+    HasLiftingProperty i p :=
+  lifting _ _ (Or.inl inferInstance)
+
+instance {A B X Y : CochainComplex.Plus C} (i : A ⟶ B) (p : X ⟶ Y)
+    [Cofibration i] [Fibration p] [WeakEquivalence p] :
+    HasLiftingProperty i p :=
+  lifting _ _ (Or.inr inferInstance)
+
 instance : (trivialCofibrations (Plus C)).HasFactorization (fibrations (Plus C)) where
   nonempty_mapFactorizationData := by
     rintro ⟨K, n, hn⟩ ⟨L, m, hm⟩ f
@@ -135,9 +183,7 @@ instance : (cofibrations (Plus C)).HasFactorization (trivialFibrations (Plus C))
       hp := ⟨hp, by assumption⟩
     }⟩
 
-/-scoped instance : ModelCategory (CochainComplex.Plus C) where
-  cm4a := sorry
-  cm4b := sorry-/
+scoped instance : ModelCategory (CochainComplex.Plus C) where-/
 
 end modelCategoryQuillen
 
