@@ -253,7 +253,7 @@ lemma isGE_eTruncGE_obj_obj (n : ℤ) (i : EInt) (h : n ≤ i) (X : C) :
   | bot => simp at h
   | coe i =>
     dsimp
-    exact t.isGE_of_GE  _ _ _ (by simpa using h)
+    exact t.isGE_of_ge  _ _ _ (by simpa using h)
   | top => exact t.isGE_of_isZero (Functor.zero_obj _) _
 
 lemma isLE_eTruncLT_obj_obj (n : ℤ) (i : EInt) (h : i ≤ (n + 1 :)) (X : C) :
@@ -263,7 +263,7 @@ lemma isLE_eTruncLT_obj_obj (n : ℤ) (i : EInt) (h : i ≤ (n + 1 :)) (X : C) :
   | coe i =>
     simp only [WithBotTop.coe_le_coe] at h
     dsimp
-    exact t.isLE_of_LE _ (i - 1) n (by lia)
+    exact t.isLE_of_le _ (i - 1) n (by lia)
   | top => simp at h
 
 lemma isZero_eTruncLT_obj_obj (X : C) (n : ℤ) [t.IsGE X n] (j : EInt) (hj : j ≤ n) :
@@ -271,7 +271,7 @@ lemma isZero_eTruncLT_obj_obj (X : C) (n : ℤ) [t.IsGE X n] (j : EInt) (hj : j 
   induction j using WithBotTop.rec with
   | bot => simp
   | coe j =>
-    have := t.isGE_of_GE X j n (by simpa using hj)
+    have := t.isGE_of_ge X j n (by simpa using hj)
     exact t.isZero_truncLT_obj_of_isGE _ _
   | top => simp at hj
 
@@ -281,7 +281,7 @@ lemma isZero_eTruncGE_obj_obj (X : C) (n : ℤ) [t.IsLE X n] (j : EInt) (hj : n 
   | bot => simp at hj
   | coe j =>
     simp only [WithBotTop.coe_lt_coe] at hj
-    have := t.isLE_of_LE X n (j - 1) (by lia)
+    have := t.isLE_of_le X n (j - 1) (by lia)
     exact t.isZero_truncGE_obj_of_isLE (j - 1) j (by lia) _
   | top => simp
 

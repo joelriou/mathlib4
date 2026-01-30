@@ -254,7 +254,7 @@ lemma truncGEπ_naturality (n : ℤ) {X Y : C} (f : X ⟶ Y) :
 lemma isLE_truncLT_obj (X : C) (a b : ℤ) (hn : a ≤ b + 1 := by lia) :
     t.IsLE ((t.truncLT a).obj X) b := by
   have : t.IsLE ((t.truncLT a).obj X) (a - 1) := by dsimp [truncLT]; infer_instance
-  exact t.isLE_of_LE _ (a - 1) _ (by lia)
+  exact t.isLE_of_le _ (a - 1) _ (by lia)
 
 instance (X : C) (n : ℤ) : t.IsLE ((t.truncLT n).obj X) (n - 1) :=
   t.isLE_truncLT_obj ..
@@ -265,7 +265,7 @@ instance (X : C) (n : ℤ) : t.IsLE ((t.truncLT (n + 1)).obj X) n :=
 lemma isGE_truncGE_obj (X : C) (a b : ℤ) (hn : b ≤ a := by lia) :
     t.IsGE ((t.truncGE a).obj X) b := by
   have : t.IsGE ((t.truncGE a).obj X) a := by dsimp [truncGE]; infer_instance
-  exact t.isGE_of_GE _ _ a (by lia)
+  exact t.isGE_of_ge _ _ a (by lia)
 
 instance (X : C) (n : ℤ) : t.IsGE ((t.truncGE n).obj X) n :=
   t.isGE_truncGE_obj ..
@@ -610,15 +610,15 @@ instance : t.minus.IsTriangulated where
   exists_zero := ⟨0, isZero_zero C, 0, inferInstance⟩
   toIsTriangulatedClosed₂ := .mk' (fun T hT ↦ by
     rintro ⟨i₁, hi₁⟩ ⟨i₃, hi₃⟩
-    exact ⟨max i₁ i₃, t.isLE₂ T hT _ (t.isLE_of_LE _ _ _ (le_max_left i₁ i₃))
-      (t.isLE_of_LE _ _ _ (le_max_right i₁ i₃))⟩)
+    exact ⟨max i₁ i₃, t.isLE₂ T hT _ (t.isLE_of_le _ _ _ (le_max_left i₁ i₃))
+      (t.isLE_of_le _ _ _ (le_max_right i₁ i₃))⟩)
 
 instance : t.plus.IsTriangulated where
   exists_zero := ⟨0, isZero_zero C, 0, inferInstance⟩
   toIsTriangulatedClosed₂ := .mk' (fun T hT ↦ by
     rintro ⟨i₁, hi₁⟩ ⟨i₃, hi₃⟩
-    exact ⟨min i₁ i₃, t.isGE₂ T hT _ (t.isGE_of_GE _ _ _ (min_le_left i₁ i₃))
-      (t.isGE_of_GE _ _ _ (min_le_right i₁ i₃))⟩)
+    exact ⟨min i₁ i₃, t.isGE₂ T hT _ (t.isGE_of_ge _ _ _ (min_le_left i₁ i₃))
+      (t.isGE_of_ge _ _ _ (min_le_right i₁ i₃))⟩)
 
 instance : t.bounded.IsTriangulated := by
   dsimp [bounded]
@@ -660,13 +660,13 @@ lemma isIso_truncGE_map_iff {Y Z : C} (g : Y ⟶ Z) (n₀ n₁ : ℤ) (hn : n₀
 instance (X : C) (a b : ℤ) [t.IsLE X b] : t.IsLE ((t.truncLT a).obj X) b := by
   by_cases h : a ≤ b + 1
   · exact t.isLE_truncLT_obj ..
-  · have := (t.isLE_iff_isIso_truncLTι_app (a - 1) a (by lia) X).1 (t.isLE_of_LE _ b _ (by lia))
+  · have := (t.isLE_iff_isIso_truncLTι_app (a - 1) a (by lia) X).1 (t.isLE_of_le _ b _ (by lia))
     exact t.isLE_of_iso (show X ≅ _ from (asIso ((t.truncLTι a).app X)).symm) _
 
 instance (X : C) (a b : ℤ) [t.IsGE X a] : t.IsGE ((t.truncGE b).obj X) a := by
   by_cases h : a ≤ b
   · exact t.isGE_truncGE_obj ..
-  · have : t.IsGE X b := t.isGE_of_GE X b a (by lia)
+  · have : t.IsGE X b := t.isGE_of_ge X b a (by lia)
     exact t.isGE_of_iso (show X ≅ _ from asIso ((t.truncGEπ b).app X)) _
 
 /-- The composition `t.truncLT b ⋙ t.truncGE a`. -/
@@ -742,7 +742,7 @@ lemma isIso_truncGE_map_truncGEπ_app (a b : ℤ) (h : b ≤ a) (X : C) :
 lemma isIso_truncLT_map_truncLTι_app (a b : ℤ) (h : a ≤ b) (X : C) :
     IsIso ((t.truncLT a).map ((t.truncLTι b).app X)) :=
   t.isIso₁_truncLT_map_of_isGE _ (t.triangleLTGE_distinguished b X) a
-    (t.isGE_of_GE ((t.truncGE b).obj X) a b (by lia))
+    (t.isGE_of_ge ((t.truncGE b).obj X) a b (by lia))
 
 instance (X : C) (n : ℤ) : IsIso ((t.truncLT n).map ((t.truncLTι n).app X)) :=
   isIso_truncLT_map_truncLTι_app t _ _ (by rfl) X
