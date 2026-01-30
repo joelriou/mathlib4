@@ -6,8 +6,10 @@ Authors: Joël Riou
 module
 
 public import Mathlib.Algebra.Homology.ShortComplex.ShortExact
+public import Mathlib.CategoryTheory.Preadditive.Injective.LiftingProperties
 public import Mathlib.CategoryTheory.MorphismProperty.Composition
 public import Mathlib.CategoryTheory.MorphismProperty.Retract
+public import Mathlib.CategoryTheory.MorphismProperty.LiftingProperty
 
 /-!
 # Epimorphisms with an injective kernel
@@ -100,6 +102,29 @@ instance : (epiWithInjectiveKernel (C := C)).IsStableUnderRetracts where
       { i := kernel.map _ _ r.left.i r.right.i (by simp)
         r := kernel.map _ _ r.left.r r.right.r (by simp) }
     exact ⟨inferInstance, r'.injective⟩
+
+lemma epiWithInjectiveKernel.hasLiftingProperty
+    {X Y : C} {p : X ⟶ Y} (hp : epiWithInjectiveKernel p)
+    {A B : C} (i : A ⟶ B) [Mono i] :
+    HasLiftingProperty i p := by
+  suffices (MorphismProperty.monomorphisms C).rlp p from this _ (.infer_property _)
+  rw [epiWithInjectiveKernel_iff] at hp
+  obtain ⟨I, _, s, hs, ⟨σ⟩⟩ := hp
+  have hI : (MorphismProperty.monomorphisms C).rlp (0 : I ⟶ 0) := by
+    intro A B i (hi : Mono i)
+    exact Injective.hasLiftingProperty_of_isZero _ _ (isZero_zero C)
+  refine MorphismProperty.of_isPullback (f' := σ.r) (f := 0) ⟨by simp, ⟨?_⟩⟩ hI
+  refine PullbackCone.IsLimit.mk _ (fun t ↦ t.fst ≫ s + t.snd ≫ σ.s)
+    (fun t ↦ ?_) (fun t ↦ ?_) (fun t m hm₁ hm₂ ↦ ?_)
+  · have := σ.f_r
+    dsimp at this ⊢
+    simp [this]
+  · have := σ.s_g
+    dsimp
+    simp [hs, this]
+  · have := σ.id
+    dsimp at this ⊢
+    simp only [← hm₁, ← hm₂, Category.assoc, ← Preadditive.comp_add, this, comp_id]
 
 end Abelian
 
