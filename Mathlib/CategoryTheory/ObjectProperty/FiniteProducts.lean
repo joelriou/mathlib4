@@ -5,9 +5,9 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
+public import Mathlib.CategoryTheory.Limits.Constructions.FiniteProductsOfBinaryProducts
+public import Mathlib.CategoryTheory.Limits.FullSubcategory
 public import Mathlib.CategoryTheory.ObjectProperty.ContainsZero
-public import Mathlib.CategoryTheory.ObjectProperty.LimitsOfShape
 
 /-!
 # Properties of objects that are stable under finite products
@@ -44,6 +44,17 @@ lemma prop_of_isTerminal [P.IsClosedUnderLimitsOfShape (Discrete.{0} PEmpty)]
     P X :=
   P.prop_of_isLimit hX (by rintro ⟨⟨⟩⟩)
 
+lemma IsClosedUnderBinaryProducts.closedUnderIsomorphisms [HasTerminal C]
+    [P.IsClosedUnderLimitsOfShape (Discrete.{0} PEmpty)] [P.IsClosedUnderBinaryProducts] :
+    P.IsClosedUnderIsomorphisms where
+  of_iso {X Y} e hX := by
+    let h : IsLimit (BinaryFan.mk (terminal.from Y) e.inv) :=
+      BinaryFan.IsLimit.mk _ (fun _ f ↦ f ≫ e.hom) (by cat_disch) (by simp) (by cat_disch)
+    apply P.prop_of_isLimit h
+    rintro (_ | _)
+    · exact P.prop_of_isTerminal _ terminalIsTerminal
+    · exact hX
+
 /-- The typeclass saying that `P : ObjectProperty C` is stable under finite products. -/
 class IsClosedUnderFiniteProducts : Prop where
   isClosedUnderLimitsOfShape (J : Type) [Finite J] :
@@ -72,32 +83,9 @@ lemma IsClosedUnderFiniteProducts.mk' [HasFiniteProducts C]
     [P.IsClosedUnderLimitsOfShape (Discrete.{0} PEmpty)]
     [P.IsClosedUnderBinaryProducts] :
     P.IsClosedUnderFiniteProducts := by
-  suffices ∀ (J : Type) [Finite J], P.IsClosedUnderLimitsOfShape (Discrete J) from ⟨this⟩
-  intro J _
-  induction J using Finite.induction_empty_option with
-  | of_equiv e =>
-    exact IsClosedUnderLimitsOfShape.of_equivalence (Discrete.equivalence e)
-  | h_empty => infer_instance
-  | h_option =>
-    constructor
-    rintro X ⟨p⟩
-    have hc : IsLimit
-        (BinaryFan.mk (Pi.lift (fun j ↦ p.π.app (.mk (some j)))) (p.π.app (.mk none))) :=
-      BinaryFan.IsLimit.mk _
-        (fun f₁ f₂ ↦ p.isLimit.lift (Cone.mk _ (Discrete.natTrans (fun ⟨j⟩ ↦ by
-          induction j with
-          | some j => exact f₁ ≫ Pi.π _ j
-          | none => exact f₂))))
-        (fun _ _ ↦ by dsimp; ext; simp [p.isLimit.fac])
-        (fun _ _ ↦ by simp [p.isLimit.fac])
-        (fun f₁ f₂ l hl₁ hl₂ ↦ by
-          refine p.isLimit.hom_ext (fun ⟨j⟩ ↦ ?_)
-          induction j with
-          | some j => simp [p.isLimit.fac, ← hl₁]
-          | none => simpa [p.isLimit.fac])
-    refine P.prop_of_isLimit hc ?_
-    rintro ⟨_ | _⟩
-    · exact P.prop_limit _ (fun _ ↦ p.prop_diag_obj _)
-    · exact p.prop_diag_obj _
+  have := IsClosedUnderBinaryProducts.closedUnderIsomorphisms P
+  have := hasFiniteProducts_of_has_binary_and_terminal (C := P.FullSubcategory)
+  have := PreservesFiniteProducts.of_preserves_binary_and_terminal P.ι
+  exact ⟨fun J _ ↦ P.isClosedUnderLimitsOfShape_of_preservesLimitsOfShape_ι _⟩
 
 end CategoryTheory.ObjectProperty
