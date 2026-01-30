@@ -61,4 +61,9 @@ variable {K L : CochainComplex C ℤ} (φ : K ⟶ L)
 
 def monoUpTo (n : ℤ) : Prop := ∀ (i : ℤ) (_ : i ≤ n), Mono (φ.f i)
 
+lemma degreewiseEpiWithInjectiveKernel.epi {K L : CochainComplex C ℤ} {f : K ⟶ L}
+    (hf : degreewiseEpiWithInjectiveKernel f) :
+    Epi f :=
+  HomologicalComplex.epi_of_epi_f f (fun n ↦ (hf n).1)
+
 end CochainComplex

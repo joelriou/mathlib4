@@ -7,7 +7,9 @@ module
 
 public import Mathlib.Algebra.Homology.Factorizations.CM5a
 public import Mathlib.Algebra.Homology.ModelCategory.Lifting
+public import Mathlib.Algebra.Homology.HomologySequence
 public import Mathlib.Algebra.Homology.HomotopyCategory.Plus
+public import Mathlib.Algebra.Homology.HomotopyCategory.KInjective
 public import Mathlib.AlgebraicTopology.ModelCategory.Basic
 
 /-!
@@ -101,13 +103,11 @@ lemma cofibration_iff {X Y : Plus C} (f : X ⟶ Y) :
     Cofibration f ↔ Mono f :=
   HomotopicalAlgebra.cofibration_iff _
 
-variable [EnoughInjectives C]
-
 instance {A B : CochainComplex.Plus C} (i : A ⟶ B) [Cofibration i] :
     Mono i := by
   rwa [← cofibration_iff]
 
-/-open HomComplex in
+open HomComplex in
 lemma lifting {A B X Y : CochainComplex.Plus C} (i : A ⟶ B) (p : X ⟶ Y)
     [Mono i] [Fibration p] (hip : WeakEquivalence i ∨ WeakEquivalence p) :
     HasLiftingProperty i p where
@@ -136,7 +136,29 @@ lemma lifting {A B X Y : CochainComplex.Plus C} (i : A ⟶ B) (p : X ⟶ Y)
       infer_instance
     let β := Lifting.cocycle₁ sq (fun n ↦ { l := (sq' n).lift })
       (cokernelIsCokernel i) (kernelIsKernel p) (hπ := by simp) (hι := by simp)
-    obtain ⟨α, hα⟩ : ∃ (α : Cochain (cokernel i) (kernel p) 0), δ 0 1 α = β.1 := sorry
+    have (n : ℤ) : Injective ((kernel p).X n) :=
+      Injective.of_iso
+        (asIso (kernelComparison p (HomologicalComplex.eval _ _ n))).symm (hp n).2
+    have : (kernel p).IsKInjective := by
+      obtain ⟨d, hd⟩ := hX
+      have : (kernel p).IsStrictlyGE d := by
+        rw [isStrictlyGE_iff]
+        intro i hi
+        rw [IsZero.iff_id_eq_zero]
+        rw [← cancel_mono ((kernel.ι p).f i)]
+        apply (X.isZero_of_isStrictlyGE d i).eq_of_tgt
+      exact isKInjective_of_injective _ d
+    obtain ⟨α, hα⟩ : ∃ (α : Cochain (cokernel i) (kernel p) 0), δ 0 1 α = β.1 := by
+      obtain hip | hip := hip
+      · refine IsKInjective.eq_δ_of_cocycle β ?_ 0 (by simp)
+        have : (ShortComplex.mk _ _ (cokernel.condition i)).ShortExact :=
+          { exact := ShortComplex.exact_cokernel i }
+        exact this.acyclic_X₃ (by dsimp; infer_instance)
+      · refine IsKInjective.eq_δ_of_cocycle' β ?_ 0 (by simp)
+        have := hp.epi
+        have : (ShortComplex.mk _ _ (kernel.condition p)).ShortExact :=
+          { exact := ShortComplex.exact_kernel p }
+        exact this.acyclic_X₁ (by dsimp; infer_instance)
     exact Lifting.hasLift sq _ (cokernelIsCokernel _) (kernelIsKernel _)
       (hπ := by simp) (hι := by simp) α hα
 
@@ -149,6 +171,8 @@ instance {A B X Y : CochainComplex.Plus C} (i : A ⟶ B) (p : X ⟶ Y)
     [Cofibration i] [Fibration p] [WeakEquivalence p] :
     HasLiftingProperty i p :=
   lifting _ _ (Or.inr inferInstance)
+
+variable [EnoughInjectives C]
 
 instance : (trivialCofibrations (Plus C)).HasFactorization (fibrations (Plus C)) where
   nonempty_mapFactorizationData := by
@@ -183,7 +207,7 @@ instance : (cofibrations (Plus C)).HasFactorization (trivialFibrations (Plus C))
       hp := ⟨hp, by assumption⟩
     }⟩
 
-scoped instance : ModelCategory (CochainComplex.Plus C) where-/
+scoped instance : ModelCategory (CochainComplex.Plus C) where
 
 end modelCategoryQuillen
 
