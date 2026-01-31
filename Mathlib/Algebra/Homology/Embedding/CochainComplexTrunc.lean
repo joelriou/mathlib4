@@ -115,8 +115,8 @@ noncomputable def mapFiltrationLEMinus (f : K ⟶ L) :
 
 variable {K L} in
 @[simp]
-lemma ι_map_mapFiltrationLEMinus_app (f : K ⟶ L) (n : ℤ) :
-    (Minus.ι _).map ((mapFiltrationLEMinus f).app n) = truncLEMap f n := rfl
+lemma mapFiltrationLEMinus_app_hom (f : K ⟶ L) (n : ℤ) :
+    ((mapFiltrationLEMinus f).app n).hom = truncLEMap f n := rfl
 
 variable (C)
 
@@ -125,14 +125,6 @@ noncomputable def filtrationLEMinusFunctor :
     CochainComplex C ℤ ⥤ ℤ ⥤ Minus C where
   obj K := K.filtrationLEMinus
   map {K L} f := mapFiltrationLEMinus f
-  map_id K := by
-    ext n : 2
-    apply (Minus.ι _).map_injective
-    simp
-  map_comp _ _ := by
-    ext n : 2
-    apply (Minus.ι _).map_injective
-    simp
 
 @[simps!]
 noncomputable def filtrationLEMinusFunctorCompWhiskeringRightObjιIso :

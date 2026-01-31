@@ -231,27 +231,27 @@ noncomputable def minusResolutionNatTrans :
     rw [HomologicalComplex₂.singleRow₀ObjTotal_hom_naturality]
 
 lemma quasiIso_minusResolutionNatTrans_app (K : CochainComplex.Minus A) :
-    Minus.quasiIso (Λ.minusResolutionNatTrans.app K) :=
+    Minus.quasiIso _ (Λ.minusResolutionNatTrans.app K) :=
   inferInstanceAs (QuasiIso (Λ.totalπ K))
 
 instance (K : CochainComplex.Minus A) :
-    QuasiIso ((Minus.ι A).map (Λ.minusResolutionNatTrans.app K)) :=
+    QuasiIso (Λ.minusResolutionNatTrans.app K).hom :=
   Λ.quasiIso_minusResolutionNatTrans_app K
-
 
 instance (K : Minus A) :
     QuasiIso ((Functor.whiskerRight Λ.minusResolutionNatTrans (Minus.ι A)).app K) := by
   dsimp; infer_instance
 
 lemma quasiIso_minusResolutionFunctor_map {K L : CochainComplex.Minus A} (f : K ⟶ L)
-    (hf : Minus.quasiIso f) :
-    Minus.quasiIso (ι.mapCochainComplexMinus.map (Λ.minusResolutionFunctor.map f)) := by
+    (hf : Minus.quasiIso _ f) :
+    Minus.quasiIso _ (ι.mapCochainComplexMinus.map (Λ.minusResolutionFunctor.map f)) := by
+  have : QuasiIso f.hom := hf
   have eq := (CochainComplex.Minus.ι _).congr_map (Λ.minusResolutionNatTrans.naturality f)
   dsimp at eq
-  simp only [Functor.map_comp] at eq
   change QuasiIso _
-  rw [← quasiIso_iff_comp_right _ ((Minus.ι A).map (Λ.minusResolutionNatTrans.app L)), eq]
-  have : QuasiIso ((Minus.ι A).map f) := hf
+  rw [← quasiIso_iff_comp_right _ (Λ.minusResolutionNatTrans.app L).hom]
+  dsimp
+  rw [eq]
   infer_instance
 
 end
