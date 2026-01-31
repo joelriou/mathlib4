@@ -12,6 +12,15 @@ public import Mathlib.CategoryTheory.Localization.CalculusOfFractions.OfAdjuncti
 /-!
 # The homotopy category of bifibrant objects
 
+We construct the homotopy category `BifibrantObject.HoCat C` of bifibrant
+objects in a model category `C` and show that the functor
+`BifibrantObject.toHoCat : BifibrantObject C ⥤ BifibrantObject.HoCat C`
+is a localization functor with respect to weak equivalences.
+We also show that certain localizer morphisms are localized weak equivalences,
+which can be understood by saying that we obtain the same localized
+category (up to equivalence) by inverting weak equivalences in `C`,
+`CofibrantObject C`, `FibrantObject C` or `BifibrantObject C`.
+
 -/
 
 @[expose] public section
@@ -99,7 +108,7 @@ lemma inverts_iff_factors (F : BifibrantObject C ⥤ D) :
 /-- The strict universal property of the localization with respect
 to weak equivalences for the quotient functor
 `toHoCat : BifibrantObject C ⥤ BifibrantObject.HoCat C`. -/
-def strictUniversalPropertyFixedTargetToπ :
+def strictUniversalPropertyFixedTargetToHoCat :
     Localization.StrictUniversalPropertyFixedTarget
       toHoCat (weakEquivalences (BifibrantObject C)) D where
   inverts := by
@@ -114,7 +123,8 @@ def strictUniversalPropertyFixedTargetToπ :
 end
 
 instance : toHoCat.IsLocalization (weakEquivalences (BifibrantObject C)) :=
-  .mk' _ _ strictUniversalPropertyFixedTargetToπ strictUniversalPropertyFixedTargetToπ
+  .mk' _ _ strictUniversalPropertyFixedTargetToHoCat
+    strictUniversalPropertyFixedTargetToHoCat
 
 instance {X Y : BifibrantObject C} (f : X ⟶ Y) [hf : WeakEquivalence f] :
     IsIso (toHoCat.map f) :=
@@ -204,7 +214,7 @@ lemma HoCat.ιCofibrantObject_map_toHoCat_map {X Y : BifibrantObject C} (f : X �
 
 /-- The isomomorphism
 `toHoCat ⋙ HoCat.ιCofibrantObject ≅ ιCofibrantObject ⋙ CofibrantObject.toHoCat`
-between functors `BifibrantObject C ⥤ CofibrantObject.π C`. -/
+between functors `BifibrantObject C ⥤ CofibrantObject.HoCat C`. -/
 def toHoCatCompιCofibrantObject :
     toHoCat (C := C) ⋙ HoCat.ιCofibrantObject ≅
       ιCofibrantObject ⋙ CofibrantObject.toHoCat := Iso.refl _
@@ -216,7 +226,7 @@ namespace CofibrantObject
 lemma exists_bifibrant (X : CofibrantObject C) :
     ∃ (Y : BifibrantObject C) (i : X ⟶ BifibrantObject.ιCofibrantObject.obj Y),
       Cofibration (ι.map i) ∧ WeakEquivalence (ι.map i) := by
-  have h := MorphismProperty.factorizationData (trivialCofibrations C) (fibrations C)
+  let h := MorphismProperty.factorizationData (trivialCofibrations C) (fibrations C)
       (terminal.from X.obj)
   have := isCofibrant_of_cofibration h.i
   have : IsFibrant h.Z := by
@@ -488,6 +498,11 @@ instance : (ιCofibrantObjectLocalizerMorphism C).IsLocalizedEquivalence := by
     (ιCofibrantObjectLocalizerMorphism C) BifibrantObject.toHoCat
     (CofibrantObject.toHoCat ⋙ CofibrantObject.HoCat.bifibrantResolution) (𝟭 _)
 
+instance {D : Type*} [Category D] (L : CofibrantObject C ⥤ D)
+    [L.IsLocalization (weakEquivalences _)] :
+    (ιCofibrantObject ⋙ L).IsLocalization (weakEquivalences _) :=
+  inferInstanceAs (((ιCofibrantObjectLocalizerMorphism C).functor ⋙ L).IsLocalization _)
+
 instance : (localizerMorphism C).IsLocalizedEquivalence :=
   inferInstanceAs ((ιCofibrantObjectLocalizerMorphism C).comp
     (CofibrantObject.localizerMorphism C)).IsLocalizedEquivalence
@@ -506,9 +521,8 @@ instance : (ιFibrantObjectLocalizerMorphism C).IsLocalizedEquivalence := by
 
 instance {D : Type*} [Category D] (L : FibrantObject C ⥤ D)
     [L.IsLocalization (weakEquivalences _)] :
-    (ιFibrantObject ⋙ L).IsLocalization (weakEquivalences _) := by
-  change ((ιFibrantObjectLocalizerMorphism C).functor ⋙ L).IsLocalization _
-  infer_instance
+    (ιFibrantObject ⋙ L).IsLocalization (weakEquivalences _) :=
+  inferInstanceAs (((ιFibrantObjectLocalizerMorphism C).functor ⋙ L).IsLocalization _)
 
 end BifibrantObject
 

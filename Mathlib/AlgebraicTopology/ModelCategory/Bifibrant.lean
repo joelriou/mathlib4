@@ -223,10 +223,9 @@ abbrev ιCofibrantObject : BifibrantObject C ⥤ CofibrantObject C :=
 abbrev ιFibrantObject : BifibrantObject C ⥤ FibrantObject C :=
   ObjectProperty.ιOfLE (bifibrantObjects_le_fibrantObject C)
 
-instance (X : BifibrantObject C) : IsFibrant (ιCofibrantObject.obj X).obj := X.2.2
+instance (X : BifibrantObject C) : IsCofibrant (ιFibrantObject.obj X).obj := X.property.1
 
-instance (X : BifibrantObject C) : IsCofibrant (ιFibrantObject.obj X).obj := X.2.1
-
+instance (X : BifibrantObject C) : IsFibrant (ιCofibrantObject.obj X).obj := X.property.2
 
 end BifibrantObject
 
