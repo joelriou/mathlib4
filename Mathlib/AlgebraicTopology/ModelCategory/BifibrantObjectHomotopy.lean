@@ -8,6 +8,7 @@ module
 public import Mathlib.AlgebraicTopology.ModelCategory.DerivabilityStructureCofibrant
 public import Mathlib.AlgebraicTopology.ModelCategory.DerivabilityStructureFibrant
 public import Mathlib.CategoryTheory.Localization.CalculusOfFractions.OfAdjunction
+public import Mathlib.CategoryTheory.Quotient.LocallySmall
 
 /-!
 # The homotopy category of bifibrant objects
@@ -25,11 +26,13 @@ category (up to equivalence) by inverting weak equivalences in `C`,
 
 @[expose] public section
 
+universe w v u
+
 open CategoryTheory Limits
 
 namespace HomotopicalAlgebra
 
-variable {C : Type*} [Category* C] [ModelCategory C]
+variable {C : Type u} [Category.{v} C] [ModelCategory C]
 
 namespace BifibrantObject
 
@@ -78,6 +81,10 @@ lemma toHoCat_map_eq {X Y : BifibrantObject C} {f g : X ⟶ Y}
 lemma toHoCat_map_eq_iff {X Y : BifibrantObject C} (f g : X ⟶ Y) :
     toHoCat.map f = toHoCat.map g ↔ homRel C f g :=
   Quotient.functor_map_eq_iff _ _ _
+
+instance [LocallySmall.{w} C] : LocallySmall.{w} (HoCat C) := by
+  dsimp [HoCat]
+  infer_instance
 
 section
 
@@ -525,5 +532,11 @@ instance {D : Type*} [Category D] (L : FibrantObject C ⥤ D)
   inferInstanceAs (((ιFibrantObjectLocalizerMorphism C).functor ⋙ L).IsLocalization _)
 
 end BifibrantObject
+
+lemma locallySmall_of_isLocalization {D : Type*} [Category* D]
+    (L : C ⥤ D) [L.IsLocalization (weakEquivalences C)] [LocallySmall.{w} C] :
+    LocallySmall.{w} D :=
+  locallySmall_of_faithful ((BifibrantObject.localizerMorphism C).localizedFunctor
+    BifibrantObject.toHoCat L).inv
 
 end HomotopicalAlgebra
