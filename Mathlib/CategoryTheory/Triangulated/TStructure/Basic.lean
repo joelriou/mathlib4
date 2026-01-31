@@ -29,13 +29,6 @@ use depending on the context.
 
 ## TODO
 
-<<<<<<< HEAD
-=======
-
-* define functors `t.truncLE n : C ⥤ C`, `t.truncGE n : C ⥤ C` and the
-  associated distinguished triangles
-* promote these truncations to a (functorial) spectral object
->>>>>>> origin/master
 * define the heart of `t` and show it is an abelian category
 
 ## References
