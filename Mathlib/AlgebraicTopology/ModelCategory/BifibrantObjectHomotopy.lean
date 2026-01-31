@@ -16,6 +16,10 @@ We construct the homotopy category `BifibrantObject.HoCat C` of bifibrant
 objects in a model category `C` and show that the functor
 `BifibrantObject.toHoCat : BifibrantObject C ⥤ BifibrantObject.HoCat C`
 is a localization functor with respect to weak equivalences.
+We also show that certain localizer morphisms are localized weak equivalences,
+which can be understood by saying that we obtain the same localized
+category (up to equivalence) by inverting weak equivalences in `C`,
+`CofibrantObject C`, `FibrantObject C` or `BifibrantObject C`.
 
 -/
 
@@ -454,5 +458,72 @@ instance : HoCat.bifibrantResolution.IsLocalization (weakEquivalences (HoCat C))
     infer_instance)
 
 end CofibrantObject
+
+namespace BifibrantObject
+
+variable (C) in
+/-- The inclusion `BifibrantObject C ⥤ C`, as a localizer morphism. -/
+def localizerMorphism :
+    LocalizerMorphism (weakEquivalences (BifibrantObject C)) (weakEquivalences C) where
+  functor := ι
+  map := by rfl
+
+variable (C) in
+/-- The inclusion `BifibrantObject C ⥤ CofibrantObject C`, as a localizer morphism. -/
+@[simps]
+def ιCofibrantObjectLocalizerMorphism :
+    LocalizerMorphism (weakEquivalences (BifibrantObject C))
+      (weakEquivalences (CofibrantObject C)) where
+  functor := ιCofibrantObject
+  map _ _ _ h := h
+
+variable (C) in
+/-- The inclusion `BifibrantObject C ⥤ FibrantObject C`, as a localizer morphism. -/
+@[simps]
+def ιFibrantObjectLocalizerMorphism :
+    LocalizerMorphism (weakEquivalences (BifibrantObject C))
+      (weakEquivalences (FibrantObject C)) where
+  functor := ιFibrantObject
+  map _ _ _ h := h
+
+open Functor
+
+instance : (ιCofibrantObjectLocalizerMorphism C).IsLocalizedEquivalence := by
+  have : CatCommSq (ιCofibrantObjectLocalizerMorphism C).functor toHoCat
+      (CofibrantObject.toHoCat ⋙ CofibrantObject.HoCat.bifibrantResolution) (𝟭 _) :=
+    ⟨(associator _ _ _).symm ≪≫
+      isoWhiskerRight toHoCatCompιCofibrantObject.symm _ ≪≫
+      associator _ _ _ ≪≫ isoWhiskerLeft _ (asIso CofibrantObject.HoCat.adj.counit)⟩
+  exact LocalizerMorphism.IsLocalizedEquivalence.mk'
+    (ιCofibrantObjectLocalizerMorphism C) BifibrantObject.toHoCat
+    (CofibrantObject.toHoCat ⋙ CofibrantObject.HoCat.bifibrantResolution) (𝟭 _)
+
+instance {D : Type*} [Category D] (L : CofibrantObject C ⥤ D)
+    [L.IsLocalization (weakEquivalences _)] :
+    (ιCofibrantObject ⋙ L).IsLocalization (weakEquivalences _) :=
+  inferInstanceAs (((ιCofibrantObjectLocalizerMorphism C).functor ⋙ L).IsLocalization _)
+
+instance : (localizerMorphism C).IsLocalizedEquivalence :=
+  inferInstanceAs ((ιCofibrantObjectLocalizerMorphism C).comp
+    (CofibrantObject.localizerMorphism C)).IsLocalizedEquivalence
+
+instance {D : Type*} [Category* D] (L : C ⥤ D)
+    [L.IsLocalization (weakEquivalences C)] :
+    (ι ⋙ L).IsLocalization (weakEquivalences (BifibrantObject C)) :=
+  inferInstanceAs (((localizerMorphism C).functor ⋙ L).IsLocalization _)
+
+instance : (ιFibrantObjectLocalizerMorphism C).IsLocalizedEquivalence := by
+  let L := FibrantObject.ι ⋙ (weakEquivalences C).Q
+  have : ((ιFibrantObjectLocalizerMorphism C).functor ⋙ L).IsLocalization
+    (weakEquivalences _) :=
+    inferInstanceAs ((ι ⋙ (weakEquivalences C).Q).IsLocalization (weakEquivalences _))
+  exact LocalizerMorphism.IsLocalizedEquivalence.of_isLocalization_of_isLocalization _ L
+
+instance {D : Type*} [Category D] (L : FibrantObject C ⥤ D)
+    [L.IsLocalization (weakEquivalences _)] :
+    (ιFibrantObject ⋙ L).IsLocalization (weakEquivalences _) :=
+  inferInstanceAs (((ιFibrantObjectLocalizerMorphism C).functor ⋙ L).IsLocalization _)
+
+end BifibrantObject
 
 end HomotopicalAlgebra
