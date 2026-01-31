@@ -38,6 +38,19 @@ and have an injective kernel. -/
 def epiWithInjectiveKernel : MorphismProperty C :=
   fun _ _ f => Epi f ∧ Injective (kernel f)
 
+/-- The class of morphisms in an abelian category that are monomorphisms
+and have a projective kernel. -/
+def monoWithProjectiveCokernel : MorphismProperty C :=
+  fun _ _ f => Mono f ∧ Projective (cokernel f)
+
+lemma monoWithProjectiveCokernel_eq_unop :
+    monoWithProjectiveCokernel (C := C) =
+      epiWithInjectiveKernel.unop := by
+  ext X Y f
+  dsimp [monoWithProjectiveCokernel, epiWithInjectiveKernel]
+  apply and_congr (by simp)
+  rw [Injective.projective_iff_injective_op, Injective.iso_iff (kernelOpOp f).symm]
+
 /-- A morphism `g : X ⟶ Y` is epi with an injective kernel iff there exists a morphism
 `f : I ⟶ X` with `I` injective such that `f ≫ g = 0` and
 the short complex `I ⟶ X ⟶ Y` has a splitting. -/
@@ -125,6 +138,14 @@ lemma epiWithInjectiveKernel.hasLiftingProperty
   · have := σ.id
     dsimp at this ⊢
     simp only [← hm₁, ← hm₂, Category.assoc, ← Preadditive.comp_add, this, comp_id]
+
+instance : (monoWithProjectiveCokernel : MorphismProperty C).IsMultiplicative := by
+  rw [monoWithProjectiveCokernel_eq_unop]
+  infer_instance
+
+instance : (monoWithProjectiveCokernel : MorphismProperty C).IsStableUnderRetracts := by
+  rw [monoWithProjectiveCokernel_eq_unop]
+  infer_instance
 
 end Abelian
 

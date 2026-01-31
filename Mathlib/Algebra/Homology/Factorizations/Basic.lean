@@ -6,6 +6,7 @@ Authors: Joël Riou
 module
 
 public import Mathlib.Algebra.Homology.HomologicalComplex
+public import Mathlib.Algebra.Homology.CochainComplexOpposite
 public import Mathlib.CategoryTheory.Abelian.EpiWithInjectiveKernel
 
 /-!
@@ -65,5 +66,36 @@ lemma degreewiseEpiWithInjectiveKernel.epi {K L : CochainComplex C ℤ} {f : K �
     (hf : degreewiseEpiWithInjectiveKernel f) :
     Epi f :=
   HomologicalComplex.epi_of_epi_f f (fun n ↦ (hf n).1)
+
+/-- A morphism of cochain complexes `φ` in an abelian category satisfies
+`degreewiseMonoWithProjectiveKernel φ` if for any `i : ℤ`, the morphism
+`φ.f i` is a monomorphism with a projective kernel. -/
+def degreewiseMonoWithProjectiveCokernel : MorphismProperty (CochainComplex C ℤ) :=
+  fun _ _ φ => ∀ (i : ℤ), monoWithProjectiveCokernel (φ.f i)
+
+lemma degreewiseMonoWithProjectiveKernel.mono {K L : CochainComplex C ℤ} {f : K ⟶ L}
+    (hf : degreewiseMonoWithProjectiveCokernel f) :
+    Mono f :=
+  HomologicalComplex.mono_of_mono_f f (fun n ↦ (hf n).1)
+
+lemma degreewiseMonoWithProjectiveCokernel_eq_unop :
+    degreewiseMonoWithProjectiveCokernel (C := C) =
+      (degreewiseEpiWithInjectiveKernel (C := Cᵒᵖ)).op.inverseImage
+        (opEquivalence C).functor.rightOp := by
+  ext K L f
+  simp only [degreewiseMonoWithProjectiveCokernel, monoWithProjectiveCokernel_eq_unop,
+    MorphismProperty.unop, MorphismProperty.inverseImage_iff, MorphismProperty.op,
+    degreewiseEpiWithInjectiveKernel, Functor.rightOp_obj, Functor.rightOp_map, Quiver.Hom.unop_op]
+  refine ⟨fun h n ↦ h _, fun h n ↦ ?_⟩
+  obtain ⟨m, rfl⟩ : ∃ m, n = - m := ⟨-n, by simp⟩
+  apply h
+
+instance : (degreewiseMonoWithProjectiveCokernel (C := C)).IsMultiplicative := by
+  rw [degreewiseMonoWithProjectiveCokernel_eq_unop]
+  infer_instance
+
+instance : (degreewiseMonoWithProjectiveCokernel (C := C)).IsStableUnderRetracts := by
+  rw [degreewiseMonoWithProjectiveCokernel_eq_unop]
+  infer_instance
 
 end CochainComplex
