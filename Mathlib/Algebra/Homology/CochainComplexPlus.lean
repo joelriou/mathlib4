@@ -21,24 +21,24 @@ namespace CochainComplex
 
 variable (C : Type*) [Category C]
 
-protected def minus [HasZeroMorphisms C] : ObjectProperty (CochainComplex C ℤ) :=
-  fun K ↦ ∃ (n : ℤ), K.IsStrictlyLE n
+protected def plus [HasZeroMorphisms C] : ObjectProperty (CochainComplex C ℤ) :=
+  fun K ↦ ∃ (n : ℤ), K.IsStrictlyGE n
 
-instance [HasZeroMorphisms C] : (CochainComplex.minus C).IsClosedUnderIsomorphisms where
+instance [HasZeroMorphisms C] : (CochainComplex.plus C).IsClosedUnderIsomorphisms where
   of_iso := by
     rintro _ _ e ⟨n, _⟩
-    exact ⟨n, isStrictlyLE_of_iso e n⟩
+    exact ⟨n, isStrictlyGE_of_iso e n⟩
 
-abbrev Minus [HasZeroMorphisms C] :=
-  (CochainComplex.minus C).FullSubcategory
+abbrev Plus [HasZeroMorphisms C] :=
+  (CochainComplex.plus C).FullSubcategory
 
-namespace Minus
+namespace Plus
 
 section
 
 variable [HasZeroMorphisms C]
 
-abbrev ι : Minus C ⥤ CochainComplex C ℤ := ObjectProperty.ι _
+abbrev ι : Plus C ⥤ CochainComplex C ℤ := ObjectProperty.ι _
 
 def fullyFaithfulι : (ι C).FullyFaithful :=
   ObjectProperty.fullyFaithfulι _
@@ -46,25 +46,25 @@ def fullyFaithfulι : (ι C).FullyFaithful :=
 instance : (ι C).Full := ObjectProperty.full_ι _
 instance : (ι C).Faithful := ObjectProperty.faithful_ι _
 
-def quasiIso [CategoryWithHomology C] : MorphismProperty (Minus C) :=
+def quasiIso [CategoryWithHomology C] : MorphismProperty (Plus C) :=
   (HomologicalComplex.quasiIso C (ComplexShape.up ℤ)).inverseImage (ι C)
 
 end
 
 variable [Preadditive C]
 
-noncomputable instance : HasShift (Minus C) ℤ :=
+noncomputable instance : HasShift (Plus C) ℤ :=
   (fullyFaithfulι C).hasShift
     (fun (n : ℤ) => ObjectProperty.lift _
-    (Minus.ι C ⋙ CategoryTheory.shiftFunctor (CochainComplex C ℤ) n) (by
+    (Plus.ι C ⋙ CategoryTheory.shiftFunctor (CochainComplex C ℤ) n) (by
       rintro ⟨K, k, hk⟩
-      exact ⟨k - n, K.isStrictlyLE_shift k n _ (by omega)⟩))
+      exact ⟨k - n, K.isStrictlyGE_shift k n _ (by omega)⟩))
     (fun n => ObjectProperty.liftCompιIso _ _ _)
 
 instance : (ι C).CommShift ℤ :=
   Functor.CommShift.ofHasShiftOfFullyFaithful _ _ _
 
-end Minus
+end Plus
 
 end CochainComplex
 
@@ -78,16 +78,16 @@ section
 
 variable [HasZeroMorphisms C] [HasZeroMorphisms D] [F.PreservesZeroMorphisms]
 
-def mapCochainComplexMinus : CochainComplex.Minus C ⥤ CochainComplex.Minus D :=
-  ObjectProperty.lift _ (CochainComplex.Minus.ι C ⋙ F.mapHomologicalComplex _) (fun K => by
+def mapCochainComplexPlus : CochainComplex.Plus C ⥤ CochainComplex.Plus D :=
+  ObjectProperty.lift _ (CochainComplex.Plus.ι C ⋙ F.mapHomologicalComplex _) (fun K => by
     obtain ⟨i, hi⟩ := K.2
     refine ⟨i, ?_⟩
-    dsimp [CochainComplex.Minus.ι]
+    dsimp [CochainComplex.Plus.ι]
     infer_instance)
 
-def mapCochainComplexMinusCompι :
-    F.mapCochainComplexMinus ⋙ CochainComplex.Minus.ι D ≅
-      CochainComplex.Minus.ι C ⋙ F.mapHomologicalComplex _ := Iso.refl _
+def mapCochainComplexPlusCompι :
+    F.mapCochainComplexPlus ⋙ CochainComplex.Plus.ι D ≅
+      CochainComplex.Plus.ι C ⋙ F.mapHomologicalComplex _ := Iso.refl _
 
 end
 

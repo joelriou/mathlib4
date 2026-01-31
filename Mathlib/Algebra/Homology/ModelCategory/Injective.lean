@@ -13,7 +13,7 @@ public import Mathlib.Algebra.Homology.HomotopyCategory.KInjective
 public import Mathlib.AlgebraicTopology.ModelCategory.Basic
 
 /-!
-# Factorization lemma
+# The model category structure on C^+
 
 -/
 
@@ -64,8 +64,8 @@ instance : HasFiniteColimits (Plus C) where
   out J _ _ := by infer_instance
 
 lemma mono_iff {X Y : Plus C} (f : X ⟶ Y) :
-    Mono f ↔ Mono f.hom := by
-  refine ⟨fun _ ↦ inferInstanceAs (Mono ((ι C).map f)),
+    Mono f ↔ Mono f.hom :=
+  ⟨fun _ ↦ inferInstanceAs (Mono ((ι C).map f)),
     fun _ ↦ Functor.mono_of_mono_map (ι C) (by assumption)⟩
 
 namespace modelCategoryQuillen
@@ -102,6 +102,14 @@ instance : (fibrations (Plus C)).IsStableUnderRetracts :=
 lemma cofibration_iff {X Y : Plus C} (f : X ⟶ Y) :
     Cofibration f ↔ Mono f :=
   HomotopicalAlgebra.cofibration_iff _
+
+lemma fibration_iff {X Y : Plus C} (f : X ⟶ Y) :
+    Fibration f ↔ degreewiseEpiWithInjectiveKernel f.hom :=
+  HomotopicalAlgebra.fibration_iff _
+
+lemma weakEquivalence_iff {X Y : Plus C} (f : X ⟶ Y) :
+    WeakEquivalence f ↔ QuasiIso f.hom :=
+  HomotopicalAlgebra.weakEquivalence_iff _
 
 instance {A B : CochainComplex.Plus C} (i : A ⟶ B) [Cofibration i] :
     Mono i := by

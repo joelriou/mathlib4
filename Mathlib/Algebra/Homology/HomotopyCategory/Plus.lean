@@ -8,6 +8,7 @@ module
 public import Mathlib.Algebra.Homology.HomotopyCategory.Triangulated
 public import Mathlib.Algebra.Homology.HomotopyCategory.SingleFunctors
 public import Mathlib.Algebra.Homology.DerivedCategory.Basic
+public import Mathlib.Algebra.Homology.CochainComplexPlus
 public import Mathlib.Algebra.Homology.Embedding.CochainComplex
 public import Mathlib.CategoryTheory.Triangulated.Subcategory
 public import Mathlib.CategoryTheory.Shift.SingleFunctorsLift
@@ -24,25 +25,6 @@ open CategoryTheory Category Limits Triangulated ZeroObject Pretriangulated
 variable (C : Type _) [Category C] [Preadditive C] [HasZeroObject C] [HasBinaryBiproducts C]
   {D : Type _} [Category D] [Preadditive D] [HasZeroObject D] [HasBinaryBiproducts D]
   (A : Type _) [Category A] [Abelian A]
-
-namespace CochainComplex
-
-protected def plus : ObjectProperty (CochainComplex C ℤ) :=
-  fun K ↦ ∃ (n : ℤ), CochainComplex.IsStrictlyGE K n
-
-abbrev Plus := (CochainComplex.plus C).FullSubcategory
-
-namespace Plus
-
-abbrev ι : Plus C ⥤ CochainComplex C ℤ := (CochainComplex.plus C).ι
-
-def fullyFaithfulι : (ι C).FullyFaithful := ObjectProperty.fullyFaithfulι _
-
-def quasiIso : MorphismProperty (Plus A) := (HomologicalComplex.quasiIso A _).inverseImage (ι A)
-
-end Plus
-
-end CochainComplex
 
 namespace HomotopyCategory
 

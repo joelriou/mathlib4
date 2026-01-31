@@ -551,6 +551,7 @@ public import Mathlib.Algebra.Homology.BifunctorTriangulated
 public import Mathlib.Algebra.Homology.CategoryWithHomology
 public import Mathlib.Algebra.Homology.CochainComplexMinus
 public import Mathlib.Algebra.Homology.CochainComplexOpposite
+public import Mathlib.Algebra.Homology.CochainComplexPlus
 public import Mathlib.Algebra.Homology.CommSq
 public import Mathlib.Algebra.Homology.ComplexShape
 public import Mathlib.Algebra.Homology.ComplexShapeSigns
@@ -664,6 +665,7 @@ public import Mathlib.Algebra.Homology.LocalCohomology
 public import Mathlib.Algebra.Homology.Localization
 public import Mathlib.Algebra.Homology.ModelCategory.Injective
 public import Mathlib.Algebra.Homology.ModelCategory.Lifting
+public import Mathlib.Algebra.Homology.ModelCategory.Projective
 public import Mathlib.Algebra.Homology.Monoidal
 public import Mathlib.Algebra.Homology.ObjectProperty
 public import Mathlib.Algebra.Homology.Opposite
