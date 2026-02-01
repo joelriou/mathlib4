@@ -24,6 +24,10 @@ variable {C₁ C₂ D₁ D₂ : Type*} [Category C₁] [Category C₂] [Category
   {W₂ : MorphismProperty C₂} {W₂' : MorphismProperty D₂}
   {T : LocalizerMorphism W₁ W₂} {L : LocalizerMorphism W₁ W₁'}
   {R : LocalizerMorphism W₂ W₂'} {B : LocalizerMorphism W₁' W₂'}
+
+section
+
+variable
   [T.IsLeftDerivabilityStructure] [W₂'.RespectsIso]
   [L.IsLocalizedEquivalence] [R.IsLocalizedEquivalence] [R.functor.EssSurj]
   (iso : T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor)
@@ -52,6 +56,41 @@ lemma isLeftDerivabilityStructure_of_isLocalizedEquivalence :
     simp [e', CatCommSq.iso, iso']
   rw [B.isLeftDerivabilityStructure_iff W₁'.Q W₂'.Q F e']
   apply TwoSquare.GuitartExact.of_hComp iso.inv
+
+end
+
+variable [W₁'.RespectsIso] [W₂'.RespectsIso] [L.IsInduced] [L.functor.IsEquivalence]
+  [R.IsInduced] [R.functor.IsEquivalence]
+  (iso : T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor)
+
+lemma isLeftDerivabilityStructure_of_equivalences
+    [T.IsLeftDerivabilityStructure]
+    (iso : T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor) :
+    B.IsLeftDerivabilityStructure := by
+  have := L.isLocalizedEquivalence_of_isInduced
+  have := R.isLocalizedEquivalence_of_isInduced
+  exact isLeftDerivabilityStructure_of_isLocalizedEquivalence iso
+
+open Functor in
+lemma isLeftDerivabilityStructure_iff_of_equivalences
+    (iso : T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor) :
+    T.IsLeftDerivabilityStructure ↔ B.IsLeftDerivabilityStructure :=
+  ⟨fun _ ↦ isLeftDerivabilityStructure_of_equivalences iso, fun _ ↦ by
+    let e : B.functor ⋙ R.inv.functor ≅ L.inv.functor ⋙ T.functor :=
+      (leftUnitor _).symm ≪≫
+        isoWhiskerRight L.functor.asEquivalence.counitIso.symm _ ≪≫
+        associator _ _ _ ≪≫ isoWhiskerLeft _ (associator _ _ _).symm ≪≫
+        isoWhiskerLeft _ (isoWhiskerRight iso.symm R.inv.functor) ≪≫
+        isoWhiskerLeft _ (associator _ _ _) ≪≫
+        isoWhiskerLeft _ (isoWhiskerLeft _ R.functor.asEquivalence.unitIso.symm) ≪≫
+        (associator _ _ _).symm ≪≫ rightUnitor _
+    have : W₁.RespectsIso := by
+      rw [← L.inverseImage_eq]
+      infer_instance
+    have : W₂.RespectsIso := by
+      rw [← R.inverseImage_eq]
+      infer_instance
+    exact isLeftDerivabilityStructure_of_equivalences e⟩
 
 end LocalizerMorphism
 

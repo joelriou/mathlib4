@@ -728,6 +728,8 @@ lemma unop_associator {E E' : Type*} [Category* E] [Category* E']
         isoWhiskerRight (Functor.unopComp _ _).symm H.unop ≪≫ (Functor.unopComp _ _).symm := by
   cat_disch
 
+instance (α : F ⟶ G) [IsIso α] : IsIso (NatTrans.op α) := (NatIso.op (asIso α)).isIso_hom
+
 end NatIso
 
 namespace Equivalence

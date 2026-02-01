@@ -305,6 +305,45 @@ instance [Φ.IsInduced] : Φ.op.IsInduced where
     simp only [← Φ.inverseImage_eq]
     rfl
 
+section
+
+variable [Φ.functor.IsEquivalence] [Φ.IsInduced] [W₂.RespectsIso]
+
+@[simps]
+noncomputable def inv :
+    LocalizerMorphism W₂ W₁ where
+  functor := Φ.functor.inv
+  map := by
+    simp only [← Φ.inverseImage_eq]
+    intro X Y f hf
+    exact (W₂.arrow_mk_iso_iff (Arrow.isoMk (Φ.functor.asEquivalence.counitIso.app _)
+      (Φ.functor.asEquivalence.counitIso.app _))).2 hf
+
+instance : Φ.inv.functor.IsEquivalence := by
+  dsimp
+  infer_instance
+
+instance : Φ.inv.IsInduced where
+  inverseImage_eq := by
+    ext X Y f
+    simp only [← Φ.inverseImage_eq]
+    exact (W₂.arrow_mk_iso_iff (Arrow.isoMk (Φ.functor.asEquivalence.counitIso.app _)
+      (Φ.functor.asEquivalence.counitIso.app _)))
+
+lemma isLocalizedEquivalence_of_isInduced :
+    Φ.IsLocalizedEquivalence := by
+  apply IsLocalizedEquivalence.of_equivalence
+  intro X Y f hf
+  let e :
+      Arrow.mk (Φ.functor.map (Φ.functor.preimage
+        ((Φ.functor.objObjPreimageIso X).hom ≫ f ≫ (Φ.functor.objObjPreimageIso Y).inv))) ≅
+      Arrow.mk f :=
+    Arrow.isoMk (Φ.functor.objObjPreimageIso X) (Φ.functor.objObjPreimageIso Y)
+  simp only [← Φ.inverseImage_eq]
+  exact ⟨_, _, _, (W₂.arrow_mk_iso_iff e).2 hf, ⟨e⟩⟩
+
+end
+
 end LocalizerMorphism
 
 end CategoryTheory
