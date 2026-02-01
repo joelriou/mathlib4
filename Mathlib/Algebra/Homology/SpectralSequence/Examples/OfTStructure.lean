@@ -42,7 +42,7 @@ lemma isZero_shift_obj_of_vanishesOnGEOne
     (a b : ℤ) (h : a < b) (X : C)
     [t.IsGE X b] : IsZero ((H.shift a).obj X) := by
   have : t.IsGE (X⟦a⟧) (b-a) := t.isGE_shift _ b a (b-a) (by lia)
-  exact IsZero.of_iso (hH.isZero' _ (t.isGE_of_GE _ 1 (b-a) (by lia)))
+  exact IsZero.of_iso (hH.isZero' _ (t.isGE_of_ge _ 1 (b-a) (by lia)))
     (((H.shiftIso a 0 a (add_zero a)).symm ≪≫
       isoWhiskerLeft (shiftFunctor C a) (H.isoShiftZero ℤ)).app X)
 
@@ -52,7 +52,7 @@ lemma isZero_shift_obj_of_vanishesOnLESubOne
     (a b : ℤ) (h : a < b) (X : C)
     [t.IsLE X a] : IsZero ((H.shift b).obj X) := by
   have : t.IsLE (X⟦b⟧) (a-b) := t.isLE_shift _ a b (a-b) (by lia)
-  exact IsZero.of_iso (hH.isZero' _ (t.isLE_of_LE (X⟦b⟧) (a - b) (-1) (by lia)))
+  exact IsZero.of_iso (hH.isZero' _ (t.isLE_of_le (X⟦b⟧) (a - b) (-1) (by lia)))
     (((H.shiftIso b 0 b (add_zero b)).symm ≪≫
       isoWhiskerLeft (shiftFunctor C b) (H.isoShiftZero ℤ)).app X)
 

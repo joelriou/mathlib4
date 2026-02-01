@@ -9,7 +9,7 @@ public import Mathlib.CategoryTheory.Localization.CalculusOfFractions
 public import Mathlib.CategoryTheory.Localization.Triangulated
 public import Mathlib.CategoryTheory.ObjectProperty.ContainsZero
 public import Mathlib.CategoryTheory.ObjectProperty.LimitsOfShape
-public import Mathlib.CategoryTheory.ObjectProperty.Shift
+public import Mathlib.CategoryTheory.ObjectProperty.ShiftAdditive
 public import Mathlib.CategoryTheory.Shift.Localization
 public import Mathlib.CategoryTheory.MorphismProperty.Limits
 
@@ -433,31 +433,6 @@ section
 
 variable [P.IsTriangulated]
 
-noncomputable instance hasShift :
-    HasShift P.FullSubcategory ℤ :=
-  P.fullyFaithfulι.hasShift (fun n ↦ ObjectProperty.lift _ (P.ι ⋙ shiftFunctor C n)
-    (fun X ↦ P.le_shift n _ X.2)) (fun _ => P.liftCompιIso _ _)
-
-instance commShiftι : P.ι.CommShift ℤ :=
-  Functor.CommShift.ofHasShiftOfFullyFaithful _ _ _
-
--- these definitions are made irreducible to prevent (at least temporarily) any abuse of defeq
-attribute [irreducible] hasShift commShiftι
-
-instance (n : ℤ) : (shiftFunctor P.FullSubcategory n).Additive := by
-  have := Functor.additive_of_iso (P.ι.commShiftIso n).symm
-  apply Functor.additive_of_comp_faithful _ P.ι
-
-instance : HasZeroObject P.FullSubcategory where
-  zero := by
-    obtain ⟨Z, hZ, mem⟩ := P.exists_prop_of_containsZero
-    refine ⟨⟨Z, mem⟩, ?_⟩
-    rw [IsZero.iff_id_eq_zero]
-    apply ObjectProperty.hom_ext
-    apply hZ.eq_of_src
-
-attribute [local simp] ObjectProperty.fullyFaithfulι fullyFaithfulInducedFunctor
-
 noncomputable instance : Pretriangulated P.FullSubcategory where
   distinguishedTriangles := fun T => P.ι.mapTriangle.obj T ∈ distTriang C
   isomorphic_distinguished := fun T₁ hT₁ T₂ e =>
@@ -525,34 +500,11 @@ instance : (F.essImage).IsTriangulated where
           comp_id, ← Functor.map_comp,
           Iso.inv_hom_id, Functor.map_id]))⟩⟩)
 
-
-
 end
 
 section
 
 variable {D : Type*} [Category D] (F : D ⥤ C) (hF : ∀ (X : D), P (F.obj X))
-
--- some of these are general API, not specific to triangulated subcategories
-
-instance [F.Faithful] : (P.lift F hF).Faithful :=
-  Functor.Faithful.of_comp_iso (P.liftCompιIso F hF)
-
-instance [F.Full] : (P.lift F hF).Full :=
-  Functor.Full.of_comp_faithful_iso (P.liftCompιIso F hF)
-
--- should be generalized
-instance [Preadditive D] [F.Additive] : (P.lift F hF).Additive where
-  map_add {X Y f g} := by
-    apply P.ι.map_injective
-    apply F.map_add
-
-noncomputable instance [HasShift D ℤ] [F.CommShift ℤ] : (P.lift F hF).CommShift ℤ :=
-  Functor.CommShift.ofComp (P.liftCompιIso F hF) ℤ
-
-noncomputable instance [HasShift D ℤ] [F.CommShift ℤ] :
-  NatTrans.CommShift (P.liftCompιIso F hF).hom ℤ :=
-    Functor.CommShift.ofComp_compatibility _ _
 
 instance isTriangulated_lift [HasShift D ℤ] [Preadditive D] [F.CommShift ℤ] [HasZeroObject D]
     [∀ (n : ℤ), (shiftFunctor D n).Additive] [Pretriangulated D] [F.IsTriangulated] :
@@ -637,7 +589,6 @@ instance : (P.map F).IsTriangulated := by
     exact ⟨⟨X, hX⟩, ⟨e⟩⟩
   · rintro ⟨X, ⟨e⟩⟩
     exact ⟨X.1, X.2, ⟨e⟩⟩
-
 
 end
 

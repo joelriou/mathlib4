@@ -339,14 +339,14 @@ instance (X : C) (n : ℤ) [t.IsLE X 0] : t.IsLE (X⟦-n⟧) n :=
   t.isLE_shift X 0 (-n) n (by linarith)
 
 instance (X : C) [t.IsLE X 0] : t.IsLE X 1 :=
-  t.isLE_of_LE X 0 1 (by linarith)
+  t.isLE_of_le X 0 1 (by linarith)
 
 instance (X : C) (n : ℤ) [t.IsLE X n] : t.IsLE (X⟦(1 : ℤ)⟧) n :=
   have := t.isLE_shift X n 1 (n - 1) (by linarith)
-  t.isLE_of_LE (X⟦(1 : ℤ)⟧) (n - 1) n (by linarith)
+  t.isLE_of_le (X⟦(1 : ℤ)⟧) (n - 1) n (by linarith)
 
 instance (X : C) [t.IsGE X 0] : t.IsGE X (-1) :=
-  t.isGE_of_GE X (-1) 0 (by linarith)
+  t.isGE_of_ge X (-1) 0 (by linarith)
 
 instance (X : C) (n : ℤ) [t.IsLE X n] : t.IsLE (X⟦n⟧) 0 :=
   t.isLE_shift X n n 0 (add_zero n)
@@ -499,7 +499,7 @@ instance : t.IsGE (t.truncGETriangle T n).obj₃ n := by dsimp; infer_instance
 instance (X : C) [t.IsGE X n] : t.IsGE (X⟦(-1 : ℤ)⟧) n := by
   have : t.IsGE (X⟦(-1 : ℤ)⟧) (n + 1) :=
     t.isGE_shift X n (-1) (n + 1) (by linarith)
-  exact t.isGE_of_GE _ n (n + 1) (by linarith)
+  exact t.isGE_of_ge _ n (n + 1) (by linarith)
 
 omit [t.HasHeart] in
 include hT in
@@ -867,7 +867,7 @@ omit [IsTriangulated C] in
 lemma isZero_homology_of_isGE (X : C) (q n : ℤ) (hn₁ : q < n) [t.IsGE X n] :
     IsZero ((t.homology q).obj X) := by
   have : t.IsGE (X⟦q⟧) (n - q) := t.isGE_shift X n q (n - q) (by linarith)
-  have : t.IsGE (X⟦q⟧) 1 := t.isGE_of_GE (X⟦q⟧) 1 (n - q) (by linarith)
+  have : t.IsGE (X⟦q⟧) 1 := t.isGE_of_ge (X⟦q⟧) 1 (n - q) (by linarith)
   exact IsZero.of_iso (t.isZero_homology₀_of_isGE_one (X⟦q⟧))
     (((t.homology₀.shiftIso q 0 q (by linarith)).app X).symm.trans
     ((t.homology₀.isoShiftZero ℤ).app (X⟦q⟧)))
@@ -890,7 +890,7 @@ lemma isZero_homology₀_of_isLE_neg_one (X : C) [t.IsLE X (-1)] :
 lemma isZero_homology_of_isLE (X : C) (q n : ℤ) (hn₁ : n < q) [t.IsLE X n] :
     IsZero ((t.homology q).obj X) := by
   have : t.IsLE (X⟦q⟧) (n - q) := t.isLE_shift X n q (n - q) (by linarith)
-  have : t.IsLE (X⟦q⟧) (-1) := t.isLE_of_LE (X⟦q⟧) (n - q) (-1) (by linarith)
+  have : t.IsLE (X⟦q⟧) (-1) := t.isLE_of_le (X⟦q⟧) (n - q) (-1) (by linarith)
   exact IsZero.of_iso (t.isZero_homology₀_of_isLE_neg_one (X⟦q⟧))
     (((t.homology₀.shiftIso q 0 q (by linarith)).app X).symm.trans
     ((t.homology₀.isoShiftZero ℤ).app (X⟦q⟧)))
@@ -901,7 +901,7 @@ lemma isGE₁_iff_isGE₀_and_isZero_homology₀ (X : C) :
   constructor
   · intro _
     constructor
-    · exact t.isGE_of_GE X 0 1 (by linarith)
+    · exact t.isGE_of_ge X 0 1 (by linarith)
     · apply isZero_homology₀_of_isGE_one
   · rintro ⟨_, hX⟩
     rw [t.isGE_iff_isZero_truncLE_obj 0 1 (by linarith)]
@@ -931,7 +931,7 @@ lemma isIso_whiskerLeft_ιHeart_truncLEι (b : ℤ) (hb : 0 ≤ b) :
   intro X
   dsimp
   rw [← t.isLE_iff_isIso_truncLEι_app]
-  exact t.isLE_of_LE _ 0 _ hb
+  exact t.isLE_of_le _ 0 _ hb
 
 omit [t.HasHomology₀] [IsTriangulated C] in
 lemma isIso_whiskerLeft_ιHeart_truncGEπ (a : ℤ) (ha : a ≤ 0) :
@@ -940,7 +940,7 @@ lemma isIso_whiskerLeft_ιHeart_truncGEπ (a : ℤ) (ha : a ≤ 0) :
   intro X
   dsimp
   rw [← t.isGE_iff_isIso_truncGEπ_app]
-  exact t.isGE_of_GE _ _ 0 ha
+  exact t.isGE_of_ge _ _ 0 ha
 
 noncomputable def ιHeartTruncLE (b : ℤ) (hb : 0 ≤ b) : t.ιHeart ⋙ t.truncLE b ≅ t.ιHeart :=
   have := t.isIso_whiskerLeft_ιHeart_truncLEι b hb
