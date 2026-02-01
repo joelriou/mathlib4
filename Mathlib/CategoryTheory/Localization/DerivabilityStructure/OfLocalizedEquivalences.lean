@@ -92,6 +92,16 @@ lemma isLeftDerivabilityStructure_iff_of_equivalences
       infer_instance
     exact isLeftDerivabilityStructure_of_equivalences e⟩
 
+lemma isRightDerivabilityStructure_iff_of_equivalences
+    (iso : T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor) :
+    T.IsRightDerivabilityStructure ↔ B.IsRightDerivabilityStructure := by
+  simp only [isRightDerivabilityStructure_iff_op]
+  let e : T.op.functor ⋙ R.op.functor ≅ L.op.functor ⋙ B.op.functor :=
+    NatIso.op iso.symm
+  have : L.op.functor.IsEquivalence := by dsimp; infer_instance
+  have : R.op.functor.IsEquivalence := by dsimp; infer_instance
+  rw [isLeftDerivabilityStructure_iff_of_equivalences e]
+
 end LocalizerMorphism
 
 end CategoryTheory
