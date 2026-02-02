@@ -8,8 +8,10 @@ module
 public import Mathlib.Algebra.Homology.CochainComplexMinus
 public import Mathlib.Algebra.Homology.HomotopyCategory.Triangulated
 public import Mathlib.Algebra.Homology.HomotopyCategory.SingleFunctors
+public import Mathlib.Algebra.Homology.HomotopyCofiber
 public import Mathlib.Algebra.Homology.DerivedCategory.Basic
 public import Mathlib.Algebra.Homology.Embedding.CochainComplex
+public import Mathlib.CategoryTheory.Localization.OfQuotient
 public import Mathlib.CategoryTheory.Triangulated.Subcategory
 public import Mathlib.CategoryTheory.Shift.SingleFunctorsLift
 
@@ -25,6 +27,22 @@ open CategoryTheory Category Limits Triangulated ZeroObject Pretriangulated
 variable (C : Type _) [Category C] [Preadditive C] [HasZeroObject C] [HasBinaryBiproducts C]
   {D : Type _} [Category D] [Preadditive D] [HasZeroObject D] [HasBinaryBiproducts D]
   (A : Type _) [Category A] [Abelian A]
+
+variable {C} in
+omit [HasZeroObject C] in
+open HomologicalComplex in
+lemma CochainComplex.minus_cylinder (K : CochainComplex C ℤ) (hK : CochainComplex.minus C K) :
+    CochainComplex.minus C (cylinder K) := by
+  obtain ⟨n, hn⟩ := hK
+  refine ⟨n + 1, ?_⟩
+  rw [CochainComplex.isStrictlyLE_iff]
+  intro i hi
+  dsimp [cylinder]
+  refine homotopyCofiber.isZero_X _ _ ?_ (fun j hj ↦ ?_)
+  · refine IsZero.of_iso ?_ ((HomologicalComplex.eval C (.up ℤ) i).mapBiprod _ _)
+    simpa using K.isZero_of_isStrictlyLE n i
+  · simp only [ComplexShape.up_Rel] at hj
+    exact K.isZero_of_isStrictlyLE n _ (by lia)
 
 namespace HomotopyCategory
 
@@ -109,6 +127,26 @@ instance : (quotient C).EssSurj where
   mem_essImage K := ⟨⟨K.obj.as, K.property⟩, ⟨Iso.refl _⟩⟩
 
 instance : (quotient C).Full := by dsimp [quotient]; infer_instance
+
+open HomologicalComplex in
+instance :
+    (quotient C).IsLocalization
+      ((homotopyEquivalences C (.up ℤ)).inverseImage (CochainComplex.Minus.ι C)) :=
+  Functor.isLocalization_of_essSurj_of_full_of_exists_cylinders _ _ (fun _ _ f hf ↦ by
+    rw [← isIso_iff_of_reflects_iso _ (HomotopyCategory.Minus.ι C)]
+    dsimp
+    rwa [isIso_quotient_map_iff_homotopyEquivalences]) (by
+    rintro ⟨K, hK⟩ ⟨L, hL⟩ f₀ f₁ hf
+    obtain ⟨f₀, rfl⟩ := ObjectProperty.homMk_surjective f₀
+    obtain ⟨f₁, rfl⟩ := ObjectProperty.homMk_surjective f₁
+    dsimp at f₀ f₁ hf
+    replace hf := homotopyOfEq f₀ f₁ ((HomotopyCategory.Minus.ι _).congr_map hf)
+    refine ⟨⟨cylinder K, CochainComplex.minus_cylinder _ hK⟩,
+      ObjectProperty.homMk (cylinder.ι₀ _),
+      ObjectProperty.homMk (cylinder.ι₁ _),
+      ObjectProperty.homMk (cylinder.π _), ?_, by cat_disch, by cat_disch,
+      ObjectProperty.homMk (cylinder.desc f₀ f₁ hf), by cat_disch, by cat_disch⟩
+    exact ⟨cylinder.homotopyEquiv _ (fun n ↦ ⟨n - 1, by simp⟩), rfl⟩)
 
 def quotientCompι :
   quotient C ⋙ ι C ≅

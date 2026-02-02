@@ -226,8 +226,6 @@ lemma isIso_quotient_map
   rw [CochainComplex.IsKProjective.isIso_quotient_map_iff_quasiIso]
   rfl
 
-variable [EnoughProjectives C]
-
 namespace isLeftDerivabilityStructure
 
 open MorphismProperty
@@ -252,10 +250,22 @@ def R : LocalizerMorphism (CochainComplex.Minus.quasiIso C) (quasiIso C) where
 instance : (R C).IsInduced where
   inverseImage_eq := by ext; apply quotient_map_mem_quasiIso_iff
 
-/-instance : (HomotopyCategory.Minus.quotient (Projectives C)).IsLocalization
+open HomologicalComplex in
+lemma inverseImage_quasiIso_mapCochainComplexMinus_projectivesι :
+    (CochainComplex.Minus.quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus =
+    (homotopyEquivalences (Projectives C) (ComplexShape.up ℤ)).inverseImage
+      (CochainComplex.Minus.ι (Projectives C)) := by
+  ext K L f
+  simp [CochainComplex.Minus.quasiIso, Functor.mapCochainComplexMinus,
+    ← CochainComplex.IsKProjective.isIso_quotient_map_iff_quasiIso,
+    ← isIso_quotient_map_iff_homotopyEquivalences,
+    ← isIso_iff_of_reflects_iso _ ((Projectives.ι C).mapHomotopyCategory (.up ℤ))]
+
+instance : (HomotopyCategory.Minus.quotient (Projectives C)).IsLocalization
       ((CochainComplex.Minus.quasiIso C).inverseImage
       (Projectives.ι C).mapCochainComplexMinus) := by
-  sorry
+  rw [inverseImage_quasiIso_mapCochainComplexMinus_projectivesι]
+  infer_instance
 
 instance : (L C).IsLocalizedEquivalence := by
   have :
@@ -264,7 +274,7 @@ instance : (L C).IsLocalizedEquivalence := by
     inferInstanceAs ((HomotopyCategory.Minus.quotient (Projectives C)).IsLocalization _)
   exact LocalizerMorphism.IsLocalizedEquivalence.of_isLocalization_of_isLocalization (L C) (𝟭 _)
 
-instance : (R C).IsLocalizedEquivalence := by
+/-instance : (R C).IsLocalizedEquivalence := by
   sorry-/
 
 instance : (L C).functor.Full := by dsimp; infer_instance
@@ -282,18 +292,10 @@ instance : TwoSquare.GuitartExact (iso C).inv :=
     obtain ⟨f₀, rfl⟩ := ObjectProperty.homMk_surjective f₀
     obtain ⟨f₁, rfl⟩ := ObjectProperty.homMk_surjective f₁
     dsimp [Functor.mapCochainComplexMinus] at f₀ f₁
-    refine ⟨⟨K₁.cylinder, ?_⟩, ObjectProperty.homMk (cylinder.ι₀ _),
+    refine ⟨⟨K₁.cylinder, CochainComplex.minus_cylinder _ ⟨_, hn₁⟩⟩,
+      ObjectProperty.homMk (cylinder.ι₀ _),
       ObjectProperty.homMk (cylinder.ι₁ _), ?_,
       ObjectProperty.homMk ?_, ?_, ?_⟩
-    · refine ⟨n₁ + 1, ?_⟩
-      rw [CochainComplex.isStrictlyLE_iff]
-      intro i hi
-      dsimp [cylinder]
-      refine homotopyCofiber.isZero_X _ _ ?_ (fun j hj ↦ ?_)
-      · refine IsZero.of_iso ?_ ((HomologicalComplex.eval (Projectives C) (.up ℤ) i).mapBiprod _ _)
-        simpa using K₁.isZero_of_isStrictlyLE n₁ i
-      · simp only [ComplexShape.up_Rel] at hj
-        exact K₁.isZero_of_isStrictlyLE n₁ _ (by lia)
     · ext : 1
       exact eq_of_homotopy _ _ (cylinder.homotopy₀₁ _ (fun n ↦ ⟨n - 1, by simp⟩))
     · exact (cylinder.mapHomologicalComplexObjIso K₁ (Projectives.ι C)
@@ -305,6 +307,8 @@ instance : TwoSquare.GuitartExact (iso C).inv :=
       cat_disch)
 
 end isLeftDerivabilityStructure
+
+variable [EnoughProjectives C]
 
 /-instance isLeftDerivabilityStructure : (localizerMorphism C).IsLeftDerivabilityStructure :=
   LocalizerMorphism.isLeftDerivabilityStructure_of_isLocalizedEquivalence
