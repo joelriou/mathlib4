@@ -274,8 +274,31 @@ instance : (L C).IsLocalizedEquivalence := by
     inferInstanceAs ((HomotopyCategory.Minus.quotient (Projectives C)).IsLocalization _)
   exact LocalizerMorphism.IsLocalizedEquivalence.of_isLocalization_of_isLocalization (L C) (𝟭 _)
 
-/-instance : (R C).IsLocalizedEquivalence := by
-  sorry-/
+open HomologicalComplex in
+instance {D : Type*} [Category* D] (L : Minus C ⥤ D) [L.IsLocalization (quasiIso C)] :
+    (quotient C ⋙ L).IsLocalization (CochainComplex.Minus.quasiIso C) := by
+  refine Functor.IsLocalization.comp _ _
+    ((homotopyEquivalences C (.up ℤ)).inverseImage (CochainComplex.Minus.ι C))
+    (quasiIso C) _ ?_ ?_ ?_
+  · intro _ _ f hf
+    refine Localization.inverts L (quasiIso C) _ ?_
+    simpa [quasiIso, quotient_map_mem_quasiIso_iff]
+  · intro K L f hf
+    exact homotopyEquivalences_le_quasiIso _ _ _ hf
+  · rintro K L f hf
+    obtain ⟨K, rfl⟩ := Minus.quotient_obj_surjective K
+    obtain ⟨L, rfl⟩ := Minus.quotient_obj_surjective L
+    obtain ⟨f, rfl⟩ := (Minus.quotient C).map_surjective f
+    apply MorphismProperty.map_mem_map
+    simpa [quasiIso, HomotopyCategory.quotient_map_mem_quasiIso_iff] using hf
+
+instance {D : Type*} [Category* D] (L : Minus C ⥤ D) [L.IsLocalization (quasiIso C)] :
+    ((R C).functor ⋙ L).IsLocalization (CochainComplex.Minus.quasiIso C) := by
+  dsimp; infer_instance
+
+instance : (R C).IsLocalizedEquivalence :=
+  LocalizerMorphism.IsLocalizedEquivalence.of_isLocalization_of_isLocalization
+    (R C) ((quasiIso C).Q)
 
 instance : (L C).functor.Full := by dsimp; infer_instance
 instance : (R C).functor.Full := by dsimp; infer_instance
@@ -310,8 +333,8 @@ end isLeftDerivabilityStructure
 
 variable [EnoughProjectives C]
 
-/-instance isLeftDerivabilityStructure : (localizerMorphism C).IsLeftDerivabilityStructure :=
+instance isLeftDerivabilityStructure : (localizerMorphism C).IsLeftDerivabilityStructure :=
   LocalizerMorphism.isLeftDerivabilityStructure_of_isLocalizedEquivalence
-    (isLeftDerivabilityStructure.iso C)-/
+    (isLeftDerivabilityStructure.iso C)
 
 end HomotopyCategory.Minus

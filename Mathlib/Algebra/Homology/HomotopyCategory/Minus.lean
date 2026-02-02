@@ -24,12 +24,11 @@ public import Mathlib.CategoryTheory.Shift.SingleFunctorsLift
 
 open CategoryTheory Category Limits Triangulated ZeroObject Pretriangulated
 
-variable (C : Type _) [Category C] [Preadditive C] [HasZeroObject C] [HasBinaryBiproducts C]
+variable (C : Type _) [Category C] [Preadditive C]
   {D : Type _} [Category D] [Preadditive D] [HasZeroObject D] [HasBinaryBiproducts D]
   (A : Type _) [Category A] [Abelian A]
 
-variable {C} in
-omit [HasZeroObject C] in
+variable {C} [HasBinaryBiproducts C] in
 open HomologicalComplex in
 lemma CochainComplex.minus_cylinder (K : CochainComplex C ℤ) (hK : CochainComplex.minus C K) :
     CochainComplex.minus C (cylinder K) := by
@@ -49,6 +48,7 @@ namespace HomotopyCategory
 def minus : ObjectProperty (HomotopyCategory C (ComplexShape.up ℤ)) :=
   fun K ↦ ∃ (n : ℤ), CochainComplex.IsStrictlyLE K.1 n
 
+variable [HasZeroObject C] [HasBinaryBiproducts C] in
 instance : (minus C).IsTriangulated where
   exists_zero := by
     refine ⟨⟨0⟩, ?_, ⟨0, ?_⟩⟩
@@ -123,11 +123,17 @@ def quotient : CochainComplex.Minus C ⥤ Minus C :=
       rintro ⟨K, n, hn⟩
       exact ⟨n, hn⟩)
 
+variable {C} in
+lemma quotient_obj_surjective :
+    Function.Surjective (quotient C).obj :=
+  fun K ↦ ⟨⟨K.obj.as, K.property⟩, rfl⟩
+
 instance : (quotient C).EssSurj where
   mem_essImage K := ⟨⟨K.obj.as, K.property⟩, ⟨Iso.refl _⟩⟩
 
 instance : (quotient C).Full := by dsimp [quotient]; infer_instance
 
+variable [HasZeroObject C] [HasBinaryBiproducts C] in
 open HomologicalComplex in
 instance :
     (quotient C).IsLocalization
@@ -152,6 +158,8 @@ def quotientCompι :
   quotient C ⋙ ι C ≅
     CochainComplex.Minus.ι C ⋙ HomotopyCategory.quotient C (ComplexShape.up ℤ) := by
   apply ObjectProperty.liftCompιIso
+
+variable [HasZeroObject C] [HasBinaryBiproducts C]
 
 noncomputable def singleFunctors : SingleFunctors C (Minus C) ℤ :=
   SingleFunctors.lift (HomotopyCategory.singleFunctors C) (ι C)
@@ -190,10 +198,12 @@ def mapHomotopyCategoryMinus : HomotopyCategory.Minus C ⥤ HomotopyCategory.Min
       dsimp [HomotopyCategory.Minus.ι, HomotopyCategory.quotient, Quotient.functor]
       infer_instance)
 
+variable [HasZeroObject C] [HasBinaryBiproducts C] in
 noncomputable instance : (F.mapHomotopyCategoryMinus).CommShift ℤ := by
   dsimp only [mapHomotopyCategoryMinus]
   infer_instance
 
+variable [HasZeroObject C] [HasBinaryBiproducts C] in
 instance : (F.mapHomotopyCategoryMinus).IsTriangulated := by
   dsimp only [mapHomotopyCategoryMinus]
   infer_instance
