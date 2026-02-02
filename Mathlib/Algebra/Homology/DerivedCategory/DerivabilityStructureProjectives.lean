@@ -228,7 +228,7 @@ lemma isIso_quotient_map
 
 variable [EnoughProjectives C]
 
-/-namespace isLeftDerivabilityStructure
+namespace isLeftDerivabilityStructure
 
 open MorphismProperty
 
@@ -239,6 +239,9 @@ def L : LocalizerMorphism
   functor := HomotopyCategory.Minus.quotient (Projectives C)
   map _ _ f hf := (isIso_quotient_map f).2 hf
 
+instance : (L C).IsInduced where
+  inverseImage_eq := by ext; apply isIso_quotient_map
+
 @[simps]
 def R : LocalizerMorphism (CochainComplex.Minus.quasiIso C) (quasiIso C) where
   functor := HomotopyCategory.Minus.quotient C
@@ -246,9 +249,23 @@ def R : LocalizerMorphism (CochainComplex.Minus.quasiIso C) (quasiIso C) where
     intro X Y f hf
     simpa [quasiIso, quotient_map_mem_quasiIso_iff]
 
-instance : (L C).IsLocalizedEquivalence := sorry
+instance : (R C).IsInduced where
+  inverseImage_eq := by ext; apply quotient_map_mem_quasiIso_iff
 
-instance : (R C).IsLocalizedEquivalence := sorry
+/-instance : (HomotopyCategory.Minus.quotient (Projectives C)).IsLocalization
+      ((CochainComplex.Minus.quasiIso C).inverseImage
+      (Projectives.ι C).mapCochainComplexMinus) := by
+  sorry
+
+instance : (L C).IsLocalizedEquivalence := by
+  have :
+      ((L C).functor ⋙ 𝟭 (Minus (Projectives C))).IsLocalization
+        ((CochainComplex.Minus.quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus) :=
+    inferInstanceAs ((HomotopyCategory.Minus.quotient (Projectives C)).IsLocalization _)
+  exact LocalizerMorphism.IsLocalizedEquivalence.of_isLocalization_of_isLocalization (L C) (𝟭 _)
+
+instance : (R C).IsLocalizedEquivalence := by
+  sorry-/
 
 instance : (L C).functor.Full := by dsimp; infer_instance
 instance : (R C).functor.Full := by dsimp; infer_instance
@@ -277,15 +294,19 @@ instance : TwoSquare.GuitartExact (iso C).inv :=
         simpa using K₁.isZero_of_isStrictlyLE n₁ i
       · simp only [ComplexShape.up_Rel] at hj
         exact K₁.isZero_of_isStrictlyLE n₁ _ (by lia)
-    · sorry
+    · ext : 1
+      exact eq_of_homotopy _ _ (cylinder.homotopy₀₁ _ (fun n ↦ ⟨n - 1, by simp⟩))
+    · exact (cylinder.mapHomologicalComplexObjIso K₁ (Projectives.ι C)
+          (fun n ↦ ⟨n - 1, by simp⟩)).hom ≫
+        cylinder.desc f₀ f₁ (homotopyOfEq _ _ ((HomotopyCategory.Minus.ι C).congr_map hf))
     · dsimp [Functor.mapCochainComplexMinus]
-      sorry
-    · sorry
-    · sorry)
+      cat_disch
+    · dsimp [Functor.mapCochainComplexMinus]
+      cat_disch)
 
 end isLeftDerivabilityStructure
 
-instance isLeftDerivabilityStructure : (localizerMorphism C).IsLeftDerivabilityStructure :=
+/-instance isLeftDerivabilityStructure : (localizerMorphism C).IsLeftDerivabilityStructure :=
   LocalizerMorphism.isLeftDerivabilityStructure_of_isLocalizedEquivalence
     (isLeftDerivabilityStructure.iso C)-/
 
