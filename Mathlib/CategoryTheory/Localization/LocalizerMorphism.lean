@@ -78,6 +78,8 @@ def id : LocalizerMorphism W₁ W₁ where
   functor := 𝟭 C₁
   map _ _ _ hf := hf
 
+instance : (id W₁).functor.IsEquivalence := by dsimp; infer_instance
+
 variable {W₁ W₂ W₃}
 
 /-- The composition of two localizers morphisms. -/
@@ -318,6 +320,9 @@ instance [Φ.IsInduced] : Φ.op.IsInduced where
   inverseImage_eq := by
     simp only [← Φ.inverseImage_eq]
     rfl
+
+instance : (id W₁).IsInduced where
+  inverseImage_eq := rfl
 
 section
 

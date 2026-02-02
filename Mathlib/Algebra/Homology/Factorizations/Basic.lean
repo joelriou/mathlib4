@@ -37,8 +37,7 @@ of total derived functors (and a refactor of the sequence of derived functors).
 
 @[expose] public section
 
-
-open CategoryTheory Abelian
+open CategoryTheory Abelian Limits
 
 variable {C : Type*} [Category* C] [Abelian C]
 
@@ -97,5 +96,12 @@ instance : (degreewiseMonoWithProjectiveCokernel (C := C)).IsMultiplicative := b
 instance : (degreewiseMonoWithProjectiveCokernel (C := C)).IsStableUnderRetracts := by
   rw [degreewiseMonoWithProjectiveCokernel_eq_unop]
   infer_instance
+
+lemma degreewiseMonoWithProjectiveCokernel_iff_of_isZero {K L : CochainComplex C ℤ}
+    (f : K ⟶ L) (hK : IsZero K) :
+    degreewiseMonoWithProjectiveCokernel f ↔ ∀ (n : ℤ), Projective (L.X n) :=
+  forall_congr' (fun n ↦ by
+    rw [monoWithProjectiveCokernel_iff_of_isZero]
+    exact Functor.map_isZero (HomologicalComplex.eval _ _ n) hK)
 
 end CochainComplex

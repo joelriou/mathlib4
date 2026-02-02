@@ -147,6 +147,13 @@ instance : (monoWithProjectiveCokernel : MorphismProperty C).IsStableUnderRetrac
   rw [monoWithProjectiveCokernel_eq_unop]
   infer_instance
 
+lemma monoWithProjectiveCokernel_iff_of_isZero {X Y : C} (f : X ⟶ Y) (hX : IsZero X) :
+    monoWithProjectiveCokernel f ↔ Projective Y := by
+  simp only [monoWithProjectiveCokernel, hX.mono f, true_and]
+  exact Projective.iso_iff
+    { hom := cokernel.desc _ (𝟙 Y) (hX.eq_of_src _ _)
+      inv := cokernel.π f }
+
 end Abelian
 
 end CategoryTheory

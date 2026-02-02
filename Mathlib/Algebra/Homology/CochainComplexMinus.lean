@@ -49,6 +49,9 @@ instance : (ι C).Faithful := ObjectProperty.faithful_ι _
 def quasiIso [CategoryWithHomology C] : MorphismProperty (Minus C) :=
   (HomologicalComplex.quasiIso C (ComplexShape.up ℤ)).inverseImage (ι C)
 
+instance [CategoryWithHomology C] : (quasiIso C).RespectsIso := by
+  dsimp [quasiIso]; infer_instance
+
 end
 
 variable [Preadditive C]
@@ -78,6 +81,7 @@ section
 
 variable [HasZeroMorphisms C] [HasZeroMorphisms D] [F.PreservesZeroMorphisms]
 
+@[simps!]
 def mapCochainComplexMinus : CochainComplex.Minus C ⥤ CochainComplex.Minus D :=
   ObjectProperty.lift _ (CochainComplex.Minus.ι C ⋙ F.mapHomologicalComplex _) (fun K => by
     obtain ⟨i, hi⟩ := K.2
@@ -85,6 +89,7 @@ def mapCochainComplexMinus : CochainComplex.Minus C ⥤ CochainComplex.Minus D :
     dsimp [CochainComplex.Minus.ι]
     infer_instance)
 
+@[simps!]
 def mapCochainComplexMinusCompι :
     F.mapCochainComplexMinus ⋙ CochainComplex.Minus.ι D ≅
       CochainComplex.Minus.ι C ⋙ F.mapHomologicalComplex _ := Iso.refl _

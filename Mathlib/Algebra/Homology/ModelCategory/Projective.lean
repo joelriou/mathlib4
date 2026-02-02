@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Algebra.Homology.ModelCategory.Injective
 public import Mathlib.Algebra.Homology.CochainComplexMinus
+public import Mathlib.AlgebraicTopology.ModelCategory.IsCofibrant
 public import Mathlib.AlgebraicTopology.ModelCategory.Opposite
 public import Mathlib.AlgebraicTopology.ModelCategory.Transport
 
@@ -102,6 +103,12 @@ scoped instance : ModelCategory (CochainComplex.Minus C) := by
     simp [← HomotopicalAlgebra.weakEquivalence_iff, weakEquivalence_iff,
       weakEquivalence_op_iff, Plus.modelCategoryQuillen.weakEquivalence_iff,
       opEquivalence, quasiIso_opEquivalence_map_iff]
+
+lemma isCofibrant_iff (X : Minus C) :
+    IsCofibrant X ↔ ∀ (n : ℤ), Projective (X.obj.X n) := by
+  rw [HomotopicalAlgebra.isCofibrant_iff, cofibration_iff,
+    degreewiseMonoWithProjectiveCokernel_iff_of_isZero]
+  exact Functor.map_isZero (Minus.ι C) (IsZero.of_mono_zero _ X)
 
 end modelCategoryQuillen
 
