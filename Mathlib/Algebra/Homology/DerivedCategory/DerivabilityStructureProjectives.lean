@@ -5,16 +5,11 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.Algebra.Homology.DerivedCategory.Plus
+public import Mathlib.Algebra.Homology.DerivedCategory.Minus
 public import Mathlib.Algebra.Homology.ModelCategory.Projective
-public import Mathlib.CategoryTheory.Preadditive.Projective.Basic
-public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.Constructor
-public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.Existence
-public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.Triangulated
-public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.OfLocalizedEquivalences
-public import Mathlib.CategoryTheory.Limits.FullSubcategory
-public import Mathlib.CategoryTheory.Triangulated.TStructure.Homology
 public import Mathlib.AlgebraicTopology.ModelCategory.DerivabilityStructureCofibrant
+public import Mathlib.CategoryTheory.GuitartExact.Quotient
+public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.OfLocalizedEquivalences
 
 /-!
 # The projective derivability structure
@@ -132,6 +127,7 @@ end CategoryTheory
 
 namespace CochainComplex.Minus
 
+@[simps]
 def localizerMorphism :
     LocalizerMorphism ((quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus)
       (quasiIso C) where
@@ -197,3 +193,74 @@ instance : (localizerMorphism C).IsLeftDerivabilityStructure := by
   infer_instance
 
 end CochainComplex.Minus
+
+namespace HomotopyCategory.Minus
+
+def localizerMorphism : LocalizerMorphism
+  (MorphismProperty.isomorphisms (HomotopyCategory.Minus (Projectives C)))
+    (HomotopyCategory.Minus.quasiIso C) where
+  functor := (Projectives.ι C).mapHomotopyCategoryMinus
+  map K L f (hf : IsIso f) := by
+    dsimp only [MorphismProperty.inverseImage, HomotopyCategory.Minus.quasiIso]
+    rw [HomotopyCategory.mem_quasiIso_iff]
+    intro n
+    infer_instance
+
+variable [EnoughProjectives C]
+
+/-namespace isLeftDerivabilityStructure
+
+open MorphismProperty
+
+@[simps]
+def L : LocalizerMorphism
+  ((CochainComplex.Minus.quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus)
+      (isomorphisms (Minus (Projectives C))) where
+  functor := HomotopyCategory.Minus.quotient (Projectives C)
+  map := by
+    rintro X Y f hf
+    simp only [inverseImage_iff] at hf
+    -- quasiisos are homotopy equivalences
+    sorry
+
+@[simps]
+def R : LocalizerMorphism (CochainComplex.Minus.quasiIso C) (quasiIso C) where
+  functor := HomotopyCategory.Minus.quotient C
+  map := by
+    intro X Y f hf
+    simpa [quasiIso, quotient_map_mem_quasiIso_iff]
+
+instance : (L C).IsLocalizedEquivalence := sorry
+
+instance : (R C).IsLocalizedEquivalence := sorry
+
+instance : (L C).functor.Full := by dsimp; infer_instance
+instance : (R C).functor.Full := by dsimp; infer_instance
+instance : (L C).functor.EssSurj := by dsimp; infer_instance
+instance : (R C).functor.EssSurj := by dsimp; infer_instance
+
+def iso : (CochainComplex.Minus.localizerMorphism C).functor ⋙
+  (R C).functor ≅ (L C).functor ⋙ (localizerMorphism C).functor := Iso.refl _
+
+open HomologicalComplex in
+instance : TwoSquare.GuitartExact (iso C).inv :=
+  TwoSquare.GuitartExact.quotient (iso C).symm (by
+    rintro ⟨K₁, n₁, hn₁⟩ ⟨K₂, n₂, hn₂⟩ f₀ f₁ hf
+    obtain ⟨f₀, rfl⟩ := ObjectProperty.homMk_surjective f₀
+    obtain ⟨f₁, rfl⟩ := ObjectProperty.homMk_surjective f₁
+    dsimp [Functor.mapCochainComplexMinus] at f₀ f₁
+    refine ⟨⟨K₁.cylinder, ?_⟩, ObjectProperty.homMk (cylinder.ι₀ _),
+      ObjectProperty.homMk (cylinder.ι₁ _), ?_,
+      ObjectProperty.homMk ?_, sorry⟩
+    · sorry
+    · sorry
+    · dsimp [Functor.mapCochainComplexMinus]
+      sorry)
+
+end isLeftDerivabilityStructure
+
+instance isLeftDerivabilityStructure : (localizerMorphism C).IsLeftDerivabilityStructure :=
+  LocalizerMorphism.isLeftDerivabilityStructure_of_isLocalizedEquivalence
+    (isLeftDerivabilityStructure.iso C)-/
+
+end HomotopyCategory.Minus

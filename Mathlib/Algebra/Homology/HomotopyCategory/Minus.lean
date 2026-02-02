@@ -86,6 +86,10 @@ instance : (quasiIso A).IsMultiplicative := by
   dsimp only [quasiIso]
   infer_instance
 
+instance : (quasiIso A).RespectsIso := by
+  dsimp only [quasiIso]
+  infer_instance
+
 instance : (quasiIso A).IsCompatibleWithShift ℤ where
   condition a := by
     ext X Y f
@@ -94,11 +98,17 @@ instance : (quasiIso A).IsCompatibleWithShift ℤ where
     exact (HomotopyCategory.quasiIso A (ComplexShape.up ℤ)).arrow_mk_iso_iff
       (Arrow.isoOfNatIso ((ι A).commShiftIso a) (Arrow.mk f))
 
+@[simps!]
 def quotient : CochainComplex.Minus C ⥤ Minus C :=
   ObjectProperty.lift _
     (CochainComplex.Minus.ι C ⋙ HomotopyCategory.quotient C (ComplexShape.up ℤ)) (by
       rintro ⟨K, n, hn⟩
       exact ⟨n, hn⟩)
+
+instance : (quotient C).EssSurj where
+  mem_essImage K := ⟨⟨K.obj.as, K.property⟩, ⟨Iso.refl _⟩⟩
+
+instance : (quotient C).Full := by dsimp [quotient]; infer_instance
 
 def quotientCompι :
   quotient C ⋙ ι C ≅
