@@ -316,3 +316,23 @@ instance (F : V ⥤ W) [F.Additive] (c : ComplexShape ι) [Linear R V] [Linear R
   (HomotopyCategory.quotient V c).linear_of_full_essSurj_comp (F.mapHomotopyCategory c)
 
 end CategoryTheory
+
+namespace HomologicalComplex
+
+variable {ι : Type*} {V : Type u} [Category.{v} V] [Preadditive V] {c : ComplexShape ι}
+
+open HomotopyCategory in
+lemma isIso_quotient_map_iff_homotopyEquivalences
+    {K L : HomologicalComplex V c} (f : K ⟶ L) :
+    IsIso ((quotient _ _).map f) ↔
+      homotopyEquivalences _ _ f := by
+  refine ⟨fun _ ↦ ?_, fun hf ↦ quotient_inverts_homotopyEquivalences V c f hf⟩
+  obtain ⟨g, hg⟩ := (quotient V c).map_surjective (inv ((quotient V c).map f))
+  let e : HomotopyEquiv K L :=
+    { hom := f
+      inv := g
+      homotopyHomInvId := HomotopyCategory.homotopyOfEq _ _ (by cat_disch)
+      homotopyInvHomId := HomotopyCategory.homotopyOfEq _ _ (by cat_disch) }
+  exact ⟨e, rfl⟩
+
+end HomologicalComplex
