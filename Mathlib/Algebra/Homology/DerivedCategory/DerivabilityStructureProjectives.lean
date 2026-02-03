@@ -10,6 +10,7 @@ public import Mathlib.Algebra.Homology.DerivedCategory.KProjective
 public import Mathlib.Algebra.Homology.ModelCategory.Projective
 public import Mathlib.AlgebraicTopology.ModelCategory.DerivabilityStructureCofibrant
 public import Mathlib.CategoryTheory.GuitartExact.Quotient
+public import Mathlib.CategoryTheory.ObjectProperty.HomologicalComplex
 public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.OfLocalizedEquivalences
 
 /-!
@@ -26,31 +27,11 @@ open HomotopicalAlgebra CategoryTheory Limits ZeroObject Category
 variable (C : Type*) [Category C] [Abelian C]
   {H : Type*} [Category H]
 
-namespace HomologicalComplex
-
-@[simps X d]
-def liftObjectProperty {ι : Type*} {c : ComplexShape ι}
-    {V : Type*} [Category* V] [Preadditive V] (P : ObjectProperty V)
-    (K : HomologicalComplex V c) (hK : ∀ (n : ι), P (K.X n)) :
-    HomologicalComplex P.FullSubcategory c where
-  X n := ⟨_, hK n⟩
-  d i j := ObjectProperty.homMk (K.d i j)
-
-@[simps]
-def liftFunctorObjectProperty {D : Type*} [Category* D] {ι : Type*} {c : ComplexShape ι}
-    {V : Type*} [Category* V] [Preadditive V] (P : ObjectProperty V)
-    (F : D ⥤ HomologicalComplex V c) (hF : ∀ (X : D) (n : ι), P ((F.obj X).X n)) :
-    D ⥤ HomologicalComplex P.FullSubcategory c where
-  obj X := liftObjectProperty _ (F.obj X) (hF X)
-  map f := { f n := ObjectProperty.homMk ((F.map f).f n) }
-
-end HomologicalComplex
-
 namespace CategoryTheory
 
-abbrev Projectives := ObjectProperty.FullSubcategory (fun (X : C) => Projective X)
+abbrev ProjectiveObject := ObjectProperty.FullSubcategory (fun (X : C) => Projective X)
 
-namespace Projectives
+namespace ProjectiveObject
 
 instance closedUnderLimitsOfShapeDiscrete (J : Type*) :
     ObjectProperty.IsClosedUnderColimitsOfShape (fun (X : C) => Projective X) (Discrete J) where
@@ -68,69 +49,41 @@ instance closedUnderLimitsOfShapeDiscrete (J : Type*) :
       ((IsColimit.precomposeInvEquiv e _).symm p.isColimit)
     exact Projective.of_iso e' inferInstance
 
-instance : HasFiniteCoproducts (Projectives C) where
+instance : HasFiniteCoproducts (ProjectiveObject C) where
   out n := by infer_instance
 
-instance : HasFiniteBiproducts (Projectives C) :=
+instance : HasFiniteBiproducts (ProjectiveObject C) :=
   HasFiniteBiproducts.of_hasFiniteCoproducts
 
-instance : HasBinaryBiproducts (Projectives C) := hasBinaryBiproducts_of_finite_biproducts _
+instance : HasBinaryBiproducts (ProjectiveObject C) := hasBinaryBiproducts_of_finite_biproducts _
 
-instance : HasZeroObject (Projectives C) where
+instance : HasZeroObject (ProjectiveObject C) where
   zero := by
     refine ⟨⟨0, inferInstance⟩, ?_⟩
     rw [IsZero.iff_id_eq_zero]
     ext : 1
     apply id_zero
 
-abbrev ι : Projectives C ⥤ C := ObjectProperty.ι _
+abbrev ι : ProjectiveObject C ⥤ C := ObjectProperty.ι _
 
-instance (X : Projectives C) : Projective ((ι C).obj X) := X.2
+instance (X : ProjectiveObject C) : Projective ((ι C).obj X) := X.2
 
-instance (X : Projectives C) : Projective X.obj := X.2
+instance (X : ProjectiveObject C) : Projective X.obj := X.2
 
-instance (X : HomotopyCategory.Plus (Projectives C)) (n : ℤ) :
+instance (X : HomotopyCategory.Plus (ProjectiveObject C)) (n : ℤ) :
     Projective (((ι C).mapHomotopyCategoryPlus.obj X).obj.as.X n) := by
   change Projective ((ι C).obj (X.obj.as.X n))
   infer_instance
 
-variable {C}
-
-def liftHomotopyCategoryPlusOfProjective (K : HomotopyCategory.Plus C)
-  [∀ (n : ℤ), Projective (K.obj.as.X n)] : HomotopyCategory.Plus (Projectives C) :=
-    { obj :=
-       ⟨{ X n := ⟨K.obj.as.X n, inferInstance⟩
-          d i j := ObjectProperty.homMk (K.obj.as.d i j)
-          shape i j hij := by ext : 1; exact K.obj.as.shape i j hij
-          d_comp_d' i j k _ _ := by ext : 1; exact K.obj.as.d_comp_d i j k }⟩
-      property := by
-        obtain ⟨n, hn⟩ := K.2
-        refine ⟨n, ?_⟩
-        rw [CochainComplex.isStrictlyGE_iff]
-        intro i hi
-        have := CochainComplex.isZero_of_isStrictlyGE K.obj.as n i hi
-        rw [IsZero.iff_id_eq_zero] at this ⊢
-        ext : 1
-        exact this }
-
-def isoMapHomotopyCategoryPlusιObj (K : HomotopyCategory.Plus C)
-    [∀ (n : ℤ), Projective (K.obj.as.X n)] :
-    (ι C).mapHomotopyCategoryPlus.obj (liftHomotopyCategoryPlusOfProjective K) ≅ K := Iso.refl _
-
-lemma mem_essImage_mapHomotopyCategoryPlus_ι_of_projective (K : HomotopyCategory.Plus C)
-    [∀ (n : ℤ), Projective (K.obj.as.X n)] :
-    (ι C).mapHomotopyCategoryPlus.essImage K :=
-  ⟨_, ⟨isoMapHomotopyCategoryPlusιObj K⟩⟩
-
-instance (K : CochainComplex.Minus (Projectives C)) :
+instance (K : CochainComplex.Minus (ProjectiveObject C)) :
     CochainComplex.IsKProjective
-      (((Projectives.ι C).mapHomologicalComplex (.up ℤ)).obj K.obj) := by
+      (((ProjectiveObject.ι C).mapHomologicalComplex (.up ℤ)).obj K.obj) := by
   obtain ⟨K, n, hn⟩ := K
-  let L := ((Projectives.ι C).mapHomologicalComplex (.up ℤ)).obj K
+  let L := ((ProjectiveObject.ι C).mapHomologicalComplex (.up ℤ)).obj K
   have (n : ℤ) : Projective (L.X n) := by dsimp [L]; infer_instance
   exact CochainComplex.isKProjective_of_projective L n
 
-end Projectives
+end ProjectiveObject
 
 end CategoryTheory
 
@@ -138,15 +91,15 @@ namespace CochainComplex.Minus
 
 @[simps]
 def localizerMorphism :
-    LocalizerMorphism ((quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus)
+    LocalizerMorphism ((quasiIso C).inverseImage (ProjectiveObject.ι C).mapCochainComplexMinus)
       (quasiIso C) where
-  functor := (Projectives.ι C).mapCochainComplexMinus
+  functor := (ProjectiveObject.ι C).mapCochainComplexMinus
   map := by rfl
 
 instance : (localizerMorphism C).IsInduced where
   inverseImage_eq := rfl
 
-instance (K : Minus (Projectives C)) (n : ℤ) :
+instance (K : Minus (ProjectiveObject C)) (n : ℤ) :
     Projective (K.obj.X n).obj :=
   (K.obj.X n).property
 
@@ -162,8 +115,8 @@ instance (K : CofibrantObject (Minus C)) (n : ℤ) :
   infer_instance
 
 def cofibrantObjectEquivalence :
-    Minus (Projectives C) ≌ CofibrantObject (Minus C) where
-  functor := ObjectProperty.lift _ (Projectives.ι C).mapCochainComplexMinus (fun K ↦ by
+    Minus (ProjectiveObject C) ≌ CofibrantObject (Minus C) where
+  functor := ObjectProperty.lift _ (ProjectiveObject.ι C).mapCochainComplexMinus (fun K ↦ by
     dsimp [cofibrantObjects]
     rw [modelCategoryQuillen.isCofibrant_iff]
     intro n
@@ -184,7 +137,7 @@ def cofibrantObjectEquivalence :
 
 @[simps]
 def cofibrantObjectLocalizerMorphism :
-    LocalizerMorphism ((quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus)
+    LocalizerMorphism ((quasiIso C).inverseImage (ProjectiveObject.ι C).mapCochainComplexMinus)
       (weakEquivalences (CofibrantObject (Minus C))) where
   functor := (cofibrantObjectEquivalence C).functor
   map := by rfl
@@ -206,9 +159,9 @@ end CochainComplex.Minus
 namespace HomotopyCategory.Minus
 
 def localizerMorphism : LocalizerMorphism
-  (MorphismProperty.isomorphisms (HomotopyCategory.Minus (Projectives C)))
+  (MorphismProperty.isomorphisms (HomotopyCategory.Minus (ProjectiveObject C)))
     (HomotopyCategory.Minus.quasiIso C) where
-  functor := (Projectives.ι C).mapHomotopyCategoryMinus
+  functor := (ProjectiveObject.ι C).mapHomotopyCategoryMinus
   map K L f (hf : IsIso f) := by
     dsimp only [MorphismProperty.inverseImage, HomotopyCategory.Minus.quasiIso]
     rw [HomotopyCategory.mem_quasiIso_iff]
@@ -217,11 +170,11 @@ def localizerMorphism : LocalizerMorphism
 
 variable {C} in
 lemma isIso_quotient_map
-    {K L : CochainComplex.Minus (Projectives C)} (f : K ⟶ L) :
+    {K L : CochainComplex.Minus (ProjectiveObject C)} (f : K ⟶ L) :
     IsIso ((quotient _).map f) ↔
-    CochainComplex.Minus.quasiIso C ((Projectives.ι C).mapCochainComplexMinus.map f) := by
-  rw [← isIso_iff_of_reflects_iso _ (HomotopyCategory.Minus.ι (Projectives C)),
-    ← isIso_iff_of_reflects_iso _ (Functor.mapHomotopyCategory (Projectives.ι C) (.up ℤ))]
+    CochainComplex.Minus.quasiIso C ((ProjectiveObject.ι C).mapCochainComplexMinus.map f) := by
+  rw [← isIso_iff_of_reflects_iso _ (HomotopyCategory.Minus.ι (ProjectiveObject C)),
+    ← isIso_iff_of_reflects_iso _ (Functor.mapHomotopyCategory (ProjectiveObject.ι C) (.up ℤ))]
   dsimp
   rw [CochainComplex.IsKProjective.isIso_quotient_map_iff_quasiIso]
   rfl
@@ -232,9 +185,9 @@ open MorphismProperty
 
 @[simps]
 def L : LocalizerMorphism
-  ((CochainComplex.Minus.quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus)
-      (isomorphisms (Minus (Projectives C))) where
-  functor := HomotopyCategory.Minus.quotient (Projectives C)
+  ((CochainComplex.Minus.quasiIso C).inverseImage (ProjectiveObject.ι C).mapCochainComplexMinus)
+      (isomorphisms (Minus (ProjectiveObject C))) where
+  functor := HomotopyCategory.Minus.quotient (ProjectiveObject C)
   map _ _ f hf := (isIso_quotient_map f).2 hf
 
 instance : (L C).IsInduced where
@@ -252,26 +205,27 @@ instance : (R C).IsInduced where
 
 open HomologicalComplex in
 lemma inverseImage_quasiIso_mapCochainComplexMinus_projectivesι :
-    (CochainComplex.Minus.quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus =
-    (homotopyEquivalences (Projectives C) (ComplexShape.up ℤ)).inverseImage
-      (CochainComplex.Minus.ι (Projectives C)) := by
+    (CochainComplex.Minus.quasiIso C).inverseImage (ProjectiveObject.ι C).mapCochainComplexMinus =
+    (homotopyEquivalences (ProjectiveObject C) (ComplexShape.up ℤ)).inverseImage
+      (CochainComplex.Minus.ι (ProjectiveObject C)) := by
   ext K L f
   simp [CochainComplex.Minus.quasiIso, Functor.mapCochainComplexMinus,
     ← CochainComplex.IsKProjective.isIso_quotient_map_iff_quasiIso,
     ← isIso_quotient_map_iff_homotopyEquivalences,
-    ← isIso_iff_of_reflects_iso _ ((Projectives.ι C).mapHomotopyCategory (.up ℤ))]
+    ← isIso_iff_of_reflects_iso _ ((ProjectiveObject.ι C).mapHomotopyCategory (.up ℤ))]
 
-instance : (HomotopyCategory.Minus.quotient (Projectives C)).IsLocalization
+instance : (HomotopyCategory.Minus.quotient (ProjectiveObject C)).IsLocalization
       ((CochainComplex.Minus.quasiIso C).inverseImage
-      (Projectives.ι C).mapCochainComplexMinus) := by
+      (ProjectiveObject.ι C).mapCochainComplexMinus) := by
   rw [inverseImage_quasiIso_mapCochainComplexMinus_projectivesι]
   infer_instance
 
 instance : (L C).IsLocalizedEquivalence := by
   have :
-      ((L C).functor ⋙ 𝟭 (Minus (Projectives C))).IsLocalization
-        ((CochainComplex.Minus.quasiIso C).inverseImage (Projectives.ι C).mapCochainComplexMinus) :=
-    inferInstanceAs ((HomotopyCategory.Minus.quotient (Projectives C)).IsLocalization _)
+      ((L C).functor ⋙ 𝟭 (Minus (ProjectiveObject C))).IsLocalization
+        ((CochainComplex.Minus.quasiIso C).inverseImage
+          (ProjectiveObject.ι C).mapCochainComplexMinus) :=
+    inferInstanceAs ((HomotopyCategory.Minus.quotient (ProjectiveObject C)).IsLocalization _)
   exact LocalizerMorphism.IsLocalizedEquivalence.of_isLocalization_of_isLocalization (L C) (𝟭 _)
 
 open HomologicalComplex in
@@ -321,7 +275,7 @@ instance : TwoSquare.GuitartExact (iso C).inv :=
       ObjectProperty.homMk ?_, ?_, ?_⟩
     · ext : 1
       exact eq_of_homotopy _ _ (cylinder.homotopy₀₁ _ (fun n ↦ ⟨n - 1, by simp⟩))
-    · exact (cylinder.mapHomologicalComplexObjIso K₁ (Projectives.ι C)
+    · exact (cylinder.mapHomologicalComplexObjIso K₁ (ProjectiveObject.ι C)
           (fun n ↦ ⟨n - 1, by simp⟩)).hom ≫
         cylinder.desc f₀ f₁ (homotopyOfEq _ _ ((HomotopyCategory.Minus.ι C).congr_map hf))
     · dsimp [Functor.mapCochainComplexMinus]
