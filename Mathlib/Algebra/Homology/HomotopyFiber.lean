@@ -1,202 +1,189 @@
 /-
-Copyright (c) 2024 Joël Riou. All rights reserved.
+Copyright (c) 2023 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joël Riou
 -/
 module
 
-public import Mathlib.Algebra.Homology.Homotopy
+public import Mathlib.Algebra.Homology.HomotopyCofiber
+public import Mathlib.Algebra.Homology.Opposite
 
-/-!
-# Homotopy fiber
+/-! The homotopy fiber of a morphism of homological complexes
+
 -/
 
 @[expose] public section
 
-open CategoryTheory Limits HomologicalComplex Category
-  ZeroObject
 
-namespace HomologicalComplex
+open CategoryTheory Category Limits Preadditive Opposite
 
-variable {C ι : Type*} [Category C] [HasZeroMorphisms C]
-  [HasZeroObject C] {c : ComplexShape ι} [DecidableRel c.Rel]
-  (K : HomologicalComplex C c)
-
-noncomputable def prevX (j : ι) : C :=
-  if c.Rel (c.prev j) j
-  then K.X (c.prev j)
-  else 0
-
-lemma isZero_prevX (j : ι) (h : ¬ c.Rel (c.prev j) j) :
-    IsZero (K.prevX j) := by
-  dsimp [prevX]
-  rw [if_neg h]
-  exact Limits.isZero_zero C
-
-noncomputable def prevXIso (i j : ι) (hij : c.Rel i j) : K.prevX j ≅ K.X i :=
-  eqToIso (by
-    dsimp [prevX]
-    obtain rfl := c.prev_eq' hij
-    rw [if_pos hij])
-
-noncomputable def prevXd (j : ι) : K.prevX j ⟶ K.X j :=
-  if hj : c.Rel (c.prev j) j
-  then (K.prevXIso _ _ hj).hom ≫ K.d (c.prev j) j
-  else 0
-
-@[reassoc (attr := simp)]
-lemma prevXIso_inv_d {i j : ι} (hij : c.Rel i j) :
-    (K.prevXIso _ _ hij).inv ≫ K.prevXd j = K.d i j := by
-  obtain rfl := c.prev_eq' hij
-  dsimp [prevXd]
-  rw [dif_pos hij, Iso.inv_hom_id_assoc]
-
-@[reassoc (attr := simp)]
-lemma prevXd_d (j k : ι) : K.prevXd j ≫ K.d j k = 0 := by
-  dsimp [prevXd]
-  split_ifs <;> simp
-
-end HomologicalComplex
+variable {C : Type*} [Category* C] [Preadditive C]
 
 namespace Homotopy
 
-variable {C ι : Type*} [Category C] [Preadditive C]
-  [HasZeroObject C] {c : ComplexShape ι} [DecidableEq ι] [DecidableRel c.Rel]
-  {K L : HomologicalComplex C c} {f g : K ⟶ L} (H : Homotopy f g)
+variable {α : Type*} {c : ComplexShape α}
 
-noncomputable def homToPrevX (j : ι) : K.X j ⟶ L.prevX j :=
-  if hj : c.Rel (c.prev j) j
-  then H.hom _ _ ≫ (L.prevXIso _ _ hj).inv
-  else 0
+open HomologicalComplex
 
-omit [DecidableEq ι] in
-@[reassoc]
-lemma homToPrevX_prevXd (j : ι) :
-    H.homToPrevX j ≫ L.prevXd j = prevD j H.hom := by
-  dsimp [prevXd, homToPrevX]
-  split_ifs with h
-  · simp [toPrev, dTo]
-  · dsimp [dTo]
-    rw [L.shape _ _ h, comp_zero, comp_zero]
+@[simps]
+def unop {F G : HomologicalComplex Cᵒᵖ c} {φ₁ φ₂ : F ⟶ G}
+    (h : Homotopy φ₁ φ₂) :
+      Homotopy ((unopFunctor C c).map φ₁.op) ((unopFunctor C c).map φ₂.op) where
+  hom i j := (h.hom j i).unop
+  zero i j hij := Quiver.Hom.op_inj (h.zero _ _ hij)
+  comm n := Quiver.Hom.op_inj (by
+    dsimp
+    rw [h.comm n]
+    dsimp
+    nth_rw 2 [add_comm]
+    rfl)
 
-omit [DecidableEq ι] in
-@[reassoc (attr := simp)]
-lemma homToPrevX_prevXIso_hom (i j : ι) (hij : c.Rel i j) :
-    H.homToPrevX j ≫ (L.prevXIso _ _ hij).hom = H.hom j i := by
-  obtain rfl := c.prev_eq' hij
-  simp [homToPrevX, dif_pos hij]
+@[simps]
+def op {F G : HomologicalComplex C c} {φ₁ φ₂ : F ⟶ G}
+    (h : Homotopy φ₁ φ₂) :
+      Homotopy ((opFunctor C c).map φ₁.op) ((opFunctor C c).map φ₂.op) where
+  hom i j := (h.hom j i).op
+  zero i j hij := Quiver.Hom.unop_inj (h.zero _ _ hij)
+  comm n := Quiver.Hom.unop_inj (by
+    dsimp
+    rw [h.comm n]
+    dsimp
+    nth_rw 2 [add_comm]
+    rfl)
 
 end Homotopy
 
-namespace CochainComplex
+def ComplexShape.decidableRelSymm {α : Type*} (c : ComplexShape α)
+    [DecidableRel c.Rel] :
+    DecidableRel c.symm.Rel :=
+  fun a b ↦ decidable_of_iff (c.Rel b a) Iff.rfl
 
-variable {C : Type*} [Category C] [Preadditive C] [HasZeroObject C]
-  {α : Type*} [AddRightCancelSemigroup α] [One α] [DecidableEq α]
+namespace HomologicalComplex
+
+attribute [local instance] ComplexShape.decidableRelSymm
+
+variable {α : Type*} {c : ComplexShape α} {F G K : HomologicalComplex C c} (φ : F ⟶ G)
+
+variable [DecidableRel c.Rel]
 
 section
 
-variable {F G : CochainComplex C α} (f : F ⟶ G)
-  [∀ (n : α), HasBinaryBiproduct (F.X n) (G.prevX n)]
+/-- A morphism of homological complexes `φ : F ⟶ G` has a homotopy fiber if for all
+indices `i` and `j` such that `c.Rel i j`, the binary biproduct `F.X i ⊞ G.X j` exists. -/
+class HasHomotopyFiber (φ : F ⟶ G) : Prop where
+  hasBinaryBiproduct (φ) (i j : α) (hij : c.Rel i j) : HasBinaryBiproduct (G.X i) (F.X j)
 
-noncomputable def homotopyFiber : CochainComplex C α where
-  X i := F.X i ⊞ G.prevX i
-  d i j :=
-    if hij : i + 1 = j
-    then
-      biprod.fst ≫ F.d _ _ ≫ biprod.inl -
-      (biprod.fst ≫ f.f i + biprod.snd ≫ G.prevXd i) ≫ (G.prevXIso _ _ hij).inv ≫ biprod.inr
-    else 0
-  shape i j (hij : i + 1 ≠ j) := by simp only [dif_neg hij]
-  d_comp_d' := by
-    rintro i _ _ rfl rfl
-    simp
+instance [HasBinaryBiproducts C] : HasHomotopyFiber φ where
+  hasBinaryBiproduct _ _ _ := inferInstance
 
-namespace HomotopyFiber
+variable [HasHomotopyFiber φ] [DecidableRel c.Rel]
 
-lemma d_eq (i j : α) (h : i + 1 = j) :
-    (homotopyFiber f).d i j =
-      biprod.fst ≫ F.d _ _ ≫ biprod.inl -
-      (biprod.fst ≫ f.f i + biprod.snd ≫ G.prevXd i) ≫ (G.prevXIso _ _ h).inv ≫ biprod.inr :=
-  dif_pos h
+instance : HasHomotopyCofiber ((opFunctor C c).map φ.op) where
+  hasBinaryBiproduct i j hij := by
+    have := HasHomotopyFiber.hasBinaryBiproduct φ j i hij
+    dsimp
+    infer_instance
 
-noncomputable def fst : homotopyFiber f ⟶ F where
-  f n := biprod.fst
-  comm' := by
-    rintro i _ rfl
-    simp only [d_eq _ _ _ rfl, Preadditive.add_comp, assoc, Preadditive.sub_comp,
-      biprod.inl_fst, comp_id, biprod.inr_fst, comp_zero, add_zero, sub_zero]
-
-noncomputable def lift {M : CochainComplex C α} (φ : M ⟶ F) (h : Homotopy (φ ≫ f) 0) :
-    M ⟶ homotopyFiber f where
-  f n := biprod.lift (φ.f n) (-h.homToPrevX n)
-  comm' := by
-    rintro i _ rfl
-    rw [d_eq _ _ _ rfl]
-    simp only [Preadditive.add_comp, assoc, Preadditive.comp_sub,
-      biprod.lift_fst_assoc, Hom.comm_assoc, Preadditive.comp_add, biprod.lift_snd_assoc,
-      Preadditive.neg_comp]
-    apply biprod.hom_ext
-    · simp
-    · dsimp
-      simp only [Preadditive.sub_comp, Preadditive.neg_comp,
-        biprod.inl_snd, comp_zero, biprod.inr_snd,
-        comp_id, zero_sub, neg_add_rev, neg_neg, biprod.lift_snd,
-        ← cancel_mono (G.prevXIso i (i + 1) rfl).hom,
-        Preadditive.add_comp, assoc, Iso.inv_hom_id, comp_id, zero_f,
-        h.homToPrevX_prevXd, h.homToPrevX_prevXIso_hom, ← comp_f, h.comm i, add_zero,
-        dNext_eq h.hom rfl, Preadditive.comp_neg, add_neg_cancel_left]
-
-@[reassoc (attr := simp)]
-lemma lift_fst {M : CochainComplex C α} (φ : M ⟶ F) (h : Homotopy (φ ≫ f) 0) :
-    lift f φ h ≫ fst f = φ := by
-  ext n
-  simp [lift, fst]
-
-end HomotopyFiber
+noncomputable def homotopyFiber : HomologicalComplex C c :=
+  (unopFunctor C c.symm).obj (op (homotopyCofiber ((opFunctor C c).map φ.op)))
 
 end
 
-section
+variable (K)
+variable [∀ i, HasBinaryBiproduct (K.X i) (K.X i)]
 
-variable (K L : CochainComplex C α) [HasBinaryBiproduct K K]
-  [∀ (n : α), HasBinaryBiproduct ((K ⊞ K).X n) (prevX K n)]
+instance (i : α) : HasBinaryBiproduct (K.op.X i) (K.op.X i) := by
+  dsimp; infer_instance
 
-noncomputable abbrev pathObject : CochainComplex C α := homotopyFiber (biprod.desc (𝟙 K) (-𝟙 K))
+abbrev HasPathObject := HasHomotopyCofiber (biprod.lift (𝟙 K.op) (-𝟙 K.op))
+
+variable [K.HasPathObject]
+
+noncomputable def pathObject := (unopFunctor C c.symm).obj (op K.op.cylinder)
 
 namespace pathObject
 
-variable {K L}
+noncomputable def π₀ : K.pathObject ⟶ K :=
+  (unopFunctor C c.symm).map (cylinder.ι₀ K.op).op
 
-noncomputable def π₀ : pathObject K ⟶ K := HomotopyFiber.fst _ ≫ biprod.fst
+noncomputable def π₁ : K.pathObject ⟶ K :=
+  (unopFunctor C c.symm).map (cylinder.ι₁ K.op).op
 
-noncomputable def π₁ : pathObject K ⟶ K := HomotopyFiber.fst _ ≫ biprod.snd
+noncomputable def ι : K ⟶ K.pathObject :=
+  (unopFunctor C c.symm).map (cylinder.π K.op).op
+
+@[reassoc (attr := simp)]
+lemma π₀_ι : ι K ≫ π₀ K = 𝟙 K :=
+  Quiver.Hom.op_inj ((opFunctor C c).map_injective (cylinder.ι₀_π K.op))
+
+@[reassoc (attr := simp)]
+lemma π₁_ι : ι K ≫ π₁ K = 𝟙 K :=
+  Quiver.Hom.op_inj ((opFunctor C c).map_injective (cylinder.ι₁_π K.op))
+
+noncomputable def homotopy₀₁ (hc : ∀ (i : α), ∃ j, c.Rel i j) : Homotopy (π₀ K) (π₁ K) :=
+  (cylinder.homotopy₀₁ K.op hc).unop
+
+/-- The homotopy equivalence between `K` and `K.pathObject`. -/
+noncomputable def homotopyEquiv (hc : ∀ (i : α), ∃ j, c.Rel i j) :
+    HomotopyEquiv K K.pathObject where
+  hom := ι K
+  inv := π₀ K
+  homotopyHomInvId := Homotopy.ofEq (by simp)
+  homotopyInvHomId := (cylinder.πCompι₀Homotopy K.op hc).unop
 
 section
 
-variable (f₀ f₁ : L ⟶ K) (h : Homotopy f₀ f₁)
+variable {K} (φ₀ φ₁ : F ⟶ K) (h : Homotopy φ₀ φ₁)
 
-noncomputable def lift : L ⟶ pathObject K :=
-  HomotopyFiber.lift _ (biprod.lift f₀ f₁)
-    (Homotopy.trans (Homotopy.ofEq (by simp [sub_eq_add_neg])) (Homotopy.equivSubZero h))
+noncomputable def lift : F ⟶ K.pathObject := by
+  letI φ : K.op.cylinder ⟶ (opFunctor C c).obj (op F) :=
+    cylinder.desc ((opFunctor C c).map φ₀.op)
+      ((opFunctor C c).map φ₁.op) h.op
+  exact (unopFunctor C c.symm).map φ.op
 
 @[reassoc (attr := simp)]
-lemma lift_π₀ : lift f₀ f₁ h ≫ π₀ = f₀ := by simp [lift, π₀]
+lemma lift_π₀ : lift φ₀ φ₁ h ≫ π₀ K = φ₀ :=
+  Quiver.Hom.op_inj ((opFunctor C c).map_injective (cylinder.ι₀_desc _ _ _))
 
 @[reassoc (attr := simp)]
-lemma lift_π₁ : lift f₀ f₁ h ≫ π₁ = f₁ := by simp [lift, π₁]
+lemma lift_π₁ : lift φ₀ φ₁ h ≫ π₁ K = φ₁ :=
+  Quiver.Hom.op_inj ((opFunctor C c).map_injective (cylinder.ι₁_desc _ _ _))
 
 end
 
-noncomputable def ι : K ⟶ pathObject K := lift (𝟙 K) (𝟙 K) (Homotopy.refl _)
+variable (F) {D : Type*} [Category* D] [Preadditive D] (H : C ⥤ D) [H.Additive]
+  [∀ (i : α), HasBinaryBiproduct (((H.mapHomologicalComplex c).obj K).X i)
+    (((H.mapHomologicalComplex c).obj K).X i)]
+  [((H.mapHomologicalComplex c).obj K).HasPathObject]
+  [∀ (i : α),
+    HasBinaryBiproduct (((H.op.mapHomologicalComplex c.symm).obj K.op).X i)
+      (((H.op.mapHomologicalComplex c.symm).obj K.op).X i)]
+  [HasHomotopyCofiber
+    (biprod.lift (𝟙 ((H.op.mapHomologicalComplex c.symm).obj K.op))
+    (-𝟙 ((H.op.mapHomologicalComplex c.symm).obj K.op)))]
+  [HasHomotopyCofiber ((H.op.mapHomologicalComplex c.symm).map (biprod.lift (𝟙 K.op) (-𝟙 K.op)))]
+  (hc : ∀ (i : α), ∃ j, c.Rel i j)
+
+noncomputable def mapHomologicalComplexObjIso :
+    (H.mapHomologicalComplex c).obj (K.pathObject) ≅
+      pathObject ((H.mapHomologicalComplex c).obj K) :=
+  (unopFunctor _ _).mapIso
+    (cylinder.mapHomologicalComplexObjIso K.op H.op hc).op.symm
 
 @[reassoc (attr := simp)]
-lemma ι_π₀ : ι ≫ π₀ = 𝟙 K := lift_π₀ _ _ _
+lemma mapHomologicalComplexObjIso_hom_map_π₀ :
+    (mapHomologicalComplexObjIso K H hc).inv ≫ (H.mapHomologicalComplex c).map (π₀ K) =
+      π₀ _ :=
+  Quiver.Hom.op_inj ((opFunctor _ _).map_injective
+    (cylinder.map_ι₀_mapHomologicalComplexObjIso_hom K.op H.op hc))
 
 @[reassoc (attr := simp)]
-lemma ι_π₁ : ι ≫ π₁ = 𝟙 K := lift_π₁ _ _ _
+lemma mapHomologicalComplexObjIso_hom_map_π₁ :
+    (mapHomologicalComplexObjIso K H hc).inv ≫ (H.mapHomologicalComplex c).map (π₁ K) =
+      π₁ _ :=
+  Quiver.Hom.op_inj ((opFunctor _ _).map_injective
+    (cylinder.map_ι₁_mapHomologicalComplexObjIso_hom K.op H.op hc))
 
 end pathObject
 
-end
-
-end CochainComplex
+end HomologicalComplex

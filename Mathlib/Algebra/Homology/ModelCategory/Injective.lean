@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Algebra.Homology.Factorizations.CM5a
 public import Mathlib.Algebra.Homology.ModelCategory.Lifting
+public import Mathlib.AlgebraicTopology.ModelCategory.IsCofibrant
 public import Mathlib.Algebra.Homology.HomologySequence
 public import Mathlib.Algebra.Homology.HomotopyCategory.Plus
 public import Mathlib.Algebra.Homology.HomotopyCategory.KInjective
@@ -216,6 +217,12 @@ instance : (cofibrations (Plus C)).HasFactorization (trivialFibrations (Plus C))
     }⟩
 
 scoped instance : ModelCategory (CochainComplex.Plus C) where
+
+lemma isFibrant_iff (X : Plus C) :
+    IsFibrant X ↔ ∀ (n : ℤ), Injective (X.obj.X n) := by
+  rw [HomotopicalAlgebra.isFibrant_iff, fibration_iff,
+    degreewiseEpiWithInjectiveKernel_iff_of_isZero]
+  exact Functor.map_isZero (Plus.ι C) (IsZero.of_mono_zero _ X)
 
 end modelCategoryQuillen
 

@@ -219,6 +219,9 @@ lemma isIso_iff {X Y : DerivedCategory.Plus C} (f : X ⟶ Y) :
       exact h
     apply isIso_of_fully_faithful ι
 
+def Q : CochainComplex.Plus C ⥤ DerivedCategory.Plus C :=
+  HomotopyCategory.Plus.quotient C ⋙ Qh
+
 end Plus
 
 end DerivedCategory

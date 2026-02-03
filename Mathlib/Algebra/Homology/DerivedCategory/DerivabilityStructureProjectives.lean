@@ -272,14 +272,12 @@ instance : TwoSquare.GuitartExact (iso C).inv :=
     refine ⟨⟨K₁.cylinder, CochainComplex.minus_cylinder _ ⟨_, hn₁⟩⟩,
       ObjectProperty.homMk (cylinder.ι₀ _),
       ObjectProperty.homMk (cylinder.ι₁ _), ?_,
-      ObjectProperty.homMk ?_, ?_, ?_⟩
+      ObjectProperty.homMk ?_, ?_⟩
     · ext : 1
       exact eq_of_homotopy _ _ (cylinder.homotopy₀₁ _ (fun n ↦ ⟨n - 1, by simp⟩))
     · exact (cylinder.mapHomologicalComplexObjIso K₁ (ProjectiveObject.ι C)
           (fun n ↦ ⟨n - 1, by simp⟩)).hom ≫
         cylinder.desc f₀ f₁ (homotopyOfEq _ _ ((HomotopyCategory.Minus.ι C).congr_map hf))
-    · dsimp [Functor.mapCochainComplexMinus]
-      cat_disch
     · dsimp [Functor.mapCochainComplexMinus]
       cat_disch)
 

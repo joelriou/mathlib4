@@ -104,4 +104,11 @@ lemma degreewiseMonoWithProjectiveCokernel_iff_of_isZero {K L : CochainComplex C
     rw [monoWithProjectiveCokernel_iff_of_isZero]
     exact Functor.map_isZero (HomologicalComplex.eval _ _ n) hK)
 
+lemma degreewiseEpiWithInjectiveKernel_iff_of_isZero {K L : CochainComplex C ℤ}
+    (f : K ⟶ L) (hL : IsZero L) :
+    degreewiseEpiWithInjectiveKernel f ↔ ∀ (n : ℤ), Injective (K.X n) :=
+  forall_congr' (fun n ↦ by
+    rw [epiWithInjectiveKernel_iff_of_isZero]
+    exact Functor.map_isZero (HomologicalComplex.eval _ _ n) hL)
+
 end CochainComplex

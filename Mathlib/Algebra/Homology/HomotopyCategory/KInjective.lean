@@ -197,4 +197,16 @@ lemma IsKInjective.eq_δ_of_cocycle' {K L : CochainComplex C ℤ} {n : ℤ}
     IsKInjective.eq_δ_of_cocycle (Cocycle.ofHom (𝟙 L)) hL (-1) (by simp)
   exact ⟨z.1.comp β (by lia), by simp [δ_comp z.1 β _ _ 0 _ hm rfl (by simp), hβ]⟩
 
+lemma IsKInjective.bijective_precomp
+    {K₁ K₂ : CochainComplex C ℤ} (f : K₁ ⟶ K₂) [QuasiIso f] (L : CochainComplex C ℤ)
+    [L.IsKInjective] :
+    Function.Bijective (fun g : ((HomotopyCategory.quotient _ _).obj K₂ ⟶
+      (HomotopyCategory.quotient _ _).obj L) ↦
+        (HomotopyCategory.quotient _ _).map f ≫ g) := by
+  have hL := IsKInjective.rightOrthogonal L
+  rw [← ObjectProperty.isLocal_trW] at hL
+  apply hL
+  rwa [← HomotopyCategory.quasiIso_eq_subcategoryAcyclic_trW,
+    HomotopyCategory.quotient_map_mem_quasiIso_iff]
+
 end CochainComplex

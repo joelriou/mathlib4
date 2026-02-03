@@ -154,6 +154,13 @@ lemma monoWithProjectiveCokernel_iff_of_isZero {X Y : C} (f : X ⟶ Y) (hX : IsZ
     { hom := cokernel.desc _ (𝟙 Y) (hX.eq_of_src _ _)
       inv := cokernel.π f }
 
+lemma epiWithInjectiveKernel_iff_of_isZero {X Y : C} (f : X ⟶ Y) (hY : IsZero Y) :
+    epiWithInjectiveKernel f ↔ Injective X := by
+  simp only [epiWithInjectiveKernel, hY.epi f, true_and]
+  exact Injective.iso_iff
+    { hom := kernel.ι f
+      inv := kernel.lift _ (𝟙 X) (hY.eq_of_tgt _ _) }
+
 end Abelian
 
 end CategoryTheory

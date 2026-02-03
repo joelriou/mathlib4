@@ -9,9 +9,11 @@ public import Mathlib.Algebra.Homology.HomotopyCategory.Triangulated
 public import Mathlib.Algebra.Homology.HomotopyCategory.SingleFunctors
 public import Mathlib.Algebra.Homology.DerivedCategory.Basic
 public import Mathlib.Algebra.Homology.CochainComplexPlus
+public import Mathlib.Algebra.Homology.HomotopyFiber
 public import Mathlib.Algebra.Homology.Embedding.CochainComplex
 public import Mathlib.CategoryTheory.Triangulated.Subcategory
 public import Mathlib.CategoryTheory.Shift.SingleFunctorsLift
+public import Mathlib.CategoryTheory.Localization.OfQuotient
 
 /-!
 # The triangulated subcategory K^+
@@ -22,15 +24,51 @@ public import Mathlib.CategoryTheory.Shift.SingleFunctorsLift
 
 open CategoryTheory Category Limits Triangulated ZeroObject Pretriangulated
 
-variable (C : Type _) [Category C] [Preadditive C] [HasZeroObject C] [HasBinaryBiproducts C]
+variable (C : Type _) [Category C] [Preadditive C]
   {D : Type _} [Category D] [Preadditive D] [HasZeroObject D] [HasBinaryBiproducts D]
   (A : Type _) [Category A] [Abelian A]
+
+variable {C} [HasBinaryBiproducts C] in
+open HomologicalComplex in
+lemma CochainComplex.plus_cylinder (K : CochainComplex C ℤ) (hK : CochainComplex.plus C K) :
+    CochainComplex.plus C (cylinder K) := by
+  obtain ⟨n, hn⟩ := hK
+  refine ⟨n - 1, ?_⟩
+  rw [CochainComplex.isStrictlyGE_iff]
+  intro i hi
+  dsimp [cylinder]
+  refine homotopyCofiber.isZero_X _ _ ?_ (fun j hj ↦ ?_)
+  · refine IsZero.of_iso ?_ ((HomologicalComplex.eval C (.up ℤ) i).mapBiprod _ _)
+    simpa using K.isZero_of_isStrictlyGE n i
+  · simp only [ComplexShape.up_Rel] at hj
+    exact K.isZero_of_isStrictlyGE n _ (by lia)
+
+open HomologicalComplex in
+attribute [local instance] ComplexShape.decidableRelSymm in
+variable {C} [HasBinaryBiproducts C] in
+lemma CochainComplex.plus_pathObject (K : CochainComplex C ℤ) (hK : CochainComplex.plus C K) :
+    CochainComplex.plus C (pathObject K) := by
+  obtain ⟨n, hn⟩ := hK
+  refine ⟨n - 1, ?_⟩
+  rw [CochainComplex.isStrictlyGE_iff]
+  intro i hi
+  apply IsZero.unop
+  dsimp [pathObject]
+  refine homotopyCofiber.isZero_X _ _ ?_ (fun j hj ↦ IsZero.op ?_)
+  · have : PreservesBinaryBiproduct (HomologicalComplex.op K) (HomologicalComplex.op K)
+        (eval Cᵒᵖ (ComplexShape.down ℤ) i) :=
+      instPreservesBinaryBiproductEval _ _ _
+    refine IsZero.of_iso ?_ ((HomologicalComplex.eval Cᵒᵖ (.down ℤ) i).mapBiprod K.op K.op)
+    simpa using (K.isZero_of_isStrictlyGE n i).op
+  · simp only [ComplexShape.symm_Rel, ComplexShape.up_Rel] at hj
+    exact K.isZero_of_isStrictlyGE n _ (by lia)
 
 namespace HomotopyCategory
 
 def plus : ObjectProperty (HomotopyCategory C (ComplexShape.up ℤ)) :=
   fun K ↦ ∃ (n : ℤ), CochainComplex.IsStrictlyGE K.1 n
 
+variable [HasZeroObject C] [HasBinaryBiproducts C] in
 instance : (plus C).IsTriangulated where
   exists_zero := by
     refine ⟨⟨0⟩, ?_, ⟨0, ?_⟩⟩
@@ -96,6 +134,54 @@ instance : (quasiIso A).IsCompatibleWithShift ℤ where
     exact (HomotopyCategory.quasiIso A (ComplexShape.up ℤ)).arrow_mk_iso_iff
       (Arrow.isoOfNatIso ((ι A).commShiftIso a) (Arrow.mk f))
 
+instance : (quasiIso A).RespectsIso := by
+  dsimp only [quasiIso]
+  infer_instance
+
+@[simps!]
+def quotient : CochainComplex.Plus C ⥤ Plus C :=
+  ObjectProperty.lift _
+    (CochainComplex.Plus.ι C ⋙ HomotopyCategory.quotient C (ComplexShape.up ℤ)) (by
+      rintro ⟨K, n, hn⟩
+      exact ⟨n, hn⟩)
+
+variable {C} in
+lemma quotient_obj_surjective :
+    Function.Surjective (quotient C).obj :=
+  fun K ↦ ⟨⟨K.obj.as, K.property⟩, rfl⟩
+
+instance : (quotient C).EssSurj where
+  mem_essImage K := ⟨⟨K.obj.as, K.property⟩, ⟨Iso.refl _⟩⟩
+
+instance : (quotient C).Full := by dsimp [quotient]; infer_instance
+
+variable [HasZeroObject C] [HasBinaryBiproducts C] in
+open HomologicalComplex in
+instance :
+    (quotient C).IsLocalization
+      ((homotopyEquivalences C (.up ℤ)).inverseImage (CochainComplex.Plus.ι C)) :=
+  Functor.isLocalization_of_essSurj_of_full_of_exists_cylinders _ _ (fun _ _ f hf ↦ by
+    rw [← isIso_iff_of_reflects_iso _ (HomotopyCategory.Plus.ι C)]
+    dsimp
+    rwa [isIso_quotient_map_iff_homotopyEquivalences]) (by
+    rintro ⟨K, hK⟩ ⟨L, hL⟩ f₀ f₁ hf
+    obtain ⟨f₀, rfl⟩ := ObjectProperty.homMk_surjective f₀
+    obtain ⟨f₁, rfl⟩ := ObjectProperty.homMk_surjective f₁
+    dsimp at f₀ f₁ hf
+    replace hf := homotopyOfEq f₀ f₁ ((HomotopyCategory.Plus.ι _).congr_map hf)
+    refine ⟨⟨cylinder K, CochainComplex.plus_cylinder _ hK⟩,
+      ObjectProperty.homMk (cylinder.ι₀ _),
+      ObjectProperty.homMk (cylinder.ι₁ _),
+      ObjectProperty.homMk (cylinder.π _), ?_, by cat_disch, by cat_disch,
+      ObjectProperty.homMk (cylinder.desc f₀ f₁ hf), by cat_disch, by cat_disch⟩
+    exact ⟨cylinder.homotopyEquiv _ (fun n ↦ ⟨n - 1, by simp⟩), rfl⟩)
+
+def quotientCompι :
+  quotient C ⋙ ι C ≅
+    CochainComplex.Plus.ι C ⋙ HomotopyCategory.quotient C (ComplexShape.up ℤ) := by
+  apply ObjectProperty.liftCompιIso
+
+variable [HasZeroObject C] [HasBinaryBiproducts C]
 noncomputable def singleFunctors : SingleFunctors C (Plus C) ℤ :=
   SingleFunctors.lift (HomotopyCategory.singleFunctors C) (ι C)
     (fun n => (plus C).lift (singleFunctor C n) (fun X => by
@@ -133,10 +219,12 @@ def mapHomotopyCategoryPlus : HomotopyCategory.Plus C ⥤ HomotopyCategory.Plus 
       dsimp [HomotopyCategory.Plus.ι, HomotopyCategory.quotient, Quotient.functor]
       infer_instance)
 
+variable [HasZeroObject C] [HasBinaryBiproducts C] in
 noncomputable instance : (F.mapHomotopyCategoryPlus).CommShift ℤ := by
   dsimp only [mapHomotopyCategoryPlus]
   infer_instance
 
+variable [HasZeroObject C] [HasBinaryBiproducts C] in
 instance : (F.mapHomotopyCategoryPlus).IsTriangulated := by
   dsimp only [mapHomotopyCategoryPlus]
   infer_instance

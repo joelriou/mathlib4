@@ -8,6 +8,9 @@ module
 public import Mathlib.Algebra.Homology.DerivedCategory.DerivabilityStructureInjectives
 public import Mathlib.Algebra.Homology.HomotopyCategory.Devissage
 public import Mathlib.CategoryTheory.Functor.Derived.RightDerivedComposition
+public import Mathlib.CategoryTheory.Functor.Derived.RightDerivedCommShift
+public import Mathlib.CategoryTheory.Functor.Derived.RightDerivedTriangulated
+public import Mathlib.CategoryTheory.Localization.DerivabilityStructure.Triangulated
 public import Mathlib.CategoryTheory.Triangulated.TStructure.Homology
 
 /-!
@@ -71,11 +74,19 @@ instance :
   dsimp only [rightDerivedFunctorPlus, rightDerivedFunctorPlusUnit]
   infer_instance
 
-instance (X : HomotopyCategory.Plus (Injectives C)) :
-    IsIso  (F.rightDerivedFunctorPlusUnit.app
-      ((Injectives.ι C).mapHomotopyCategoryPlus.obj X)) := by
+instance (X : HomotopyCategory.Plus (InjectiveObject C)) :
+    IsIso (F.rightDerivedFunctorPlusUnit.app
+      ((InjectiveObject.ι C).mapHomotopyCategoryPlus.obj X)) := by
   dsimp only [rightDerivedFunctorPlus, rightDerivedFunctorPlusUnit]
   infer_instance
+
+instance (K : CochainComplex.Plus (InjectiveObject C)) :
+    IsIso (F.rightDerivedFunctorPlusUnit.app
+      ((HomotopyCategory.Plus.quotient C).obj
+        ((InjectiveObject.ι C).mapCochainComplexPlus.obj K))) :=
+  inferInstanceAs (IsIso (F.rightDerivedFunctorPlusUnit.app
+    ((InjectiveObject.ι C).mapHomotopyCategoryPlus.obj
+      ((HomotopyCategory.Plus.quotient _).obj K))))
 
 noncomputable instance : F.rightDerivedFunctorPlus.CommShift ℤ :=
   IsRightDerivedFunctor.commShift F.rightDerivedFunctorPlus F.rightDerivedFunctorPlusUnit
@@ -85,10 +96,8 @@ noncomputable instance : NatTrans.CommShift F.rightDerivedFunctorPlusUnit ℤ :=
   infer_instance
 
 instance : F.rightDerivedFunctorPlus.IsTriangulated :=
-  LocalizerMorphism.isTriangulated_of_isRightDerivedFunctor
-    (Φ := (Injectives.localizerMorphism C))
-    (hF := MorphismProperty.isomorphisms_isInvertedBy _)
-    (α := F.rightDerivedFunctorPlusUnit)
+  (HomotopyCategory.Plus.localizerMorphism C).isTriangulated_of_isRightDerivedFunctor _
+    (MorphismProperty.isomorphisms_isInvertedBy _) _ _ (F.rightDerivedFunctorPlusUnit)
 
 section
 
@@ -96,30 +105,20 @@ open DerivedCategory.Plus.TStructure
 
 instance : F.rightDerivedFunctorPlus.RightTExact t t where
   objGE X n hX := by
-    obtain ⟨K, hK, ⟨e⟩⟩ : ∃ (K : CochainComplex C ℤ) (hK : K.IsStrictlyGE n),
-        Nonempty (X ≅ DerivedCategory.Plus.Qh.obj ⟨⟨K⟩, n, hK⟩) := by
-      obtain ⟨Y, _, ⟨e⟩⟩ := DerivedCategory.exists_iso_Q_obj_of_isGE
-        (DerivedCategory.Plus.ι.obj X) n
-      exact ⟨Y, inferInstance, ⟨DerivedCategory.Plus.ι.preimageIso e⟩⟩
-    let r := Injectives.rightResolution_localizerMorphism K n
-    have e' : (DerivedCategory.Plus.ι.obj (DerivedCategory.Plus.Qh.obj
-        ((mapHomotopyCategoryPlus F).obj
-          ((mapHomotopyCategoryPlus (Injectives.ι C)).obj r.X₁)))) ≅
-      DerivedCategory.Q.obj ((F.mapHomologicalComplex _).obj (K.injectiveResolution n)) :=
-      (DerivedCategory.Plus.QhCompιIsoιCompQh D).app _ ≪≫
-        (DerivedCategory.quotientCompQhIso D).app _
-    have : ((mapHomotopyCategoryPlus F ⋙ DerivedCategory.Plus.Qh).obj
-        ((mapHomotopyCategoryPlus (Injectives.ι C)).obj r.X₁)).IsGE n := by
-      dsimp
-      rw [← DerivedCategory.Plus.isGE_ι_obj_iff]
-      exact DerivedCategory.TStructure.t.isGE_of_iso e'.symm n
-    have : IsIso (DerivedCategory.Plus.Qh.map r.w) := Localization.inverts _ _ _ r.hw
-    have : t.IsGE ((rightDerivedFunctorPlus F).obj (DerivedCategory.Plus.Qh.obj
-      ((Injectives.localizerMorphism C).functor.obj r.X₁))) n :=
-      t.isGE_of_iso (asIso (F.rightDerivedFunctorPlusUnit.app
-        ((Injectives.ι C).mapHomotopyCategoryPlus.obj r.X₁))) n
-    apply (t.isGE_of_iso (F.rightDerivedFunctorPlus.mapIso
-      (e ≪≫ asIso (DerivedCategory.Plus.Qh.map r.w)).symm))
+    obtain ⟨L, _, ⟨e⟩⟩ := DerivedCategory.Plus.exists_injective_resolution X n
+    let iso :
+        DerivedCategory.Plus.Q.obj
+          ((InjectiveObject.ι C ⋙ F).mapCochainComplexPlus.obj L) ≅
+        F.rightDerivedFunctorPlus.obj (DerivedCategory.Plus.Q.obj
+          ((InjectiveObject.ι C).mapCochainComplexPlus.obj L)) :=
+      asIso (F.rightDerivedFunctorPlusUnit.app
+        ((HomotopyCategory.Plus.quotient C).obj
+          ((InjectiveObject.ι C).mapCochainComplexPlus.obj L)))
+    rw [← t.isGE_iff_of_iso (F.rightDerivedFunctorPlus.mapIso e), ← t.isGE_iff_of_iso iso]
+    simp only [← DerivedCategory.Plus.isGE_ι_obj_iff]
+    change DerivedCategory.TStructure.t.IsGE
+      (DerivedCategory.Q.obj (((InjectiveObject.ι C ⋙ F).mapHomologicalComplex _).obj L.obj)) n
+    infer_instance
 
 instance (K : DerivedCategory.Plus C) (n : ℤ) [t.IsGE K n] :
     t.IsGE (F.rightDerivedFunctorPlus.obj K) n :=
@@ -307,9 +306,9 @@ lemma isIso_rightDerivedFunctorPlusCompNatTrans_app (K : HomotopyCategory.Plus C
 
 /-- isIso_rightDerivedFunctorPlusCompNatTrans' -/
 lemma isIso_rightDerivedFunctorPlusCompNatTrans'
-    (h : ∀ (K : HomotopyCategory.Plus (Injectives C)),
+    (h : ∀ (K : HomotopyCategory.Plus (InjectiveObject C)),
       IsIso (G.rightDerivedFunctorPlusUnit.app
-        ((Injectives.ι C ⋙ F).mapHomotopyCategoryPlus.obj K))) :
+        ((InjectiveObject.ι C ⋙ F).mapHomotopyCategoryPlus.obj K))) :
     IsIso (rightDerivedFunctorPlusCompNatTrans e) := by
   suffices ∀ K, IsIso ((rightDerivedFunctorPlusCompNatTrans e).app K) from
     NatIso.isIso_of_isIso_app _
@@ -322,10 +321,11 @@ lemma isIso_rightDerivedFunctorPlusCompNatTrans'
       rw [(rightDerivedFunctorPlusCompNatTrans e).naturality e'.inv]
       infer_instance
     simpa only [isIso_comp_left_iff] using this
-  obtain ⟨M, ⟨e'⟩⟩ : ∃ (M : HomotopyCategory.Plus (Injectives C)),
-    Nonempty (((Injectives.ι C).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).obj M ≅ K) :=
+  obtain ⟨M, ⟨e'⟩⟩ : ∃ (M : HomotopyCategory.Plus (InjectiveObject C)),
+    Nonempty (((InjectiveObject.ι C).mapHomotopyCategoryPlus ⋙
+      DerivedCategory.Plus.Qh).obj M ≅ K) :=
       ⟨_, ⟨Functor.objObjPreimageIso _ _⟩⟩
-  refine ⟨((Injectives.ι C).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).obj M,
+  refine ⟨((InjectiveObject.ι C).mapHomotopyCategoryPlus ⋙ DerivedCategory.Plus.Qh).obj M,
     e'.symm, ?_⟩
   apply isIso_rightDerivedFunctorPlusCompNatTrans_app
   · infer_instance
@@ -333,13 +333,13 @@ lemma isIso_rightDerivedFunctorPlusCompNatTrans'
   · infer_instance
 
 instance isIso_rightDerivedFunctorPlusCompNatTrans
-    [hFG : ∀ (I : Injectives C), IsIso (G.rightDerivedFunctorPlusUnit.app
-        ((HomotopyCategory.Plus.singleFunctor D 0).obj (F.obj ((Injectives.ι C).obj I))))] :
+    [hFG : ∀ (I : InjectiveObject C), IsIso (G.rightDerivedFunctorPlusUnit.app
+        ((HomotopyCategory.Plus.singleFunctor D 0).obj (F.obj ((InjectiveObject.ι C).obj I))))] :
     IsIso (rightDerivedFunctorPlusCompNatTrans e) := by
   apply isIso_rightDerivedFunctorPlusCompNatTrans'
   rintro ⟨⟨K⟩, n, hK⟩
   exact G.isIso_rightDerivedFunctorPlusUnit_app
-    (((Injectives.ι C ⋙ F).mapHomologicalComplex (ComplexShape.up ℤ)).obj K) n
+    (((InjectiveObject.ι C ⋙ F).mapHomologicalComplex (ComplexShape.up ℤ)).obj K) n
     (fun i _ => hFG _)
 
 end

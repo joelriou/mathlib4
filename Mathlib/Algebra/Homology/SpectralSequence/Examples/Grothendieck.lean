@@ -29,9 +29,9 @@ variable {A B C : Type*} [Category* A] [Category* B] [Category* C]
   (F : A ⥤ B) [F.Additive] [EnoughInjectives A]
   (G : B ⥤ C) [G.Additive] [EnoughInjectives B] (X : A)
 
-variable [∀ (I : Injectives A),
+variable [∀ (I : InjectiveObject A),
   IsIso (G.rightDerivedFunctorPlusUnit.app
-    ((HomotopyCategory.Plus.singleFunctor B 0).obj (F.obj ((Injectives.ι A).obj I))))]
+    ((HomotopyCategory.Plus.singleFunctor B 0).obj (F.obj ((InjectiveObject.ι A).obj I))))]
 
 noncomputable example : (F ⋙ G).rightDerivedFunctorPlus ≅
     F.rightDerivedFunctorPlus ⋙ G.rightDerivedFunctorPlus :=

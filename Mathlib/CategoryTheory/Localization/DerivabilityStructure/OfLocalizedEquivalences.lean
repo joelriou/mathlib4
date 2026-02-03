@@ -27,14 +27,13 @@ variable {C₁ C₂ D₁ D₂ : Type*} [Category C₁] [Category C₂] [Category
 
 section
 
-variable
-  [T.IsLeftDerivabilityStructure] [W₂'.RespectsIso]
+variable [W₂'.RespectsIso]
   [L.IsLocalizedEquivalence] [R.IsLocalizedEquivalence] [R.functor.EssSurj]
-  (iso : T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor)
-  [TwoSquare.GuitartExact iso.inv]
 
-include iso in
-lemma isLeftDerivabilityStructure_of_isLocalizedEquivalence :
+lemma isLeftDerivabilityStructure_of_isLocalizedEquivalence
+    [T.IsLeftDerivabilityStructure]
+    (iso : T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor)
+    [TwoSquare.GuitartExact iso.inv] :
     B.IsLeftDerivabilityStructure := by
   have : B.HasLeftResolutions := fun Y₂ ↦ by
     obtain ⟨X₂, ⟨e₂⟩⟩ := R.functor.exists_of_essSurj Y₂
@@ -56,6 +55,19 @@ lemma isLeftDerivabilityStructure_of_isLocalizedEquivalence :
     simp [e', CatCommSq.iso, iso']
   rw [B.isLeftDerivabilityStructure_iff W₁'.Q W₂'.Q F e']
   apply TwoSquare.GuitartExact.of_hComp iso.inv
+
+lemma isRightDerivabilityStructure_of_isLocalizedEquivalence
+    [T.IsRightDerivabilityStructure]
+    (iso : T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor)
+    [TwoSquare.GuitartExact iso.hom] :
+    B.IsRightDerivabilityStructure := by
+  rw [isRightDerivabilityStructure_iff_op]
+  let iso' : T.op.functor ⋙ R.op.functor ≅ L.op.functor ⋙ B.op.functor := NatIso.op iso.symm
+  have : R.op.functor.EssSurj := by
+    dsimp; infer_instance
+  have : TwoSquare.GuitartExact iso'.inv :=
+    inferInstanceAs (TwoSquare.op iso.hom).GuitartExact
+  exact isLeftDerivabilityStructure_of_isLocalizedEquivalence iso'
 
 end
 

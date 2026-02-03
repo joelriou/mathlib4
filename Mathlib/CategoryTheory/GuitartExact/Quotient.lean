@@ -5,7 +5,7 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.CategoryTheory.GuitartExact.Basic
+public import Mathlib.CategoryTheory.GuitartExact.Opposite
 
 /-!
 # Guitart exact squares given by quotient categories
@@ -41,6 +41,8 @@ the cylinder object of `X₀`.
 @[expose] public section
 
 namespace CategoryTheory
+
+open Opposite
 
 namespace TwoSquare
 
@@ -88,6 +90,20 @@ lemma quotient (e : T ⋙ R ≅ L ⋙ B)
   obtain ⟨s₀, ⟨f₀⟩⟩ := H A₀
   obtain ⟨s₁, ⟨f₁⟩⟩ := H A₁
   exact (Zigzag.of_inv f₀).trans ((hZ₀ s₀ s₁).trans (Zigzag.of_hom f₁))
+
+lemma quotient' (e : T ⋙ R ≅ L ⋙ B)
+    (h : ∀ ⦃X : C⦄ ⦃Y₀ : C₀⦄ (f₀ f₁ : X ⟶ L.obj Y₀) (_ : B.map f₀ = B.map f₁),
+      ∃ (Path : C₀) (i₀ i₁ : Path ⟶ Y₀) (_ : T.map i₀ = T.map i₁)
+          (φ : X ⟶ L.obj Path), φ ≫ L.map i₀ = f₀ ∧
+        φ ≫ L.map i₁ = f₁) : GuitartExact e.inv := by
+  rw [← guitartExact_op_iff]
+  let e' : T.op ⋙ R.op ≅ L.op ⋙ B.op := NatIso.op e.symm
+  change GuitartExact e'.hom
+  apply quotient
+  intro X Y₀ f₀ f₁ hf
+  obtain ⟨Cyl, i₀, i₁, hi, φ, hφ₀, hφ₁⟩ := h f₀.unop f₁.unop (Quiver.Hom.op_inj (by simpa))
+  exact ⟨Opposite.op Cyl, i₀.op, i₁.op, by cat_disch, φ.op, Quiver.Hom.unop_inj (by simpa),
+    Quiver.Hom.unop_inj (by simpa)⟩
 
 end GuitartExact
 
