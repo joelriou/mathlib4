@@ -180,11 +180,6 @@ instance : (HomotopyCategory.quasiIso A (.up ℤ)).kFlat.IsTriangulated where
         (HomotopyCategory.subcategoryAcyclic A).ext_of_isTriangulatedClosed₂ _
       (((curriedTensor _).obj Z).map_distinguished _ hT) (h₁ Z hZ).2 (h₃ Z hZ).2⟩)
 
-variable (A) in
-instance closedUnderLimitsOfShape_discrete_kFlat (J : Type) [Finite J] :
-    (quasiIso A (.up ℤ)).kFlat.IsClosedUnderLimitsOfShape (Discrete J)  := by
-  apply ObjectProperty.closedUnderLimitsOfShape_discrete_of_isTriangulated
-
 instance : (quasiIso A (.up ℤ)).kFlat.IsStableUnderRetracts where
   of_retract {K L} e hL := by
     have : (subcategoryAcyclic A).IsStableUnderRetracts := inferInstance
