@@ -40,7 +40,8 @@ lemma prop_prod [P.IsClosedUnderBinaryProducts] (X Y : C) [HasBinaryProduct X Y]
     P (X ⨯ Y) :=
   P.prop_limit _ (by rintro ⟨_ | _⟩ <;> assumption)
 
-lemma prop_biprod [HasZeroMorphisms C] [P.IsClosedUnderBinaryProducts] (X Y : C)
+lemma prop_biprod_of_isClosedUnderBinaryProducts
+    [HasZeroMorphisms C] [P.IsClosedUnderBinaryProducts] (X Y : C)
     [HasBinaryBiproduct X Y]
     (hX : P X) (hY : P Y) :
     P (X ⊞ Y) :=
