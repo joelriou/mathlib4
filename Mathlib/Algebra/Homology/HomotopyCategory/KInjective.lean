@@ -170,7 +170,7 @@ instance (K L : CochainComplex C ℤ) [hK : K.IsKInjective] [hL : L.IsKInjective
     preservesBinaryBiproducts_of_preservesBiproducts _
   refine ObjectProperty.prop_of_iso _
     ((HomotopyCategory.quotient C (.up ℤ)).mapBiprod K L).symm ?_
-  apply ObjectProperty.biprod_stable_of_isTriangulated
+  apply ObjectProperty.prop_biprod
   all_goals assumption
 
 lemma IsKInjective.eq_δ_of_cocycle {K L : CochainComplex C ℤ} {n : ℤ}

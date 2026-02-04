@@ -9,7 +9,6 @@ public import Mathlib.Algebra.Homology.SpectralObject.Cycles
 public import Mathlib.Algebra.Homology.ShortComplex.ShortExact
 public import Mathlib.CategoryTheory.Abelian.Refinements
 public import Mathlib.CategoryTheory.ComposableArrows.Three
-public import Batteries.Tactic.Lint
 
 /-!
 # Spectral objects in abelian categories
@@ -182,19 +181,19 @@ noncomputable def leftHomologyDataShortComplexE :
   have : hi.lift (KernelFork.ofι _ (X.shortComplexE n₀ n₁ n₂ hn₁ hn₂ f₁ f₂ f₃).zero) =
       X.δToCycles n₀ n₁ hn₁ f₁ f₂ f₃ :=
     Fork.IsLimit.hom_ext hi (by simpa using hi.fac _ .zero)
-  refine {
-  K := X.cycles n₁ f₁ f₂
-  H := cokernel (X.δToCycles n₀ n₁ hn₁ f₁ f₂ f₃)
-  i := X.iCycles n₁ f₁ f₂
-  π := cokernel.π _
-  wi := by simp
-  hi := hi
-  wπ := by rw [this]; simp
-  hπ := by
-    refine (IsColimit.equivOfNatIsoOfIso ?_ _ _ ?_).2
-      (cokernelIsCokernel (X.δToCycles n₀ n₁ hn₁ f₁ f₂ f₃))
-    · exact parallelPair.ext (Iso.refl _) (Iso.refl _) (by simpa) (by simp)
-    · exact Cofork.ext (Iso.refl _)}
+  exact {
+    K := X.cycles n₁ f₁ f₂
+    H := cokernel (X.δToCycles n₀ n₁ hn₁ f₁ f₂ f₃)
+    i := X.iCycles n₁ f₁ f₂
+    π := cokernel.π _
+    wi := by simp
+    hi := hi
+    wπ := by rw [this]; simp
+    hπ := by
+      refine (IsColimit.equivOfNatIsoOfIso ?_ _ _ ?_).2
+        (cokernelIsCokernel (X.δToCycles n₀ n₁ hn₁ f₁ f₂ f₃))
+      · exact parallelPair.ext (Iso.refl _) (Iso.refl _) (by simpa) (by simp)
+      · exact Cofork.ext (Iso.refl _)}
 
 @[simp]
 lemma leftHomologyDataShortComplexE_f' :
@@ -271,19 +270,19 @@ noncomputable def rightHomologyDataShortComplexE :
   have : hp.desc (CokernelCofork.ofπ _ (X.shortComplexE n₀ n₁ n₂ hn₁ hn₂ f₁ f₂ f₃).zero) =
       X.δFromOpcycles n₁ n₂ hn₂ f₁ f₂ f₃ :=
     Cofork.IsColimit.hom_ext hp (by simpa using hp.fac _ .one)
-  refine {
-  Q := X.opcycles n₁ f₂ f₃
-  H := kernel (X.δFromOpcycles n₁ n₂ hn₂ f₁ f₂ f₃)
-  p := X.pOpcycles n₁ f₂ f₃
-  ι := kernel.ι _
-  wp := by simp
-  hp := hp
-  wι := by rw [this]; simp
-  hι := by
-    refine (IsLimit.equivOfNatIsoOfIso ?_ _ _ ?_).2
-      (kernelIsKernel (X.δFromOpcycles n₁ n₂ hn₂ f₁ f₂ f₃))
-    · exact parallelPair.ext (Iso.refl _) (Iso.refl _) (by simpa) (by simp)
-    · exact Fork.ext (Iso.refl _) }
+  exact {
+    Q := X.opcycles n₁ f₂ f₃
+    H := kernel (X.δFromOpcycles n₁ n₂ hn₂ f₁ f₂ f₃)
+    p := X.pOpcycles n₁ f₂ f₃
+    ι := kernel.ι _
+    wp := by simp
+    hp := hp
+    wι := by rw [this]; simp
+    hι := by
+      refine (IsLimit.equivOfNatIsoOfIso ?_ _ _ ?_).2
+        (kernelIsKernel (X.δFromOpcycles n₁ n₂ hn₂ f₁ f₂ f₃))
+      · exact parallelPair.ext (Iso.refl _) (Iso.refl _) (by simpa) (by simp)
+      · exact Fork.ext (Iso.refl _) }
 
 @[simp]
 lemma rightHomologyDataShortComplexE_g' :

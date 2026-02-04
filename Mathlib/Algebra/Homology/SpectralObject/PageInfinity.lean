@@ -26,7 +26,6 @@ namespace SpectralObject
 variable {C ι κ : Type*} [Category C] [Abelian C] [Preorder ι]
   (X : SpectralObject C ι)
   {c : ℤ → ComplexShape κ} {r₀ : ℤ}
-  --[∀ r, DecidableRel (c r).Rel]
   (data : SpectralSequenceMkData ι c r₀) [HasSpectralSequence X data]
 
 lemma spectralSequence_page_d_eq_zero_iff_isIso₁
@@ -34,16 +33,16 @@ lemma spectralSequence_page_d_eq_zero_iff_isIso₁
     (pq' pq'' : κ) (hpq' : (c r).Rel pq' pq'') (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁)
     (hn₂ : n₁ + 1 = n₂) (hn₁' : n₁ = data.deg pq')
     (i₀' i₀ i₁ i₂ i₃ : ι)
-    (hi₀' : i₀' = X.i₀ data r' pq')
-    (hi₀ : i₀ = X.i₀ data r pq')
+    (hi₀' : i₀' = data.i₀ r' pq')
+    (hi₀ : i₀ = data.i₀ r pq')
     (hi₁ : i₁ = data.i₁ pq')
     (hi₂ : i₂ = data.i₂ pq')
-    (hi₃ : i₃ = X.i₃ data r pq') :
+    (hi₃ : i₃ = data.i₃ r pq') :
     ((X.spectralSequence data).page r).d pq' pq'' = 0 ↔
       IsIso (X.EMap n₀ n₁ n₂ hn₁ hn₂ _ _ _ _ _ _
-        (fourδ₁Toδ₀' i₀' i₀ i₁ i₂ i₃ (X.le₀'₀ data hrr' hr pq' hi₀' hi₀)
-          (X.le₀₁ data r hr pq' hi₀ hi₁) (X.le₁₂ data pq' hi₁ hi₂)
-          (X.le₂₃ data r hr pq' hi₂ hi₃))) := by
+        (fourδ₁Toδ₀' i₀' i₀ i₁ i₂ i₃ (data.le₀'₀ hrr' hr pq' hi₀' hi₀)
+          (data.le₀₁' r hr pq' hi₀ hi₁) (data.le₁₂' pq' hi₁ hi₂)
+          (data.le₂₃' r hr pq' hi₂ hi₃))) := by
   let S := ((spectralSequence X data).page r).sc' ((c r).prev  pq') pq' pq''
   let H : S.HomologyData :=
     X.spectralSequenceHomologyData data r r' hrr' hr _ pq' pq'' rfl ((c r).next_eq' hpq')
@@ -51,8 +50,8 @@ lemma spectralSequence_page_d_eq_zero_iff_isIso₁
   let e := X.spectralSequencePageXIso data r hr pq' n₀ n₁ n₂ hn₁ hn₂ hn₁'
     i₀ i₁ i₂ i₃ hi₀ hi₁ hi₂ hi₃
   let φ := (X.EMap n₀ n₁ n₂ hn₁ hn₂ _ _ _ _ _ _
-    (fourδ₁Toδ₀' i₀' i₀ i₁ i₂ i₃ (X.le₀'₀ data hrr' hr pq' hi₀' hi₀)
-      (X.le₀₁ data r hr pq' hi₀ hi₁) (X.le₁₂ data pq' hi₁ hi₂) (X.le₂₃ data r hr pq' hi₂ hi₃)))
+    (fourδ₁Toδ₀' i₀' i₀ i₁ i₂ i₃ (data.le₀'₀ hrr' hr pq' hi₀' hi₀)
+      (data.le₀₁' r hr pq' hi₀ hi₁) (data.le₁₂' pq' hi₁ hi₂) (data.le₂₃' r hr pq' hi₂ hi₃)))
   have fac : H.left.i = φ ≫ e.inv := rfl
   have eq₁ : IsIso φ ↔ IsIso H.left.i := by
     apply (MorphismProperty.isomorphisms C).arrow_mk_iso_iff
@@ -73,16 +72,16 @@ lemma spectralSequence_page_d_eq_zero_iff_isIso₂
     (pq pq' : κ) (hpq' : (c r).Rel pq pq') (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁)
     (hn₂ : n₁ + 1 = n₂) (hn₁' : n₁ = data.deg pq')
     (i₀ i₁ i₂ i₃ i₃' : ι)
-    (hi₀ : i₀ = X.i₀ data r pq')
+    (hi₀ : i₀ = data.i₀ r pq')
     (hi₁ : i₁ = data.i₁ pq')
     (hi₂ : i₂ = data.i₂ pq')
-    (hi₃ : i₃ = X.i₃ data r pq')
-    (hi₃' : i₃' = X.i₃ data r' pq') :
+    (hi₃ : i₃ = data.i₃ r pq')
+    (hi₃' : i₃' = data.i₃ r' pq') :
     ((X.spectralSequence data).page r).d pq pq' = 0 ↔
       IsIso (X.EMap n₀ n₁ n₂ hn₁ hn₂ _ _ _ _ _ _
         (fourδ₄Toδ₃' i₀ i₁ i₂ i₃ i₃'
-          (X.le₀₁ data r hr pq' hi₀ hi₁) (X.le₁₂ data pq' hi₁ hi₂)
-          (X.le₂₃ data r hr pq' hi₂ hi₃) (X.le₃₃' data hrr' hr pq' hi₃ hi₃'))) := by
+          (data.le₀₁' r hr pq' hi₀ hi₁) (data.le₁₂' pq' hi₁ hi₂)
+          (data.le₂₃' r hr pq' hi₂ hi₃) (data.le₃₃' hrr' hr pq' hi₃ hi₃'))) := by
   let S := ((spectralSequence X data).page r).sc' pq pq' ((c r).next pq')
   let H : S.HomologyData := X.spectralSequenceHomologyData data r r' hrr' hr
     pq pq' _ ((c r).prev_eq' hpq') rfl n₀ n₁ n₂ hn₁ hn₂ hn₁'
@@ -90,8 +89,8 @@ lemma spectralSequence_page_d_eq_zero_iff_isIso₂
   let e := X.spectralSequencePageXIso data r hr pq' n₀ n₁ n₂ hn₁ hn₂ hn₁'
     i₀ i₁ i₂ i₃ hi₀ hi₁ hi₂ hi₃
   let φ := (X.EMap n₀ n₁ n₂ hn₁ hn₂ _ _ _ _ _ _
-    (fourδ₄Toδ₃' i₀ i₁ i₂ i₃ i₃' (X.le₀₁ data r hr pq' hi₀ hi₁) (X.le₁₂ data pq' hi₁ hi₂)
-    (X.le₂₃ data r hr pq' hi₂ hi₃) (X.le₃₃' data hrr' hr pq' hi₃ hi₃')))
+    (fourδ₄Toδ₃' i₀ i₁ i₂ i₃ i₃' (data.le₀₁' r hr pq' hi₀ hi₁) (data.le₁₂' pq' hi₁ hi₂)
+    (data.le₂₃' r hr pq' hi₂ hi₃) (data.le₃₃' hrr' hr pq' hi₃ hi₃')))
   have fac : H.right.p = e.hom ≫ φ := rfl
   have eq₁ : IsIso H.right.p ↔ IsIso φ := by
     apply (MorphismProperty.isomorphisms C).arrow_mk_iso_iff
@@ -112,9 +111,9 @@ lemma spectralSequence_page_d_eq_zero_of_isZero₁
     (pq' pq'' : κ) (n₂ : ℤ)
     (hn₂ : n₂ = data.deg pq' + 1)
     (i₀' i₀ : ι)
-    (hi₀' : i₀' = X.i₀ data r' pq')
-    (hi₀ : i₀ = X.i₀ data r pq')
-    (h : IsZero ((X.H n₂).obj (mk₁ (homOfLE (X.le₀'₀ data hrr' hr pq' hi₀' hi₀))))) :
+    (hi₀' : i₀' = data.i₀ r' pq')
+    (hi₀ : i₀ = data.i₀ r pq')
+    (h : IsZero ((X.H n₂).obj (mk₁ (homOfLE (data.le₀'₀ hrr' hr pq' hi₀' hi₀))))) :
     ((X.spectralSequence data).page r).d pq' pq'' = 0 := by
   by_cases hpq' : (c r).Rel pq' pq''
   · rw [X.spectralSequence_page_d_eq_zero_iff_isIso₁ data r r' hrr' hr pq' pq'' hpq'
@@ -127,9 +126,9 @@ lemma spectralSequence_page_d_eq_zero_of_isZero₂
     (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ ≤ r)
     (pq pq' : κ) (n₀ : ℤ) (hn₀ : n₀ = data.deg pq' - 1)
     (i₃ i₃' : ι)
-    (hi₃ : i₃ = X.i₃ data r pq')
-    (hi₃' : i₃' = X.i₃ data r' pq')
-    (h : IsZero ((X.H n₀).obj (mk₁ (homOfLE (X.le₃₃' data hrr' hr pq' hi₃ hi₃'))))) :
+    (hi₃ : i₃ = data.i₃ r pq')
+    (hi₃' : i₃' = data.i₃ r' pq')
+    (h : IsZero ((X.H n₀).obj (mk₁ (homOfLE (data.le₃₃' hrr' hr pq' hi₃ hi₃'))))) :
     ((X.spectralSequence data).page r).d pq pq' = 0 := by
   by_cases hpq : (c r).Rel pq pq'
   · rw [X.spectralSequence_page_d_eq_zero_iff_isIso₂ data r r' hrr' hr pq pq' hpq
@@ -143,15 +142,15 @@ lemma spectralSequenceHasEdgeEpiAt_iff (pq : κ) (r : ℤ) (hr : r₀ ≤ r := b
       ∀ (pq' : κ) (_ : (c r).Rel pq pq')
         (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁) (hn₂ : n₁ + 1 = n₂) (_ : n₁ = data.deg pq)
         (i₀' i₀ i₁ i₂ i₃ : ι)
-        (hi₀' : i₀' = X.i₀ data (r + 1) pq)
-        (hi₀ : i₀ = X.i₀ data r pq)
+        (hi₀' : i₀' = data.i₀ (r + 1) pq)
+        (hi₀ : i₀ = data.i₀ r pq)
         (hi₁ : i₁ = data.i₁ pq)
         (hi₂ : i₂ = data.i₂ pq)
-        (hi₃ : i₃ = X.i₃ data r pq),
+        (hi₃ : i₃ = data.i₃ r pq),
           IsIso (X.EMap n₀ n₁ n₂ hn₁ hn₂ _ _ _ _ _ _
-          (fourδ₁Toδ₀' i₀' i₀ i₁ i₂ i₃ (X.le₀'₀ data rfl hr pq hi₀' hi₀)
-            (X.le₀₁ data r hr pq hi₀ hi₁) (X.le₁₂ data pq hi₁ hi₂)
-            (X.le₂₃ data r hr pq hi₂ hi₃))) := by
+          (fourδ₁Toδ₀' i₀' i₀ i₁ i₂ i₃ (data.le₀'₀ rfl hr pq hi₀' hi₀)
+            (data.le₀₁' r hr pq hi₀ hi₁) (data.le₁₂' pq hi₁ hi₂)
+            (data.le₂₃' r hr pq hi₂ hi₃))) := by
   constructor
   · intro h pq' hpq n₀ n₁ n₂ hn₁ hn₂ hn₁' i₀' i₀ i₁ i₂ i₃ hi₀' hi₀ hi₁ hi₂ hi₃
     rw [← X.spectralSequence_page_d_eq_zero_iff_isIso₁ data r _ rfl hr pq pq' hpq
@@ -169,9 +168,9 @@ lemma spectralSequenceHasEdgeEpiAt_iff (pq : κ) (r : ℤ) (hr : r₀ ≤ r := b
 
 lemma spectralSequenceHasEdgeEpiAt (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ ≤ r)
     (pq : κ) (n₂ : ℤ) (hn₂ : n₂ = data.deg pq + 1) (i₀' i₀ : ι)
-    (hi₀' : i₀' = X.i₀ data r' pq)
-    (hi₀ : i₀ = X.i₀ data r pq)
-    (h : IsZero ((X.H n₂).obj (mk₁ (homOfLE (X.le₀'₀ data hrr' hr pq hi₀' hi₀))))) :
+    (hi₀' : i₀' = data.i₀ r' pq)
+    (hi₀ : i₀ = data.i₀ r pq)
+    (h : IsZero ((X.H n₂).obj (mk₁ (homOfLE (data.le₀'₀ hrr' hr pq hi₀' hi₀))))) :
     (X.spectralSequence data).HasEdgeEpiAt pq r where
   zero pq' := X.spectralSequence_page_d_eq_zero_of_isZero₁ data r r' hrr' hr pq pq' n₂ hn₂
     i₀' i₀ hi₀' hi₀ h
@@ -179,20 +178,19 @@ lemma spectralSequenceHasEdgeEpiAt (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ �
 lemma mem_spectralSequence_hasEdgeEpiSet (r : ℤ) (hr : r₀ ≤ r) (pq : κ)
     (n₂ : ℤ) (hn₂ : n₂ = data.deg pq + 1)
     (isZero : ∀ (i j : ι) (hij : i ≤ j)
-      (_ : j ≤ X.i₀ data r pq),
+      (_ : j ≤ data.i₀ r pq),
       IsZero ((X.H n₂).obj (mk₁ (homOfLE hij)))) :
     r ∈ (X.spectralSequence data).hasEdgeEpiSet pq := by
   refine ⟨hr, fun r' hrr' ↦ X.spectralSequenceHasEdgeEpiAt data r' (r' + 1) rfl
     (by lia) pq n₂ hn₂ _ _ rfl rfl ?_⟩
   apply isZero
-  apply data.antitone_i₀
-  lia
+  exact data.antitone_i₀ _ _ _
 
 lemma spectralSequenceHasEdgeEpiAtFrom (r : ℤ) (hr : r₀ ≤ r) (pq : κ)
     (n₂ : ℤ) (hn₂ : n₂ = data.deg pq + 1)
     [(X.spectralSequence data).HasPageInfinityAt pq]
     (isZero : ∀ (i j : ι) (hij : i ≤ j)
-      (_ : j ≤ X.i₀ data r pq),
+      (_ : j ≤ data.i₀ r pq),
       IsZero ((X.H n₂).obj (mk₁ (homOfLE hij)))) :
     (X.spectralSequence data).HasEdgeEpiAtFrom pq r where
   le := (X.spectralSequence data).rFromMin_LE pq r
@@ -203,15 +201,15 @@ lemma spectralSequenceHasEdgeMonoAt_iff (pq : κ) (r : ℤ) (hr : r₀ ≤ r) :
       ∀ (pq' : κ) (_ : (c r).Rel pq' pq)
         (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁) (hn₂ : n₁ + 1 = n₂) (_ : n₁ = data.deg pq)
         (i₀ i₁ i₂ i₃ i₃' : ι)
-        (hi₀ : i₀ = X.i₀ data r pq)
+        (hi₀ : i₀ = data.i₀ r pq)
         (hi₁ : i₁ = data.i₁ pq)
         (hi₂ : i₂ = data.i₂ pq)
-        (hi₃ : i₃ = X.i₃ data r pq)
-        (hi₃' : i₃' = X.i₃ data (r + 1) pq),
+        (hi₃ : i₃ = data.i₃ r pq)
+        (hi₃' : i₃' = data.i₃ (r + 1) pq),
           IsIso (X.EMap n₀ n₁ n₂ hn₁ hn₂ _ _ _ _ _ _
           (fourδ₄Toδ₃' i₀ i₁ i₂ i₃ i₃'
-            (X.le₀₁ data r hr pq hi₀ hi₁) (X.le₁₂ data pq hi₁ hi₂)
-            (X.le₂₃ data r hr pq hi₂ hi₃) (X.le₃₃' data rfl hr pq hi₃ hi₃'))) := by
+            (data.le₀₁' r hr pq hi₀ hi₁) (data.le₁₂' pq hi₁ hi₂)
+            (data.le₂₃' r hr pq hi₂ hi₃) (data.le₃₃' rfl hr pq hi₃ hi₃'))) := by
   constructor
   · intro h pq' hpq n₀ n₁ n₂ hn₁ hn₂ hn₁' i₀ i₁ i₂ i₃ i₃' hi₀ hi₁ hi₂ hi₃ hi₃'
     rw [← X.spectralSequence_page_d_eq_zero_iff_isIso₂ data r _ rfl hr pq' pq hpq
@@ -229,9 +227,9 @@ lemma spectralSequenceHasEdgeMonoAt_iff (pq : κ) (r : ℤ) (hr : r₀ ≤ r) :
 
 lemma spectralSequenceHasEdgeMonoAt (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ ≤ r)
     (pq : κ) (n₀ : ℤ) (hn₀ : n₀ = data.deg pq - 1) (i₃ i₃' : ι)
-    (hi₃ : i₃ = X.i₃ data r pq)
-    (hi₃' : i₃' = X.i₃ data r' pq)
-    (h : IsZero ((X.H n₀).obj (mk₁ (homOfLE (X.le₃₃' data hrr' hr pq hi₃ hi₃'))))) :
+    (hi₃ : i₃ = data.i₃ r pq)
+    (hi₃' : i₃' = data.i₃ r' pq)
+    (h : IsZero ((X.H n₀).obj (mk₁ (homOfLE (data.le₃₃' hrr' hr pq hi₃ hi₃'))))) :
     (X.spectralSequence data).HasEdgeMonoAt pq r where
   zero pq' := X.spectralSequence_page_d_eq_zero_of_isZero₂ data r r' hrr' hr pq' pq n₀ hn₀
     i₃ i₃' hi₃ hi₃' h
@@ -239,20 +237,19 @@ lemma spectralSequenceHasEdgeMonoAt (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ 
 lemma mem_spectralSequence_hasEdgeMonoSet (r : ℤ) (hr : r₀ ≤ r) (pq : κ)
     (n₀ : ℤ) (hn₀ : n₀ = data.deg pq - 1)
     (isZero : ∀ (i j : ι) (hij : i ≤ j)
-      (_ : X.i₃ data r pq ≤ i),
+      (_ : data.i₃ r pq ≤ i),
       IsZero ((X.H n₀).obj (mk₁ (homOfLE hij)))) :
     r ∈ (X.spectralSequence data).hasEdgeMonoSet pq := by
   refine ⟨hr, fun r' hrr' ↦
     X.spectralSequenceHasEdgeMonoAt data r' (r' + 1) rfl (by lia) pq n₀ hn₀ _ _ rfl rfl ?_⟩
   --have := (X.spectralSequence data).hasPage_of_LE _ _ hrr'
   apply isZero
-  apply data.monotone_i₃
-  lia
+  exact data.monotone_i₃ _ _ _
 
 lemma spectralSequenceHasEdgeMonoAtFrom (r : ℤ) (hr : r₀ ≤ r) (pq : κ)
     (n₀ : ℤ) (hn₀ : n₀ = data.deg pq - 1)
     [(X.spectralSequence data).HasPageInfinityAt pq]
-    (isZero : ∀ (i j : ι) (hij : i ≤ j) (_ : X.i₃ data r pq ≤ i),
+    (isZero : ∀ (i j : ι) (hij : i ≤ j) (_ : data.i₃ r pq ≤ i),
       IsZero ((X.H n₀).obj (mk₁ (homOfLE hij)))) :
     (X.spectralSequence data).HasEdgeMonoAtFrom pq r where
   le := (X.spectralSequence data).rToMin_LE pq r
@@ -264,18 +261,18 @@ lemma spectralSequence_edgeMonoStep_compatibility
     [(X.spectralSequence data).HasEdgeMonoAt pq r]
     (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁) (hn₂ : n₁ + 1 = n₂) (hn₁' : n₁ = data.deg pq)
     (i₀' i₀ i₁ i₂ i₃ i₃' : ι)
-    (hi₀' : i₀' = X.i₀ data r' pq)
-    (hi₀ : i₀ = X.i₀ data r pq)
+    (hi₀' : i₀' = data.i₀ r' pq)
+    (hi₀ : i₀ = data.i₀ r pq)
     (hi₁ : i₁ = data.i₁ pq)
     (hi₂ : i₂ = data.i₂ pq)
-    (hi₃ : i₃ = X.i₃ data r pq)
-    (hi₃' : i₃' = X.i₃ data r' pq) :
+    (hi₃ : i₃ = data.i₃ r pq)
+    (hi₃' : i₃' = data.i₃ r' pq) :
     X.EMapFourδ₄Toδ₃' n₀ n₁ n₂ hn₁ hn₂ i₀' i₁ i₂ i₃ i₃' _ _
-      (X.le₂₃ data r hr pq hi₂ hi₃) (X.le₃₃' data hrr' hr pq hi₃ hi₃') ≫
+      (data.le₂₃' r hr pq hi₂ hi₃) (data.le₃₃' hrr' hr pq hi₃ hi₃') ≫
     (X.spectralSequencePageXIso data r' (by lia) pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
       i₀' i₁ i₂ i₃' hi₀' hi₁ hi₂ hi₃').inv ≫
     (X.spectralSequence data).edgeMonoStep pq r r' hrr' =
-      X.EMapFourδ₁Toδ₀' n₀ n₁ n₂ hn₁ hn₂ i₀' i₀ i₁ i₂ i₃ (X.le₀'₀ data hrr' hr pq hi₀' hi₀) _ _ _ ≫
+      X.EMapFourδ₁Toδ₀' n₀ n₁ n₂ hn₁ hn₂ i₀' i₀ i₁ i₂ i₃ (data.le₀'₀ hrr' hr pq hi₀' hi₀) _ _ _ ≫
     ((X.spectralSequencePageXIso data r hr pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
       i₀ i₁ i₂ i₃ hi₀ hi₁ hi₂ hi₃)).inv := by
   let H := X.spectralSequenceHomologyData data r r' hrr' hr _ pq _ rfl rfl n₀ n₁ n₂ hn₁ hn₂ hn₁'
@@ -301,20 +298,20 @@ lemma spectralSequence_edgeEpiStep_compatibility
     [(X.spectralSequence data).HasEdgeEpiAt pq r]
     (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁) (hn₂ : n₁ + 1 = n₂) (hn₁' : n₁ = data.deg pq)
     (i₀' i₀ i₁ i₂ i₃ i₃' : ι)
-    (hi₀' : i₀' = X.i₀ data r' pq)
-    (hi₀ : i₀ = X.i₀ data r pq)
+    (hi₀' : i₀' = data.i₀ r' pq)
+    (hi₀ : i₀ = data.i₀ r pq)
     (hi₁ : i₁ = data.i₁ pq)
     (hi₂ : i₂ = data.i₂ pq)
-    (hi₃ : i₃ = X.i₃ data r pq)
-    (hi₃' : i₃' = X.i₃ data r' pq) :
+    (hi₃ : i₃ = data.i₃ r pq)
+    (hi₃' : i₃' = data.i₃ r' pq) :
     (X.spectralSequence data).edgeEpiStep pq r r' hrr' ≫
     (X.spectralSequencePageXIso data r' (by lia) pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
       i₀' i₁ i₂ i₃' hi₀' hi₁ hi₂ hi₃').hom ≫
-    X.EMapFourδ₁Toδ₀' n₀ n₁ n₂ hn₁ hn₂ i₀' i₀ i₁ i₂ i₃' (X.le₀'₀ data hrr' hr pq hi₀' hi₀) _ _ _ =
+    X.EMapFourδ₁Toδ₀' n₀ n₁ n₂ hn₁ hn₂ i₀' i₀ i₁ i₂ i₃' (data.le₀'₀ hrr' hr pq hi₀' hi₀) _ _ _ =
     (X.spectralSequencePageXIso data r hr pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
       i₀ i₁ i₂ i₃ hi₀ hi₁ hi₂ hi₃).hom ≫
     X.EMapFourδ₄Toδ₃' n₀ n₁ n₂ hn₁ hn₂ i₀ i₁ i₂ i₃ i₃' _ _ _
-      (X.le₃₃' data hrr' hr pq hi₃ hi₃') := by
+      (data.le₃₃' hrr' hr pq hi₃ hi₃') := by
   let H := X.spectralSequenceHomologyData data r r' hrr' hr _ pq _ rfl rfl n₀ n₁ n₂ hn₁ hn₂ hn₁'
     i₀' i₀ i₁ i₂ i₃ i₃' hi₀' hi₀ hi₁ hi₂ hi₃ hi₃'
   refine Eq.trans ?_ ((X.spectralSequence data).rightHomologyData_ι_edgeEpiStep_compatibility
@@ -334,9 +331,9 @@ lemma spectralSequence_edgeEpiStep_compatibility
 
 lemma hasPageInfinityAt (r : ℤ) (hr : r₀ ≤ r) (pq : κ)
     (n₀ n₂ : ℤ) (hn₀ : n₀ = data.deg pq - 1) (hn₂ : n₂ = data.deg pq + 1)
-    (isZero₁ : ∀ (i j : ι) (hij : i ≤ j) (_ : j ≤ X.i₀ data r pq),
+    (isZero₁ : ∀ (i j : ι) (hij : i ≤ j) (_ : j ≤ data.i₀ r pq),
       IsZero ((X.H n₂).obj (mk₁ (homOfLE hij))))
-    (isZero₂ : ∀ (i j : ι) (hij : i ≤ j) (_ : X.i₃ data r pq ≤ i),
+    (isZero₂ : ∀ (i j : ι) (hij : i ≤ j) (_ : data.i₃ r pq ≤ i),
       IsZero ((X.H n₀).obj (mk₁ (homOfLE hij)))) :
     (X.spectralSequence data).HasPageInfinityAt pq where
   nonempty_hasEdgeEpiSet := ⟨r, X.mem_spectralSequence_hasEdgeEpiSet data r hr pq n₂ hn₂ isZero₁⟩
@@ -349,19 +346,19 @@ lemma spectralSequence_edgeMonoSteps_compatibility
     [(X.spectralSequence data).HasEdgeMonoAtFrom pq r]
     (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁) (hn₂ : n₁ + 1 = n₂) (hn₁' : n₁ = data.deg pq)
     (i₀' i₀ i₁ i₂ i₃ i₃' : ι)
-    (hi₀' : i₀' = X.i₀ data r' pq)
-    (hi₀ : i₀ = X.i₀ data r pq)
+    (hi₀' : i₀' = data.i₀ r' pq)
+    (hi₀ : i₀ = data.i₀ r pq)
     (hi₁ : i₁ = data.i₁ pq)
     (hi₂ : i₂ = data.i₂ pq)
-    (hi₃ : i₃ = X.i₃ data r pq)
-    (hi₃' : i₃' = X.i₃ data r' pq) :
+    (hi₃ : i₃ = data.i₃ r pq)
+    (hi₃' : i₃' = data.i₃ r' pq) :
     X.EMapFourδ₄Toδ₃' n₀ n₁ n₂ hn₁ hn₂ i₀' i₁ i₂ i₃ i₃' _ _
-      (X.le₂₃ data r hr pq hi₂ hi₃) (X.monotone_i₃ data r r' hrr' hr pq hi₃ hi₃') ≫
+      (data.le₂₃' r hr pq hi₂ hi₃) (data.monotone_i₃' hrr' hr pq hi₃ hi₃') ≫
       (X.spectralSequencePageXIso data r' (by lia) pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
         i₀' i₁ i₂ i₃' hi₀' hi₁ hi₂ hi₃').inv ≫
       (X.spectralSequence data).edgeMonoSteps pq r r' hrr' =
         X.EMapFourδ₁Toδ₀' n₀ n₁ n₂ hn₁ hn₂ i₀' i₀ i₁ i₂ i₃
-          (X.antitone_i₀ data r r' hrr' hr pq hi₀ hi₀') _ _ _ ≫
+          (data.antitone_i₀' hrr' hr pq hi₀ hi₀') _ _ _ ≫
         (X.spectralSequencePageXIso data r hr pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
         i₀ i₁ i₂ i₃ hi₀ hi₁ hi₂ hi₃).inv := by
   obtain ⟨k, hk⟩ := Int.le.dest hrr'
@@ -380,13 +377,13 @@ lemma spectralSequence_edgeMonoSteps_compatibility
     rw [← (X.spectralSequence data).edgeMonoSteps_comp pq r (r + k) r''
         (by lia) (by lia),
       ← X.EMapFourδ₄Toδ₃'_comp n₀ n₁ n₂ hn₁ hn₂ i₀'' i₁ i₂ i₃ _ i₃'' _ _ _
-      (X.monotone_i₃ data r (r + k) (by lia) (by lia) pq hi₃ rfl)
-      (X.monotone_i₃ data (r + k) r'' (by lia) (by lia) pq rfl hi₃''), assoc,
+      (data.monotone_i₃' (r' := r + k) (by lia) (by lia) pq hi₃ rfl)
+      (data.monotone_i₃' (by lia) (by lia) pq rfl hi₃''), assoc,
       (X.spectralSequence data).edgeMonoSteps_eq_edgeMonoStep pq (r + k) r'' (by lia),
       X.spectralSequence_edgeMonoStep_compatibility_assoc data pq (r + k) r'' (by lia) (by lia)
       n₀ n₁ n₂ hn₁ hn₂ hn₁' i₀'' _ i₁ i₂ _ i₃'' hi₀'' rfl hi₁ hi₂ rfl hi₃'',
       ← EMapFourδ₁Toδ₀'_EMapFourδ₃Toδ₃'_assoc,
-      hk r (r + k) (by lia) (by lia) _ i₀ i₁ i₂ i₃ _ rfl hi₀ hi₁ hi₂ hi₃ rfl rfl,
+      hk r (r + k) _ _ _ i₀ i₁ i₂ i₃ _ rfl hi₀ hi₁ hi₂ hi₃ rfl rfl,
       X.EMapFourδ₁Toδ₀'_comp_assoc]
 
 @[reassoc]
@@ -396,21 +393,21 @@ lemma spectralSequence_edgeEpiSteps_compatibility
     [(X.spectralSequence data).HasEdgeEpiAtFrom pq r]
     (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁) (hn₂ : n₁ + 1 = n₂) (hn₁' : n₁ = data.deg pq)
     (i₀' i₀ i₁ i₂ i₃ i₃' : ι)
-    (hi₀' : i₀' = X.i₀ data r' pq)
-    (hi₀ : i₀ = X.i₀ data r pq)
+    (hi₀' : i₀' = data.i₀ r' pq)
+    (hi₀ : i₀ = data.i₀ r pq)
     (hi₁ : i₁ = data.i₁ pq)
     (hi₂ : i₂ = data.i₂ pq)
-    (hi₃ : i₃ = X.i₃ data r pq)
-    (hi₃' : i₃' = X.i₃ data r' pq) :
+    (hi₃ : i₃ = data.i₃ r pq)
+    (hi₃' : i₃' = data.i₃ r' pq) :
     (X.spectralSequence data).edgeEpiSteps pq r r' hrr' ≫
       (X.spectralSequencePageXIso data r' (by lia) pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
         i₀' i₁ i₂ i₃' hi₀' hi₁ hi₂ hi₃').hom ≫
         X.EMapFourδ₁Toδ₀' n₀ n₁ n₂ hn₁ hn₂ i₀' i₀ i₁ i₂ i₃'
-          (X.antitone_i₀ data r r' hrr' hr pq hi₀ hi₀') _ _ _ =
+          (data.antitone_i₀' hrr' hr pq hi₀ hi₀') _ _ _ =
       (X.spectralSequencePageXIso data r hr pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
         i₀ i₁ i₂ i₃ hi₀ hi₁ hi₂ hi₃).hom ≫
         X.EMapFourδ₄Toδ₃' n₀ n₁ n₂ hn₁ hn₂ i₀ i₁ i₂ i₃ i₃' _ _ _
-          (X.monotone_i₃ data r r' hrr' hr pq hi₃ hi₃') := by
+          (data.monotone_i₃' hrr' hr pq hi₃ hi₃') := by
   obtain ⟨k, hk⟩ := Int.le.dest hrr'
   revert r r' i₀' i₀ i₁ i₂ i₃ i₃'
   induction k with
@@ -427,8 +424,8 @@ lemma spectralSequence_edgeEpiSteps_compatibility
     rw [← (X.spectralSequence data).edgeEpiSteps_comp pq r (r + k) r''
       (by lia) (by lia),
       ← X.EMapFourδ₁Toδ₀'_comp n₀ n₁ n₂ hn₁ hn₂ i₀'' _ i₀ i₁ i₂ i₃''
-      (X.antitone_i₀ data (r + k) r'' (by lia) (by lia) pq rfl hi₀'')
-      (X.antitone_i₀ data r (r + k) (by lia) (by lia) pq hi₀ rfl), assoc,
+      (data.antitone_i₀' (r := r + k) (by lia) (by lia) pq rfl hi₀'')
+      (data.antitone_i₀' (by lia) (by lia) pq hi₀ rfl), assoc,
       (X.spectralSequence data).edgeEpiSteps_eq_edgeEpiStep pq (r + k) r'' (by lia),
       X.spectralSequence_edgeEpiStep_compatibility_assoc data pq (r + k) r'' (by lia) (by lia)
         n₀ n₁ n₂ hn₁ hn₂ hn₁' i₀'' _ i₁ i₂ _ i₃'' hi₀'' rfl hi₁ hi₂ rfl hi₃'',
@@ -474,9 +471,9 @@ lemma EMapFourδ₄Toδ₃'_EObjIsoPageInfinity_inv' :
 end
 
 class StationaryAt (pq : κ) : Prop where
-  exists_isZero₀ : ∃ (k : ℕ), ∀ (i j : ι) (hij : i ≤ j) (_ : j ≤ X.i₀ data (r₀ + k) pq),
+  exists_isZero₀ : ∃ (k : ℕ), ∀ (i j : ι) (hij : i ≤ j) (_ : j ≤ data.i₀ (r₀ + k) pq),
     IsZero ((X.H (data.deg pq + 1)).obj (mk₁ (homOfLE hij)))
-  exists_isZero₃ : ∃ (k : ℕ), ∀ (i j : ι) (hij : i ≤ j) (_ : X.i₃ data (r₀ + k) pq ≤ i),
+  exists_isZero₃ : ∃ (k : ℕ), ∀ (i j : ι) (hij : i ≤ j) (_ : data.i₃ (r₀ + k) pq ≤ i),
     IsZero ((X.H (data.deg pq - 1)).obj (mk₁ (homOfLE hij)))
 
 section
@@ -484,9 +481,9 @@ section
 variable (pq : κ)
 
 def stationarySet (pq : κ) : Set ℕ := fun k =>
-  (∀ (i j : ι) (hij : i ≤ j) (_ : j ≤ X.i₀ data (r₀ + k) pq),
+  (∀ (i j : ι) (hij : i ≤ j) (_ : j ≤ data.i₀ (r₀ + k) pq),
     IsZero ((X.H (data.deg pq + 1)).obj (mk₁ (homOfLE hij)))) ∧
-  (∀ (i j : ι) (hij : i ≤ j) (_ : X.i₃ data (r₀ + k) pq ≤ i),
+  (∀ (i j : ι) (hij : i ≤ j) (_ : data.i₃ (r₀ + k) pq ≤ i),
     IsZero ((X.H (data.deg pq - 1)).obj (mk₁ (homOfLE hij))))
 
 variable [hpq : X.StationaryAt data pq]
@@ -497,13 +494,11 @@ lemma nonempty_stationarySet :
   ⟨max hpq.exists_isZero₀.choose hpq.exists_isZero₃.choose, by
     constructor
     · intro i j hij hj
-      refine hpq.exists_isZero₀.choose_spec i j hij (hj.trans ?_)
-      apply data.antitone_i₀
-      simp
+      exact hpq.exists_isZero₀.choose_spec i j hij
+        (hj.trans (data.antitone_i₀ _ _ _ (by lia) (by simp)))
     · intro i j hij hi
-      refine hpq.exists_isZero₃.choose_spec i j hij (LE.le.trans ?_ hi)
-      apply data.monotone_i₃
-      simp⟩
+      exact hpq.exists_isZero₃.choose_spec i j hij
+        ((data.monotone_i₃ _ _ _ (by lia) (by simp)).trans hi)⟩
 
 noncomputable def stationaryPage : ℤ :=
   r₀ + (Nat.lt_wfRel.wf).min (X.stationarySet data pq) (X.nonempty_stationarySet data pq)
@@ -517,7 +512,7 @@ lemma le₀_stationaryPage (pq : κ) [X.StationaryAt data pq] :
 omit [OrderBot ι] [OrderTop ι] [X.HasSpectralSequence data] in
 lemma stationaryPage_isZero₀ (n : ℤ) (hn : n = data.deg pq + 1)
     (i j : ι) (hij : i ≤ j)
-    (hj : j ≤ X.i₀ data (X.stationaryPage data pq) pq (X.le₀_stationaryPage data pq)) :
+    (hj : j ≤ data.i₀ (X.stationaryPage data pq) pq (X.le₀_stationaryPage data pq)) :
     IsZero ((X.H n).obj (mk₁ (homOfLE hij))) := by
   subst hn
   exact ((Nat.lt_wfRel.wf).min_mem (X.stationarySet data pq)
@@ -526,7 +521,7 @@ lemma stationaryPage_isZero₀ (n : ℤ) (hn : n = data.deg pq + 1)
 omit [OrderBot ι] [OrderTop ι] [X.HasSpectralSequence data] in
 lemma stationaryPage_isZero₃ (n : ℤ) (hn : n = data.deg pq - 1)
     (i j : ι) (hij : i ≤ j)
-    (hi : X.i₃ data (X.stationaryPage data pq) pq (X.le₀_stationaryPage data pq) ≤ i) :
+    (hi : data.i₃ (X.stationaryPage data pq) pq (X.le₀_stationaryPage data pq) ≤ i) :
     IsZero ((X.H n).obj (mk₁ (homOfLE hij))) := by
   subst hn
   exact ((Nat.lt_wfRel.wf).min_mem (X.stationarySet data pq)
@@ -555,7 +550,7 @@ variable (n₀ n₁ n₂ : ℤ) (hn₁ : n₀ + 1 = n₁) (hn₂ : n₁ + 1 = n�
 noncomputable def spectralSequencePageInfinityIso
     (i₁ i₂ : ι) (hi₁ : i₁ = data.i₁ pq) (hi₂ : i₂ = data.i₂ pq) :
     (X.spectralSequence data).pageInfinity pq ≅ X.pageInfinity n₀ n₁ n₂ hn₁ hn₂ i₁ i₂
-      (X.le₁₂ data pq hi₁ hi₂) :=
+      (data.le₁₂' pq hi₁ hi₂) :=
   (X.spectralSequence data).pageInfinityIso pq (X.stationaryPage data pq) ≪≫
     X.spectralSequencePageXIso _ _ (X.le₀_stationaryPage data pq) pq n₀ n₁ n₂ hn₁ hn₂ hn₁'
        _ i₁ i₂ _ rfl hi₁ hi₂ rfl ≪≫
@@ -564,9 +559,9 @@ noncomputable def spectralSequencePageInfinityIso
         (X.stationaryPage_isZero₃ data pq n₀ (by lia) _ _ _ (by rfl))
 
 lemma spectralSequencePageInfinityIso_hom
-    (i₀ i₁ i₂ i₃ : ι) (hi₀ : i₀ = X.i₀ data _ pq (X.le₀_stationaryPage data pq))
+    (i₀ i₁ i₂ i₃ : ι) (hi₀ : i₀ = data.i₀ _ pq (X.le₀_stationaryPage data pq))
       (hi₁ : i₁ = data.i₁ pq) (hi₂ : i₂ = data.i₂ pq)
-      (hi₃ : i₃ = X.i₃ data (X.stationaryPage data pq) pq) :
+      (hi₃ : i₃ = data.i₃ (X.stationaryPage data pq) pq) :
   (X.spectralSequencePageInfinityIso data pq n₀ n₁ n₂ hn₁ hn₂ hn₁' i₁ i₂ hi₁ hi₂).hom =
   ((X.spectralSequence data).pageInfinityIso pq (X.stationaryPage data pq)).hom ≫
     (X.spectralSequencePageXIso data _ (X.le₀_stationaryPage data pq) pq n₀ n₁ n₂ hn₁ hn₂ hn₁'

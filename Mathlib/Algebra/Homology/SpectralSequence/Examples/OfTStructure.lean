@@ -80,7 +80,8 @@ instance [t.IsGE X 0] [H.VanishesOnGEOne t] :
       (t.eTruncGE.obj i).map_zero, (H.shift n).map_zero]
   isZero₂ i j hij n hi := by
     dsimp
-    have := t.isGE_eTruncGE_obj_obj (n + 1) i (by induction i <;> simp_all)
+    have := t.isGE_eTruncGE_obj_obj (n + 1) i
+      (by induction i using WithBotTop.rec <;> simp_all)
     apply H.isZero_shift_obj_of_vanishesOnGEOne t n (n+1) (by lia)
 
 noncomputable def spectralSequence : E₂CohomologicalSpectralSequence A :=

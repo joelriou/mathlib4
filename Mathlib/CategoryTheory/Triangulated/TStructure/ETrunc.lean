@@ -6,7 +6,7 @@ Authors: Joël Riou
 module
 
 public import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLEGT
-public import Mathlib.Data.EInt.Basic
+public import Mathlib.Order.WithBotTop
 
 /-!
 # Truncations for a t-structure
@@ -37,32 +37,33 @@ variable (t : TStructure C)
 `n : ℤ` to `t.truncLT n` and `⊤` to `𝟭 C`. -/
 noncomputable def eTruncLT : EInt ⥤ C ⥤ C where
   obj n := by
-    induction n with
+    induction n using WithBotTop.rec with
     | bot => exact 0
     | coe a => exact t.truncLT a
     | top => exact 𝟭 C
   map {x y} f := by
-    induction x with
+    induction x using WithBotTop.rec with
     | bot =>
-      induction y with
+      induction y using WithBotTop.rec with
       | bot => exact 𝟙 _
       | coe b => exact 0
       | top => exact 0
     | coe a =>
-      induction y with
+      induction y using WithBotTop.rec with
       | bot => exact 0
       | coe b => exact t.natTransTruncLTOfLE a b (by simpa using leOfHom f)
       | top => exact t.truncLTι a
     | top =>
-      induction y with
+      induction y using WithBotTop.rec with
       | bot => exact 0
       | coe b => exact 0
       | top => exact 𝟙 _
-  map_id n := by induction n <;> simp
+  map_id n := by induction n using WithBotTop.rec <;> simp
   map_comp {x y z} f g := by
     have f' := leOfHom f
     have g' := leOfHom g
-    induction x <;> induction y <;> induction z <;> cat_disch
+    induction x using WithBotTop.rec <;> induction y using WithBotTop.rec <;>
+      induction z using WithBotTop.rec <;> cat_disch
 
 @[simp]
 lemma eTruncLT_obj_top : t.eTruncLT.obj ⊤ = 𝟭 _ := rfl
@@ -71,45 +72,46 @@ lemma eTruncLT_obj_top : t.eTruncLT.obj ⊤ = 𝟭 _ := rfl
 lemma eTruncLT_obj_bot : t.eTruncLT.obj ⊥ = 0 := rfl
 
 @[simp]
-lemma eTruncLT_obj_mk (n : ℤ) : t.eTruncLT.obj (EInt.mk n) = t.truncLT n := rfl
+lemma eTruncLT_obj_coe (n : ℤ) : t.eTruncLT.obj n = t.truncLT n := rfl
 
 @[simp]
 lemma eTruncLT_map_eq_truncLTι (n : ℤ) :
-    t.eTruncLT.map (homOfLE (show EInt.mk n ≤ ⊤ by simp)) = t.truncLTι n := rfl
+    t.eTruncLT.map (homOfLE (show (n : EInt) ≤ ⊤ by simp)) = t.truncLTι n := rfl
 
 instance (i : EInt) : (t.eTruncLT.obj i).Additive := by
-  induction i <;> constructor <;> cat_disch
+  induction i using WithBotTop.rec <;> constructor <;> cat_disch
 
 /-- The functor `EInt ⥤ C ⥤ C` which sends `⊥` to `𝟭 C`,
 `n : ℤ` to `t.truncGE n` and `⊤` to the zero functor. -/
 noncomputable def eTruncGE : EInt ⥤ C ⥤ C where
   obj n := by
-    induction n with
+    induction n using WithBotTop.rec with
     | bot => exact 𝟭 C
     | coe a => exact t.truncGE a
     | top => exact 0
   map {x y} f := by
-    induction x with
+    induction x using WithBotTop.rec with
     | bot =>
-      induction y with
+      induction y using WithBotTop.rec with
       | bot => exact 𝟙 _
       | coe b => exact t.truncGEπ b
       | top => exact 0
     | coe a =>
-      induction y with
+      induction y using WithBotTop.rec with
       | bot => exact 0
       | coe b => exact t.natTransTruncGEOfLE a b (by simpa using leOfHom f)
       | top => exact 0
     | top =>
-      induction y with
+      induction y using WithBotTop.rec with
       | bot => exact 0
       | coe b => exact 0
       | top => exact 𝟙 _
-  map_id n := by induction n <;> simp
+  map_id n := by induction n using WithBotTop.rec <;> simp
   map_comp {x y z} f g := by
     have f' := leOfHom f
     have g' := leOfHom g
-    induction x <;> induction y <;> induction z <;> cat_disch
+    induction x using WithBotTop.rec <;> induction y using WithBotTop.rec <;>
+      induction z using WithBotTop.rec <;> cat_disch
 
 @[simp]
 lemma eTruncGE_obj_bot :
@@ -120,32 +122,32 @@ lemma eTruncGE_obj_top :
     t.eTruncGE.obj ⊤ = 0 := rfl
 
 @[simp]
-lemma eTruncGE_obj_mk (n : ℤ) : t.eTruncGE.obj (EInt.mk n) = t.truncGE n := rfl
+lemma eTruncGE_obj_coe (n : ℤ) : t.eTruncGE.obj n = t.truncGE n := rfl
 
 instance (i : EInt) : (t.eTruncGE.obj i).Additive := by
-  induction i <;> constructor <;> cat_disch
+  induction i using WithBotTop.rec <;> constructor <;> cat_disch
 
 /-- The connecting homomorphism from `t.eTruncGE` to the
 shift by `1` of `t.eTruncLT`. -/
 noncomputable def eTruncGEδLT :
     t.eTruncGE ⟶ t.eTruncLT ⋙ ((Functor.whiskeringRight C C C).obj (shiftFunctor C (1 : ℤ))) where
   app a := by
-    induction a with
+    induction a using WithBotTop.rec with
     | bot => exact 0
     | coe a => exact t.truncGEδLT a
     | top => exact 0
   naturality {a b} hab := by
     replace hab := leOfHom hab
-    induction a; rotate_right
+    induction a using WithBotTop.rec; rotate_right
     · apply (isZero_zero _).eq_of_src
     all_goals
-      induction b <;> simp at hab <;>
+      induction b using WithBotTop.rec <;> simp at hab <;>
         dsimp [eTruncGE, eTruncLT] <;>
         simp [t.truncGEδLT_comp_whiskerRight_natTransTruncLTOfLE]
 
 @[simp]
-lemma eTruncGEδLT_mk (n : ℤ) :
-    t.eTruncGEδLT.app (EInt.mk n) = t.truncGEδLT n := rfl
+lemma eTruncGEδLT_coe (n : ℤ) :
+    t.eTruncGEδLT.app n = t.truncGEδLT n := rfl
 
 /-- The natural transformation `t.eTruncLT.obj i ⟶ 𝟭 C` for all `i : EInt`. -/
 noncomputable abbrev eTruncLTι (i : EInt) : t.eTruncLT.obj i ⟶ 𝟭 _ :=
@@ -174,7 +176,7 @@ lemma eTruncLT_map_app_eTruncLTι_app {i j : EInt} (f : i ⟶ j) (X : C) :
 lemma eTruncLT_obj_map_eTruncLTι_app (i : EInt) (X : C) :
     (t.eTruncLT.obj i).map ((t.eTruncLTι i).app X) =
     (t.eTruncLTι i).app ((t.eTruncLT.obj i).obj X) := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot => simp
   | coe n => simp [truncLT_map_truncLTι_app]
   | top => simp
@@ -206,7 +208,7 @@ lemma eTruncGEπ_app_eTruncGE_map_app {i j : EInt} (f : i ⟶ j) (X : C) :
 lemma eTruncGE_obj_map_eTruncGEπ_app (i : EInt) (X : C) :
     (t.eTruncGE.obj i).map ((t.eTruncGEπ i).app X) =
     (t.eTruncGEπ i).app ((t.eTruncGE.obj i).obj X) := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot => simp
   | coe n => simp [truncGE_map_truncGEπ_app]
   | top => simp
@@ -220,7 +222,7 @@ noncomputable def eTriangleLTGE : EInt ⥤ C ⥤ Triangle C where
 
 lemma eTriangleLTGE_distinguished (i : EInt) (X : C) :
     (t.eTriangleLTGE.obj i).obj X ∈ distTriang _ := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot =>
     rw [Triangle.distinguished_iff_of_isZero₁ _ (Functor.zero_obj X)]
     dsimp
@@ -233,52 +235,52 @@ lemma eTriangleLTGE_distinguished (i : EInt) (X : C) :
 
 instance (X : C) (n : ℤ) [t.IsLE X n] (i : EInt) :
     t.IsLE ((t.eTruncLT.obj i).obj X) n := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot => exact isLE_of_isZero _ (by simp) _
   | coe _ => dsimp; infer_instance
   | top => dsimp; infer_instance
 
 instance (X : C) (n : ℤ) [t.IsGE X n] (i : EInt) :
     t.IsGE ((t.eTruncGE.obj i).obj X) n := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot => dsimp; infer_instance
   | coe _ => dsimp; infer_instance
   | top => exact isGE_of_isZero _ (by simp) _
 
-lemma isGE_eTruncGE_obj_obj (n : ℤ) (i : EInt) (h : EInt.mk n ≤ i) (X : C) :
+lemma isGE_eTruncGE_obj_obj (n : ℤ) (i : EInt) (h : n ≤ i) (X : C) :
     t.IsGE ((t.eTruncGE.obj i).obj X) n := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot => simp at h
   | coe i =>
     dsimp
     exact t.isGE_of_ge  _ _ _ (by simpa using h)
   | top => exact t.isGE_of_isZero (Functor.zero_obj _) _
 
-lemma isLE_eTruncLT_obj_obj (n : ℤ) (i : EInt) (h : i ≤ EInt.mk (n + 1)) (X : C) :
+lemma isLE_eTruncLT_obj_obj (n : ℤ) (i : EInt) (h : i ≤ (n + 1 :)) (X : C) :
     t.IsLE (((t.eTruncLT.obj i)).obj X) n := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot => exact t.isLE_of_isZero (by simp) _
   | coe i =>
-    simp only [EInt.coe_le_coe_iff] at h
+    simp only [WithBotTop.coe_le_coe] at h
     dsimp
     exact t.isLE_of_le _ (i - 1) n (by lia)
   | top => simp at h
 
-lemma isZero_eTruncLT_obj_obj (X : C) (n : ℤ) [t.IsGE X n] (j : EInt) (hj : j ≤ EInt.mk n) :
+lemma isZero_eTruncLT_obj_obj (X : C) (n : ℤ) [t.IsGE X n] (j : EInt) (hj : j ≤ n) :
     IsZero ((t.eTruncLT.obj j).obj X) := by
-  induction j with
+  induction j using WithBotTop.rec with
   | bot => simp
   | coe j =>
     have := t.isGE_of_ge X j n (by simpa using hj)
     exact t.isZero_truncLT_obj_of_isGE _ _
   | top => simp at hj
 
-lemma isZero_eTruncGE_obj_obj (X : C) (n : ℤ) [t.IsLE X n] (j : EInt) (hj : EInt.mk n < j) :
+lemma isZero_eTruncGE_obj_obj (X : C) (n : ℤ) [t.IsLE X n] (j : EInt) (hj : n < j) :
     IsZero ((t.eTruncGE.obj j).obj X) := by
-  induction j with
+  induction j using WithBotTop.rec with
   | bot => simp at hj
   | coe j =>
-    simp only [EInt.coe_lt_coe_iff] at hj
+    simp only [WithBotTop.coe_lt_coe] at hj
     have := t.isLE_of_le X n (j - 1) (by lia)
     exact t.isZero_truncGE_obj_of_isLE (j - 1) j (by lia) _
   | top => simp
@@ -289,12 +291,12 @@ variable [IsTriangulated C]
 
 lemma isIso_eTruncGE_obj_map_truncGEπ_app (a b : EInt) (h : a ≤ b) (X : C) :
     IsIso ((t.eTruncGE.obj b).map ((t.eTruncGEπ a).app X)) := by
-  induction b with
+  induction b using WithBotTop.rec with
   | bot =>
     obtain rfl : a = ⊥ := by simpa using h
     infer_instance
   | coe b =>
-    induction a with
+    induction a using WithBotTop.rec with
     | bot => dsimp; infer_instance
     | coe a => exact t.isIso_truncGE_map_truncGEπ_app b a (by simpa using h) X
     | top => simp at h
@@ -302,10 +304,10 @@ lemma isIso_eTruncGE_obj_map_truncGEπ_app (a b : EInt) (h : a ≤ b) (X : C) :
 
 lemma isIso_eTruncLT_obj_map_truncLTπ_app (a b : EInt) (h : a ≤ b) (X : C) :
     IsIso ((t.eTruncLT.obj a).map ((t.eTruncLTι b).app X)) := by
-  induction a with
+  induction a using WithBotTop.rec with
   | bot => exact ⟨0, IsZero.eq_of_src (by simp) _ _, IsZero.eq_of_src (by simp) _ _⟩
   | coe a =>
-    induction b with
+    induction b using WithBotTop.rec with
     | bot => simp at h
     | coe b =>
       exact t.isIso_truncLT_map_truncLTι_app a b (by simpa using h) X
@@ -323,14 +325,14 @@ instance (a : EInt) (X : C) : IsIso ((t.eTruncLTι a).app ((t.eTruncLT.obj a).ob
 
 instance (X : C) (n : ℤ) [t.IsGE X n] (i : EInt) :
     t.IsGE ((t.eTruncLT.obj i).obj X) n := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot => exact isGE_of_isZero _ (by simp) _
   | coe _ => dsimp; infer_instance
   | top => dsimp; infer_instance
 
 instance (X : C) (n : ℤ) [t.IsLE X n] (i : EInt) :
     t.IsLE ((t.eTruncGE.obj i).obj X) n := by
-  induction i with
+  induction i using WithBotTop.rec with
   | bot => dsimp; infer_instance
   | coe _ => dsimp; infer_instance
   | top => exact isLE_of_isZero _ (by simp) _
@@ -448,17 +450,17 @@ noncomputable def eTruncLTGELTSelfToGELT :
 instance : IsIso (t.eTruncLTGELTSelfToLTGE a b) := by
   rw [NatTrans.isIso_iff_isIso_app]
   intro X
-  induction b with
+  induction b using WithBotTop.rec with
   | bot => simp [isIsoZero_iff_source_target_isZero]
   | coe b =>
-    induction a with
+    induction a using WithBotTop.rec with
     | bot => simpa using inferInstanceAs (IsIso ((t.truncLT b).map ((t.truncLTι b).app X)))
     | coe a =>
-      simp only [eTruncLT_obj_mk, eTruncGE_obj_mk, Functor.comp_obj, eTruncLTGELTSelfToLTGE_app,
+      simp only [eTruncLT_obj_coe, eTruncGE_obj_coe, Functor.comp_obj, eTruncLTGELTSelfToLTGE_app,
         eTruncLT_map_eq_truncLTι]
       infer_instance
     | top =>
-      simp only [eTruncLT_obj_mk, eTruncGE_obj_top, Functor.comp_obj, eTruncLTGELTSelfToLTGE_app,
+      simp only [eTruncLT_obj_coe, eTruncGE_obj_top, Functor.comp_obj, eTruncLTGELTSelfToLTGE_app,
         eTruncLT_map_eq_truncLTι, zero_map, Functor.map_zero, isIsoZero_iff_source_target_isZero]
       constructor
       all_goals exact Functor.map_isZero _ (Functor.zero_obj _)
@@ -469,14 +471,14 @@ variable (b : EInt) (X : C)
 instance : IsIso (t.eTruncLTGELTSelfToGELT a b) := by
   rw [NatTrans.isIso_iff_isIso_app]
   intro X
-  induction a with
+  induction a using WithBotTop.rec with
   | bot => simpa using inferInstanceAs (IsIso ((t.eTruncLTι b).app ((t.eTruncLT.obj b).obj X)))
   | coe a =>
-    induction b with
+    induction b using WithBotTop.rec with
     | bot => simpa [isIsoZero_iff_source_target_isZero] using
         (t.eTruncGE.obj a).map_isZero (Functor.zero_obj _)
     | coe b =>
-      simp only [eTruncLT_obj_mk, eTruncGE_obj_mk, Functor.comp_obj, eTruncLTGELTSelfToGELT_app,
+      simp only [eTruncLT_obj_coe, eTruncGE_obj_coe, Functor.comp_obj, eTruncLTGELTSelfToGELT_app,
         eTruncLT_map_eq_truncLTι]
       infer_instance
     | top => simpa using inferInstanceAs (IsIso (𝟙 _))
