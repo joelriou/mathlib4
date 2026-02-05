@@ -319,7 +319,7 @@ lemma isEquivalence_toDescentData_of_sieve_le
     (h₂ : Sieve.ofArrows _ f' ≤ Sieve.ofArrows _ f)
     [(F.toDescentData f').IsEquivalence] :
     (F.toDescentData f).IsEquivalence := by
-  let H (i' : ι') : ∃ (i : ι) (p : X' i' ⟶ X i), p ≫ f i = f' i' := by
+  have H (i' : ι') : ∃ (i : ι) (p : X' i' ⟶ X i), p ≫ f i = f' i' := by
     obtain ⟨_, p, _, ⟨i⟩, fac⟩ := h₂ _ (Sieve.ofArrows_mk _ f' i')
     exact ⟨_, _, fac⟩
   choose α p hp using H
