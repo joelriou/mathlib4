@@ -8,7 +8,10 @@ module
 public import Mathlib.AlgebraicTopology.ModelCategory.DerivabilityStructureCofibrant
 public import Mathlib.AlgebraicTopology.ModelCategory.DerivabilityStructureFibrant
 public import Mathlib.CategoryTheory.Localization.CalculusOfFractions.OfAdjunction
+<<<<<<< HEAD
 public import Mathlib.CategoryTheory.Quotient.LocallySmall
+=======
+>>>>>>> origin/master
 
 /-!
 # The homotopy category of bifibrant objects
@@ -17,22 +20,32 @@ We construct the homotopy category `BifibrantObject.HoCat C` of bifibrant
 objects in a model category `C` and show that the functor
 `BifibrantObject.toHoCat : BifibrantObject C ⥤ BifibrantObject.HoCat C`
 is a localization functor with respect to weak equivalences.
+<<<<<<< HEAD
 We also show that certain localizer morphisms are localized weak equivalences,
 which can be understood by saying that we obtain the same localized
 category (up to equivalence) by inverting weak equivalences in `C`,
 `CofibrantObject C`, `FibrantObject C` or `BifibrantObject C`.
+=======
+>>>>>>> origin/master
 
 -/
 
 @[expose] public section
 
+<<<<<<< HEAD
 universe w v u
 
+=======
+>>>>>>> origin/master
 open CategoryTheory Limits
 
 namespace HomotopicalAlgebra
 
+<<<<<<< HEAD
 variable {C : Type u} [Category.{v} C] [ModelCategory C]
+=======
+variable {C : Type*} [Category* C] [ModelCategory C]
+>>>>>>> origin/master
 
 namespace BifibrantObject
 
@@ -82,10 +95,13 @@ lemma toHoCat_map_eq_iff {X Y : BifibrantObject C} (f g : X ⟶ Y) :
     toHoCat.map f = toHoCat.map g ↔ homRel C f g :=
   Quotient.functor_map_eq_iff _ _ _
 
+<<<<<<< HEAD
 instance [LocallySmall.{w} C] : LocallySmall.{w} (HoCat C) := by
   dsimp [HoCat]
   infer_instance
 
+=======
+>>>>>>> origin/master
 section
 
 variable {D : Type*} [Category* D]
@@ -228,6 +244,7 @@ def toHoCatCompιCofibrantObject :
 
 end BifibrantObject
 
+<<<<<<< HEAD
 namespace CofibrantObject
 
 lemma exists_bifibrant (X : CofibrantObject C) :
@@ -539,4 +556,6 @@ lemma locallySmall_of_isLocalization {D : Type*} [Category* D]
   locallySmall_of_faithful ((BifibrantObject.localizerMorphism C).localizedFunctor
     BifibrantObject.toHoCat L).inv
 
+=======
+>>>>>>> origin/master
 end HomotopicalAlgebra
