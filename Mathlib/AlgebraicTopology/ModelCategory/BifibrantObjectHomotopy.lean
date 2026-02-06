@@ -393,7 +393,7 @@ instance (X : BifibrantObject.HoCat C) : IsIso (HoCat.adjCounit'.app X) := by
 
 instance : IsIso (HoCat.adjCounit' (C := C)) := NatIso.isIso_of_isIso_app _
 
-/-- Auxiliary definition for `CofibrantObject.π.adj`. -/
+/-- Auxiliary definition for `CofibrantObject.HoCat.adj`. -/
 noncomputable def HoCat.adjCounitIso :
     BifibrantObject.HoCat.ιCofibrantObject ⋙ bifibrantResolution ≅ 𝟭 (BifibrantObject.HoCat C) :=
   (asIso HoCat.adjCounit').symm
