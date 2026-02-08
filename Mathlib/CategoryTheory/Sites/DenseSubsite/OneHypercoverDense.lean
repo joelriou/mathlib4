@@ -833,10 +833,12 @@ lemma sheafifyHomEquivOfIsOneHypercoverDense_naturality_left
     ((F.sheafifyOfIsOneHypercoverDense J₀ J A).map f ≫ g))) =
       f ≫ IsCoverDense.restrictHomEquivHom (adj₂.homEquiv _ _ (adj₁.homEquiv _ _ g))
   rw [← IsCoverDense.restrictHomEquivHom_naturality_left]
-  dsimp
-  erw [adj₁.homEquiv_naturality_left]
-  erw [adj₂.homEquiv_naturality_left]
-  rfl
+  congr 2
+  trans adj₂.homEquiv _ _ ((presheafToSheaf J₀ A).map (F.op.whiskerLeft f) ≫
+    (adj₁.homEquiv _ _) g)
+  · congr 1
+    apply adj₁.homEquiv_naturality_left
+  · apply adj₂.homEquiv_naturality_left
 
 @[reassoc]
 lemma sheafifyHomEquivOfIsOneHypercoverDense_naturality_right
