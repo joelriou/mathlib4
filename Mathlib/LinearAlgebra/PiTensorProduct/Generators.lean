@@ -42,7 +42,7 @@ noncomputable def equivTensorPiTensorComplSingleton (i₀ : ι) :
   ((reindex R (s := M) (e := (unitSumSubtypeNeEquiv i₀).symm)).trans
     (tmulEquivDep R
         (fun i => M (unitSumSubtypeNeEquiv i₀ i))).symm).trans
-      (LinearEquiv.rTensor _ (subsingletonEquiv (R := R) (M := M i₀) Unit.unit))
+      (LinearEquiv.rTensor _ (subsingletonEquiv (R := R) Unit.unit))
 
 variable (i₀ : ι)
 
