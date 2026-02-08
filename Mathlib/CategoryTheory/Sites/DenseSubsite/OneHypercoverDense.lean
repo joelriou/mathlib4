@@ -814,7 +814,8 @@ lemma presheafMap_presheafObjObjIso_hom (X : C) (i : (data X).I₀) :
   apply presheafObj_hom_ext
   intro j
   rw [assoc, presheafMap_π]
-  erw [presheafObjObjIso.inv_π]
+  dsimp [presheafObjObjIso]
+  rw [presheafObjObjIso.inv_π data G₀]
   apply restriction_eq_of_fac
   simp
 
@@ -824,10 +825,7 @@ lemma presheafObjObjIso_inv_naturality {X₀ Y₀ : C₀} (f : X₀ ⟶ Y₀) :
       (presheafObjObjIso data G₀ Y₀).inv ≫ presheafMap data G₀ (F.map f) := by
   apply presheafObj_hom_ext
   intro j
-  dsimp
-  rw [assoc, assoc, presheafMap_π]
-  erw [presheafObjObjIso.inv_π, presheafObjObjIso.inv_restriction]
-  rw [IsDenseSubsite.mapPreimage_comp, IsDenseSubsite.mapPreimage_map]
+  simp [presheafObjObjIso, IsDenseSubsite.mapPreimage_comp]
 
 @[reassoc]
 lemma presheafObjObjIso_hom_naturality {X₀ Y₀ : C₀} (f : X₀ ⟶ Y₀) :
@@ -948,8 +946,10 @@ lemma sheafifyHomEquivOfIsOneHypercoverDense_naturality_left
   change IsCoverDense.restrictHomEquivHom (adj₂.homEquiv _ _ (adj₁.homEquiv _ _
     ((F.sheafifyOfIsOneHypercoverDense J₀ J A).map f ≫ g))) =
       f ≫ IsCoverDense.restrictHomEquivHom (adj₂.homEquiv _ _ (adj₁.homEquiv _ _ g))
-  erw [← IsCoverDense.restrictHomEquivHom_naturality_left]
-  erw [adj₁.homEquiv_naturality_left, adj₂.homEquiv_naturality_left]
+  rw [← IsCoverDense.restrictHomEquivHom_naturality_left]
+  dsimp
+  erw [adj₁.homEquiv_naturality_left]
+  erw [adj₂.homEquiv_naturality_left]
   rfl
 
 @[reassoc]
