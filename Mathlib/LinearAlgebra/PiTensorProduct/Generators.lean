@@ -135,7 +135,6 @@ lemma _root_.MultilinearMap.ext_of_span_eq_top
 
 end AddCommMonoid
 
-
 variable
   [CommRing R] [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)] [AddCommMonoid N] [Module R N]
   {g : ⦃i : ι⦄ → (j : γ i) → M i}
