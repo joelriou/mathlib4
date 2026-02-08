@@ -456,18 +456,10 @@ noncomputable abbrev presheafObjMultifork (X : C) :
   Multifork.ofι _ (presheafObj data G₀ X) (presheafObjπ data G₀ X)
     (fun _ ↦ presheafObj_condition _ _ _ _ _ _)
 
--- to be moved
-/-- Constructor for isomorphisms between multiforks. -/
-def _root_.CategoryTheory.Limits.Multifork.isoMk {C : Type*} [Category C]
-    {S : MulticospanShape}
-    {I : MulticospanIndex S C} {c₁ c₂ : Multifork I} (e : c₁.pt ≅ c₂.pt)
-    (h : ∀ (i : S.L), c₁.ι i = e.hom ≫ c₂.ι i := by aesop_cat) : c₁ ≅ c₂ :=
-  Cones.ext e (by rintro (_ | _) <;> simp [h])
-
 /-- The multifork `presheafObjMultifork` is a limit. -/
 noncomputable def presheafObjIsLimit (X : C) :
     IsLimit (presheafObjMultifork data G₀ X) :=
-  IsLimit.ofIsoLimit (limit.isLimit _) (Multifork.isoMk (Iso.refl _))
+  IsLimit.ofIsoLimit (limit.isLimit _) (Multifork.ext (Iso.refl _))
 
 namespace restriction
 
@@ -756,38 +748,16 @@ noncomputable def compPresheafIso : F.op ⋙ presheaf data G₀ ≅ G₀.val :=
   NatIso.ofComponents (fun X₀ ↦ presheafObjObjIso data G₀ X₀.unop)
     (fun f ↦ presheafObjObjIso_hom_naturality data G₀ f.unop)
 
--- to be moved
-/-- Constructor for isomorphisms between functors from `WalkingMulticospan J`
-for `J : MulticospanShape`. -/
-@[simps!]
-def _root_.CategoryTheory.Limits.multicospanIsoMk {J : MulticospanShape}
-    {C : Type*} [Category C] {G₁ G₂ : WalkingMulticospan J ⥤ C}
-    (e : ∀ (i : J.L), G₁.obj (.left i) ≅ G₂.obj (.left i))
-    (e' : ∀ (j : J.R), G₁.obj (.right j) ≅ G₂.obj (.right j))
-    (h₁ : ∀ (i : J.R), G₁.map (WalkingMulticospan.Hom.fst i) ≫ (e' i).hom =
-      (e (J.fst i)).hom ≫ G₂.map (WalkingMulticospan.Hom.fst i))
-    (h₂ : ∀ (i : J.R), G₁.map (WalkingMulticospan.Hom.snd i) ≫ (e' i).hom =
-      (e (J.snd i)).hom ≫ G₂.map (WalkingMulticospan.Hom.snd i)) :
-    G₁ ≅ G₂ :=
-  NatIso.ofComponents (fun x ↦ match x with
-    | .left i => e i
-    | .right j => e' j) (by
-        rintro _ _ (_ | _ | _)
-        · simp
-        · dsimp
-          exact h₁ _
-        · exact h₂ _)
-
 lemma isSheaf : Presheaf.IsSheaf J (presheaf data G₀) := by
   rw [isSheaf_iff data]
   constructor
   · exact (Presheaf.isSheaf_of_iso_iff (compPresheafIso data G₀)).2 G₀.cond
   · intro X
     refine ⟨(IsLimit.postcomposeHomEquiv
-      (Limits.multicospanIsoMk (fun _ ↦ presheafObjObjIso _ _ _)
+      (WalkingMulticospan.functorExt (fun _ ↦ presheafObjObjIso _ _ _)
           (fun _ ↦ presheafObjObjIso _ _ _) (fun j ↦ ?_) (fun j ↦ ?_)) _).1
       (IsLimit.ofIsoLimit (presheafObjIsLimit data G₀ X)
-        (Multifork.isoMk (Iso.refl _) (fun i ↦ ?_)))⟩
+        (Multifork.ext (Iso.refl _) (fun i ↦ ?_)))⟩
     · apply presheafObjObjIso_hom_naturality
     · apply presheafObjObjIso_hom_naturality
     · simp [Multifork.ι, PreOneHypercover.multifork]
