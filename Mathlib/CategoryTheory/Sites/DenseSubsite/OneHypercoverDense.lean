@@ -3,7 +3,9 @@ Copyright (c) 2026 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joël Riou
 -/
-import Mathlib.CategoryTheory.Sites.DenseSubsite.Basic
+module
+
+public import Mathlib.CategoryTheory.Sites.DenseSubsite.Basic
 
 /-!
 # Equivalence of categories of sheaves with a dense subsite that is 1-hypercover dense
@@ -22,6 +24,8 @@ to the site `(C, J)`, see `Functor.hasWeakSheafify_of_isOneHypercoverDense`
 and `Functor.hasSheafify_of_isOneHypercoverDense`.
 
 -/
+
+@[expose] public section
 
 universe w v₀ v v' u₀ u u'
 
@@ -59,9 +63,7 @@ namespace PreOneHypercoverDenseData
 
 attribute [reassoc] w
 
-variable {F}
-
-variable {X : C} (data : PreOneHypercoverDenseData.{w} F X)
+variable {F} {X : C} (data : PreOneHypercoverDenseData.{w} F X)
 
 /-- The pre-`1`-hypercover induced by a `PreOneHypercoverDenseData` structure. -/
 @[simps]
@@ -349,8 +351,7 @@ lemma fac (a : S.Arrow) :
           r := ⟨_, 𝟙 _, F.map d ≫ F.map b ≫ (data a.Y).f i, by
             simp only [fac₁, fac₂, assoc, id_comp]⟩ }))
 
-variable {s}
-
+variable {s} in
 include hG hG₀ in
 lemma hom_ext {f₁ f₂ : s.pt ⟶ G.obj (op X)}
     (h : ∀ (a : S.Arrow), f₁ ≫ G.map a.f.op = f₂ ≫ G.map a.f.op) : f₁ = f₂ :=
