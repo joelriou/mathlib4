@@ -1,0 +1,59 @@
+/-
+Copyright (c) 2026 Joël Riou. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Joël Riou
+-/
+module
+
+public import Mathlib.AlgebraicTopology.ExtraDegeneracy
+public import Mathlib.CategoryTheory.Limits.FormalCoproducts.Cech
+public import Mathlib.CategoryTheory.Limits.Constructions.WidePullbackOfTerminal
+
+/-!
+# Extradegeneracy for the Cech object
+
+Let `U : FormalCoproduct C`. Let `T` be a terminal object in `C`.
+In this file, we construct an isomorphism from the Cech object `U.cech` that is
+defined for objects in `FormalCoproduct` to the general Cech nerve construction
+applied to the morphism from `U` to the terminal object.
+This isomorphism is used in order to show that, as an augmented object (over `T`),
+the Cech object `U.cech` has an extra degeneracy when there is a
+morphism `T ⟶ U.obj i₀` for some `i₀`.
+
+-/
+
+@[expose] public section
+
+universe w t v u
+
+open Simplicial
+
+namespace CategoryTheory.Limits.FormalCoproduct
+
+variable {C : Type u} [Category.{v} C] [HasFiniteProducts C]
+  (U : FormalCoproduct.{w} C) {T : C} (hT : IsTerminal T)
+
+instance (n : ℕ) :
+    HasWidePullback (Arrow.mk ((isTerminalIncl T hT).from U)).right
+      (fun (_ : Fin (n + 1)) ↦ (Arrow.mk ((isTerminalIncl T hT).from U)).left)
+      fun _ ↦ (Arrow.mk ((isTerminalIncl T hT).from U)).hom := by
+  dsimp
+  have : HasProduct fun (x : Fin (n + 1)) ↦ U := ⟨⟨_, U.isLimitPowerFan (Fin (n + 1))⟩⟩
+  exact hasWidePullback_of_isTerminal _ (isTerminalIncl _ hT)
+
+def cechIsoCechNerve :
+    U.cech ≅ Arrow.cechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) := by
+  sorry
+
+def cechIsoAugmentedCechNerve :
+    U.cech.augmentOfIsTerminal (isTerminalIncl _ hT) ≅
+      Arrow.augmentedCechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) := by
+  sorry
+
+noncomputable def extraDegeneracyCech {i₀ : U.I} (d : T ⟶ U.obj i₀) :
+    (U.cech.augmentOfIsTerminal (isTerminalIncl _ hT)).ExtraDegeneracy :=
+  .ofIso (U.cechIsoAugmentedCechNerve hT).symm
+    (Arrow.AugmentedCechNerve.extraDegeneracy _
+      { section_ := Hom.fromIncl i₀ d })
+
+end CategoryTheory.Limits.FormalCoproduct

@@ -517,6 +517,15 @@ def augment (X : SimplicialObject C) (X₀ : C) (f : X _⦋0⦌ ⟶ X₀)
 theorem augment_hom_zero (X : SimplicialObject C) (X₀ : C) (f : X _⦋0⦌ ⟶ X₀) (w) :
     (X.augment X₀ f w).hom.app (op ⦋0⦌) = f := by simp
 
+/-- The augmented simplicial object that is deduced from a simplicial object and
+a terminal object. -/
+@[simps!]
+def augmentOfIsTerminal (X : SimplicialObject C) {T : C} (hT : IsTerminal T) :
+    Augmented C where
+  left := X
+  right := T
+  hom := { app _ := hT.from _ }
+
 end SimplicialObject
 
 /-- Cosimplicial objects. -/
