@@ -11,8 +11,11 @@ public import Mathlib.CategoryTheory.Limits.FormalCoproducts
 /-!
 # The Cech object for formal coproducts
 
-noncomputable def cechFunctor :
-    FormalCoproduct.{w} C ⥤ SimplicialObject (FormalCoproduct.{w} C) where
+Let `C` be a category that has finite products. In this file, we define a
+functor `cechFunctor : FormalCoproduct C ⥤ SimplicialObject (FormalCoproduct C)`
+which sends a formal coproduct of objects `U j` (for `j : ι`) to the simplicial object
+which sends `⦋n⦌` to the formal coproduct, indexed by `i : Fin (n + 1) → ι`,
+of the products of the objects `U (i a)` for all `a : Fin (n + 1)`.
 
 -/
 

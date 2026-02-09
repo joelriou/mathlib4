@@ -15,8 +15,8 @@ Given a family of objects `U : ι → C` in a category `C` that has finite produ
 we define a Cech complex functor
 `cechComplexFunctor : (Cᵒᵖ ⥤ A) ⥤ CochainComplex A ℕ` which sends a presheaf
 `P : Cᵒᵖ ⥤ A` in a preadditive category (where products exist) to the cochain
-complex which in degree `n` consists of the product, indexed by `x : Fin (n + 1) → ι`,
-of the value of `P` on the product of the objects `U (x i)` for `i : Fin (n + 1)`.
+complex which in degree `n` consists of the product, indexed by `i : Fin (n + 1) → ι`,
+of the value of `P` on the product of the objects `U (i a)` for `a : Fin (n + 1)`.
 
 -/
 
