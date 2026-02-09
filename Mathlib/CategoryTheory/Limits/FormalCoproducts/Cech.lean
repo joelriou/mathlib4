@@ -132,6 +132,7 @@ noncomputable def cechMap {U V : FormalCoproduct.{w} C} (f : U ⟶ V) :
 
 /-- The functor `FormalCoproduct C ⥤ SimplicialObject (FormalCoproduct C)`
 which sends a formal coproduct to its Cech object. -/
+@[simps]
 noncomputable def cechFunctor :
     FormalCoproduct.{w} C ⥤ SimplicialObject (FormalCoproduct.{w} C) where
   obj U := U.cech
