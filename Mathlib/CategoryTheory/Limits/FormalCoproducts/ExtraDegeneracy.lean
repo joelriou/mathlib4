@@ -41,12 +41,24 @@ instance (n : ℕ) :
   have : HasProduct fun (x : Fin (n + 1)) ↦ U := ⟨⟨_, U.isLimitPowerFan (Fin (n + 1))⟩⟩
   exact hasWidePullback_of_isTerminal _ (isTerminalIncl _ hT)
 
+instance (n : SimplexCategory) :
+    HasLimit (WidePullbackShape.wideCospan ((incl C).obj T) _
+      fun (_ : ToType n) ↦ (isTerminalIncl T hT).from U) :=
+  ⟨⟨_, WidePullbackCone.isLimitOfFan  _ (U.isLimitPowerFan _)
+    (isTerminalIncl T hT)⟩⟩
+
+noncomputable def cechIsoCechNerveApp (n : SimplexCategoryᵒᵖ) :
+    U.cech.obj n ≅ (Arrow.cechNerve (Arrow.mk ((isTerminalIncl _ hT).from U))).obj n :=
+  IsLimit.conePointUniqueUpToIso (WidePullbackCone.isLimitOfFan
+    (arrows := fun _ ↦ (isTerminalIncl _ hT).from U)
+    (U.isLimitPowerFan (ToType n.unop)) (isTerminalIncl _ hT)) (limit.isLimit _)
+
 /-- The Cech construction for `FormalCoproduct` is isomorphic
 to the general `Arrow.cechNerve` construction applied to the morphism
 to the terminal object. -/
-def cechIsoCechNerve :
-    U.cech ≅ Arrow.cechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) := by
-  sorry
+noncomputable def cechIsoCechNerve :
+    U.cech ≅ Arrow.cechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) :=
+  NatIso.ofComponents (fun _ ↦ cechIsoCechNerveApp _ _ _) sorry
 
 /-- The Cech construction for `FormalCoproduct` is isomorphic
 to the general `Arrow.augmentedCechNerve` construction applied to the morphism
