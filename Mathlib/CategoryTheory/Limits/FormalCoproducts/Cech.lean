@@ -154,9 +154,18 @@ lemma mapPower_powerMap {U V : FormalCoproduct.{w} C} (f : U ⟶ V)
       Category.assoc, limit.lift_π, Fan.mk_π_app, Pi.map_π]
     apply limit.lift_π
 
-variable [HasFiniteProducts C]
-
 attribute [local simp] mapPower_comp mapPower_powerMap
+
+/-- The functor `(Type t)ᵒᵖ ⥤ FormalCoproduct.{w} C ⥤ FormalCoproduct.{max w t} C`
+which sends a type `α` and `U : FormalCoproduct C` to `U.power α`. -/
+@[simps]
+noncomputable def powerBifunctor [HasProducts.{t} C] :
+    (Type t)ᵒᵖ ⥤ FormalCoproduct.{w} C ⥤ FormalCoproduct.{max w t} C where
+  obj α := powerFunctor α.unop
+  map f := { app _ := mapPower _ f.unop }
+  map_comp _ _ := by ext : 2; dsimp; apply mapPower_comp
+
+variable [HasFiniteProducts C]
 
 /-- Given `U : FormalCoproduct C`, this is the simplicial object
 in `FormalCoproduct C` which sends `⦋n⦌` to `U.power (Fin (n + 1))`. -/
@@ -166,19 +175,13 @@ noncomputable def cech (U : FormalCoproduct.{w} C) :
   obj n := U.power (ToType n.unop)
   map f := U.mapPower f.unop.toOrderHom.toFun
 
-/-- The morphims `U.cech ⟶ V.cech` induced by a morphism `U ⟶ V` in
-the category `FormalCoproduct C`. -/
-@[simps]
-noncomputable def cechMap {U V : FormalCoproduct.{w} C} (f : U ⟶ V) :
-    U.cech ⟶ V.cech where
-  app n := powerMap f _
-
 /-- The functor `FormalCoproduct C ⥤ SimplicialObject (FormalCoproduct C)`
 which sends a formal coproduct to its Cech object. -/
+@[simps]
 noncomputable def cechFunctor :
     FormalCoproduct.{w} C ⥤ SimplicialObject (FormalCoproduct.{w} C) where
   obj U := U.cech
-  map f := cechMap f
+  map f := { app _ := powerMap f _ }
   map_comp _ _ := by ext : 1; simp
 
 end CategoryTheory.Limits.FormalCoproduct
