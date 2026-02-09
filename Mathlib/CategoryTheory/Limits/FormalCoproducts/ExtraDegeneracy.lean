@@ -41,15 +41,25 @@ instance (n : ℕ) :
   have : HasProduct fun (x : Fin (n + 1)) ↦ U := ⟨⟨_, U.isLimitPowerFan (Fin (n + 1))⟩⟩
   exact hasWidePullback_of_isTerminal _ (isTerminalIncl _ hT)
 
+/-- The Cech construction for `FormalCoproduct` is isomorphic
+to the general `Arrow.cechNerve` construction applied to the morphism
+to the terminal object. -/
 def cechIsoCechNerve :
     U.cech ≅ Arrow.cechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) := by
   sorry
 
-def cechIsoAugmentedCechNerve :
+/-- The Cech construction for `FormalCoproduct` is isomorphic
+to the general `Arrow.augmentedCechNerve` construction applied to the morphism
+to the terminal object. -/
+noncomputable def cechIsoAugmentedCechNerve :
     U.cech.augmentOfIsTerminal (isTerminalIncl _ hT) ≅
-      Arrow.augmentedCechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) := by
-  sorry
+      Arrow.augmentedCechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) :=
+  Comma.isoMk (U.cechIsoCechNerve hT) (Iso.refl _) (by
+    ext : 1
+    apply (isTerminalIncl _ hT).hom_ext)
 
+/-- The Cech object of `U : FormalCoproduct C` has an extra degeneracy
+when there is a morphism `T ⟶ U.obj i₀` from the terminal object. -/
 noncomputable def extraDegeneracyCech {i₀ : U.I} (d : T ⟶ U.obj i₀) :
     (U.cech.augmentOfIsTerminal (isTerminalIncl _ hT)).ExtraDegeneracy :=
   .ofIso (U.cechIsoAugmentedCechNerve hT).symm
