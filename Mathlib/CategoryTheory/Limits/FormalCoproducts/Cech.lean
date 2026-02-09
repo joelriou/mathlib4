@@ -115,6 +115,7 @@ attribute [local simp] mapPower_comp mapPower_powerMap
 
 /-- The functor `(Type t)ᵒᵖ ⥤ FormalCoproduct.{w} C ⥤ FormalCoproduct.{max w t} C`
 which sends a type `α` and `U : FormalCoproduct C` to `U.power α`. -/
+@[simps]
 noncomputable def powerBifunctor [HasProducts.{t} C] :
     (Type t)ᵒᵖ ⥤ FormalCoproduct.{w} C ⥤ FormalCoproduct.{max w t} C where
   obj α := powerFunctor α.unop
