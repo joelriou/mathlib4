@@ -13,7 +13,7 @@ public import Mathlib.CategoryTheory.Sites.DenseSubsite.Basic
 Let `F : C₀ ⥤ C` be a functor equipped with Grothendieck topologies `J₀` and `J`.
 Assume that `F` is a dense subsite. We introduce a typeclass
 `IsOneHypercoverDense.{w} F J₀ J` which roughly says that objects in `C`
-admits a `1`-hypercover consisting of objects in `C₀`.
+admit a `1`-hypercover consisting of objects in `C₀`.
 
 -/
 
