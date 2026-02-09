@@ -47,6 +47,7 @@ instance (n : SimplexCategory) :
   ⟨⟨_, WidePullbackCone.isLimitOfFan  _ (U.isLimitPowerFan _)
     (isTerminalIncl T hT)⟩⟩
 
+/-- Auxiliary definition for `cechIsoCechNerve`. -/
 noncomputable def cechIsoCechNerveApp (n : SimplexCategoryᵒᵖ) :
     U.cech.obj n ≅ (Arrow.cechNerve (Arrow.mk ((isTerminalIncl _ hT).from U))).obj n :=
   IsLimit.conePointUniqueUpToIso (WidePullbackCone.isLimitOfFan
