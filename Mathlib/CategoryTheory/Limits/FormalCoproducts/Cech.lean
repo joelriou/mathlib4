@@ -154,6 +154,12 @@ lemma mapPower_powerMap {U V : FormalCoproduct.{w} C} (f : U ⟶ V)
       Category.assoc, limit.lift_π, Fan.mk_π_app, Pi.map_π]
     apply limit.lift_π
 
+@[reassoc (attr := simp)]
+lemma mapPower_π (U : FormalCoproduct.{w} C) {α β : Type}
+    [HasProductsOfShape α C] [HasProductsOfShape β C] (f : α → β) (a : α) :
+    mapPower U f ≫ U.powerπ a = U.powerπ (f a) := by
+  ext <;> simp
+
 attribute [local simp] mapPower_comp mapPower_powerMap
 
 /-- The functor `(Type t)ᵒᵖ ⥤ FormalCoproduct.{w} C ⥤ FormalCoproduct.{max w t} C`
