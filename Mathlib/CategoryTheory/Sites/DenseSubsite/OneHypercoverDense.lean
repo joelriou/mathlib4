@@ -159,7 +159,7 @@ lemma isDenseSubsite_of_isOneHypercoverDense [F.IsLocallyFull J] [F.IsLocallyFai
       Sieve.functorPushforward F S₀ ∈ J.sieves (F.obj X₀) ↔ S₀ ∈ J₀.sieves X₀) :
     IsDenseSubsite J₀ J F where
   isCoverDense' := ⟨fun X ↦ by
-    refine J.superset_covering ?_ ((F.oneHypercoverDenseData J₀ J X).mem₀)
+    refine J.superset_covering ?_ (F.oneHypercoverDenseData J₀ J X).mem₀
     rintro Y _ ⟨_, a, _, h, rfl⟩
     cases h
     exact ⟨{ fac := rfl, ..}⟩⟩
