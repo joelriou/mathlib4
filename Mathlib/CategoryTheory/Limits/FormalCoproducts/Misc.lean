@@ -19,13 +19,36 @@ public import Mathlib.CategoryTheory.ShrinkYoneda
 
 @[expose] public section
 
-universe w v u
+universe w v v' u u'
 
 namespace CategoryTheory
 
+variable {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D]
 open Opposite Limits
 
-variable {C : Type u} [Category.{v} C] [LocallySmall.{w} C]
+--(eval C (Cᵒᵖ ⥤ Type w)).obj shrinkYoneda.{w, v, u} ⋙
+-- (Functor.whiskeringLeft Dᵒᵖ Cᵒᵖ (Type w)).obj F.op
+
+namespace Subfunctor
+
+variable {F : D ⥤ C} {G : C ⥤ D} (adj : F ⊣ G) {ι : Type*} (U : ι → C)
+
+-- to be moved
+def ofObjectsIsoOfAdj :
+    F.op ⋙ (ofObjects U).toFunctor ≅
+      (ofObjects (G.obj ∘ U)).toFunctor :=
+  NatIso.ofComponents (fun X ↦ Equiv.toIso ((Equiv.refl _).subtypeEquiv (fun _ ↦ by
+    simp only [Functor.op_obj, Functor.const_obj_obj, ofObjects, Set.mem_setOf_eq,
+      Function.comp_apply, Equiv.refl_apply]
+    constructor
+    · rintro ⟨i, ⟨f⟩⟩
+      exact ⟨i, ⟨adj.homEquiv _ _ f⟩⟩
+    · rintro ⟨i, ⟨f⟩⟩
+      exact ⟨i, ⟨(adj.homEquiv _ _).symm f⟩⟩))) (fun _ ↦ rfl)
+
+end Subfunctor
+
+variable [LocallySmall.{w} C] [LocallySmall.{w} D]
 
 -- to be moved
 noncomputable def isTerminalShrinkYonedaObj {T : C} (hT : IsTerminal T) :
@@ -53,7 +76,7 @@ noncomputable def shrinkYonedaCech [HasFiniteProducts C] :
             (isColimitOfPreserves ((evaluation _ _).obj V) (coproductIsCoproduct _)) v
           let φ : Opposite.unop V ⟶ U.obj (i 0) :=
             shrinkYonedaObjObjEquiv v ≫ Pi.π _ 0
-          simp [Subfunctor.ofObjects_obj_eq_univ φ] ⟩ } }
+          simp [Subfunctor.ofObjects_obj_eq_univ φ]⟩ } }
 
 lemma isEmpty_shrinkYonedaCechRightObj [HasFiniteProducts C]
     (X : Cᵒᵖ) (hX : ∀ (i : U.I), IsEmpty (X.unop ⟶ U.obj i)) :
@@ -74,13 +97,30 @@ noncomputable def extraDegeneracyShrinkYonedaCech
   · ext : 1
     apply (Subfunctor.isTerminalOfObjectsToFunctor _ f hT).hom_ext
 
-variable [HasFiniteLimits C]
 
-def shrinkYonedaCechOverIso (X : C) :
+section
+
+variable {F : D ⥤ C} {G : C ⥤ D} (adj : F ⊣ G) [HasFiniteProducts C]
+  [HasFiniteProducts D]
+
+noncomputable def shrinkYonedaCechIsoOfAdj :
     ((SimplicialObject.Augmented.whiskering _ _).obj
-      ((Functor.whiskeringLeft _ _ _).obj (Over.forget X).op)).obj U.shrinkYonedaCech ≅
-        ((Over.star X).mapFormalCoproduct.obj U).shrinkYonedaCech := by
-  sorry
+      ((Functor.whiskeringLeft _ _ _).obj F.op)).obj U.shrinkYonedaCech ≅
+    (G.mapFormalCoproduct.obj U).shrinkYonedaCech :=
+  Comma.isoMk (by
+    dsimp [shrinkYonedaCech]
+    refine (Functor.whiskeringRightObjCompIso ..).app _ ≪≫ ?_
+    sorry) (Subfunctor.ofObjectsIsoOfAdj adj _) rfl
+
+end
+
+--def shrinkYonedaCechOverIso (X : C) :
+--    ((SimplicialObject.Augmented.whiskering _ _).obj
+--      ((Functor.whiskeringLeft _ _ _).obj (Over.forget X).op)).obj U.shrinkYonedaCech ≅
+--        ((Over.star X).mapFormalCoproduct.obj U).shrinkYonedaCech := by
+--  exact U.shrinkYonedaCechIsoOfAdj (Over.forgetAdjStar X)
+
+variable [HasFiniteLimits C]
 
 instance nonempty_extraDegeneracy_shrinkYonedaCech_evaluation (X : Cᵒᵖ) :
     Nonempty (((SimplicialObject.Augmented.whiskering _ _).obj
@@ -89,7 +129,7 @@ instance nonempty_extraDegeneracy_shrinkYonedaCech_evaluation (X : Cᵒᵖ) :
   · obtain ⟨i, ⟨f⟩⟩ := hX
     exact ⟨.ofIso (((SimplicialObject.Augmented.whiskering _ _).obj
       ((evaluation _ _).obj (op (Over.mk (𝟙 _))))).mapIso
-        (U.shrinkYonedaCechOverIso X.unop)).symm
+        (U.shrinkYonedaCechIsoOfAdj (Over.forgetAdjStar X.unop))).symm
           (SimplicialObject.Augmented.ExtraDegeneracy.map
             (extraDegeneracyShrinkYonedaCech _ (Over.homMk (prod.lift (𝟙 _) f))
               Over.mkIdTerminal) _)⟩
