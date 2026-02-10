@@ -22,7 +22,7 @@ open Limits
 
 -- to be generalized to concrete categories, and moved
 section
-variable {G H : AddCommGrp.{u}} (e : G ≅ H)
+variable {G H : AddCommGrpCat.{u}} (e : G ≅ H)
 
 def Iso.toEquivOfConcrete : G ≃ H where
   toFun := e.hom
@@ -50,66 +50,66 @@ lemma Iso.inv_surjective :
 
 end
 
-lemma AddCommGrp.fst_biprodIsoProd_inv_apply
-    {G H : AddCommGrp.{u}} (g : G × H) :
-    (biprod.fst : G ⊞ H ⟶ G) ((AddCommGrp.biprodIsoProd G H).inv g) = g.1 :=
-  AddCommGrp.biprodIsoProd_inv_comp_fst_apply _ _ _
+lemma AddCommGrpCat.fst_biprodIsoProd_inv_apply
+    {G H : AddCommGrpCat.{u}} (g : G × H) :
+    (biprod.fst : G ⊞ H ⟶ G) ((AddCommGrpCat.biprodIsoProd G H).inv g) = g.1 :=
+  AddCommGrpCat.biprodIsoProd_inv_comp_fst_apply _ _ _
 
-lemma AddCommGrp.snd_biprodIsoProd_inv_apply
-    {G H : AddCommGrp.{u}} (g : G × H) :
-    (biprod.snd : G ⊞ H ⟶ H) ((AddCommGrp.biprodIsoProd G H).inv g) = g.2 :=
-  AddCommGrp.biprodIsoProd_inv_comp_snd_apply _ _ _
+lemma AddCommGrpCat.snd_biprodIsoProd_inv_apply
+    {G H : AddCommGrpCat.{u}} (g : G × H) :
+    (biprod.snd : G ⊞ H ⟶ H) ((AddCommGrpCat.biprodIsoProd G H).inv g) = g.2 :=
+  AddCommGrpCat.biprodIsoProd_inv_comp_snd_apply _ _ _
 
 @[simp]
-lemma AddCommGrp.biprodIsoProd_hom_apply_fst
-    {G H : AddCommGrp.{u}} (g : (G ⊞ H :)) :
-    ((AddCommGrp.biprodIsoProd G H).hom g).1 = (biprod.fst : G ⊞ H ⟶ _) g :=
+lemma AddCommGrpCat.biprodIsoProd_hom_apply_fst
+    {G H : AddCommGrpCat.{u}} (g : (G ⊞ H :)) :
+    ((AddCommGrpCat.biprodIsoProd G H).hom g).1 = (biprod.fst : G ⊞ H ⟶ _) g :=
   rfl
 
 @[simp]
-lemma AddCommGrp.biprodIsoProd_hom_apply_snd
-    {G H : AddCommGrp.{u}} (g : (G ⊞ H :)) :
-    ((AddCommGrp.biprodIsoProd G H).hom g).2 = (biprod.snd : G ⊞ H ⟶ _) g :=
+lemma AddCommGrpCat.biprodIsoProd_hom_apply_snd
+    {G H : AddCommGrpCat.{u}} (g : (G ⊞ H :)) :
+    ((AddCommGrpCat.biprodIsoProd G H).hom g).2 = (biprod.snd : G ⊞ H ⟶ _) g :=
   rfl
 
 @[simp]
-lemma AddCommGrp.fst_inl_apply {G H : AddCommGrp.{u}} (g : G) :
+lemma AddCommGrpCat.fst_inl_apply {G H : AddCommGrpCat.{u}} (g : G) :
     (biprod.fst : G ⊞ H ⟶ _) ((biprod.inl : _ ⟶ G ⊞ H) g) = g := by
   simp [← ConcreteCategory.comp_apply]
 
 @[simp]
-lemma AddCommGrp.snd_inl_apply {G H : AddCommGrp.{u}} (g : G) :
+lemma AddCommGrpCat.snd_inl_apply {G H : AddCommGrpCat.{u}} (g : G) :
     (biprod.snd : G ⊞ H ⟶ _) ((biprod.inl : _ ⟶ G ⊞ H) g) = 0 := by
   simp [← ConcreteCategory.comp_apply]
 
 @[simp]
-lemma AddCommGrp.fst_inr_apply {G H : AddCommGrp.{u}} (h : H) :
+lemma AddCommGrpCat.fst_inr_apply {G H : AddCommGrpCat.{u}} (h : H) :
     (biprod.fst : G ⊞ H ⟶ _) ((biprod.inr : _ ⟶ G ⊞ H) h) = 0 := by
   simp [← ConcreteCategory.comp_apply]
 
 @[simp]
-lemma AddCommGrp.snd_inr_apply {G H : AddCommGrp.{u}} (h : H) :
+lemma AddCommGrpCat.snd_inr_apply {G H : AddCommGrpCat.{u}} (h : H) :
     (biprod.snd : G ⊞ H ⟶ _) ((biprod.inr : _ ⟶ G ⊞ H) h) = h := by
   simp [← ConcreteCategory.comp_apply]
 
-lemma AddCommGrp.biprodIsoProd_inv_comp_apply
-    {G H K : AddCommGrp.{u}} (f : G ⊞ H ⟶ K) (g : G) (h : H) :
-    ((AddCommGrp.biprodIsoProd G H).inv ≫ f) ⟨g, h⟩ =
+lemma AddCommGrpCat.biprodIsoProd_inv_comp_apply
+    {G H K : AddCommGrpCat.{u}} (f : G ⊞ H ⟶ K) (g : G) (h : H) :
+    ((AddCommGrpCat.biprodIsoProd G H).inv ≫ f) ⟨g, h⟩ =
     (biprod.inl ≫ f) g + (biprod.inr ≫ f) h := by
   dsimp
   rw [← map_add]
   congr 1
-  apply (AddCommGrp.biprodIsoProd G H).hom_injective
+  apply (AddCommGrpCat.biprodIsoProd G H).hom_injective
   simp only [← ConcreteCategory.comp_apply, Iso.inv_hom_id,
-    AddCommGrp.hom_id, AddMonoidHom.id_apply, map_add]
+    AddCommGrpCat.hom_id, AddMonoidHom.id_apply, map_add]
   ext
   · dsimp
-    rw [AddCommGrp.biprodIsoProd_hom_apply_fst,
-      AddCommGrp.biprodIsoProd_hom_apply_fst]
+    rw [AddCommGrpCat.biprodIsoProd_hom_apply_fst,
+      AddCommGrpCat.biprodIsoProd_hom_apply_fst]
     simp
   · dsimp
-    rw [AddCommGrp.biprodIsoProd_hom_apply_snd,
-      AddCommGrp.biprodIsoProd_hom_apply_snd]
+    rw [AddCommGrpCat.biprodIsoProd_hom_apply_snd,
+      AddCommGrpCat.biprodIsoProd_hom_apply_snd]
     simp
 
 
@@ -122,7 +122,7 @@ namespace Ext
 variable {X₁ X₂ Y : C} {n : ℕ}
 
 /-- The additive equivalence `Ext.{w} (X₁ ⊞ X₂) Y n ≃+ Ext.{w} X₁ Y n × Ext.{w} X₂ Y n`. -/
-@[simps (config := .lemmasOnly) apply apply_fst apply_snd symm_apply]
+@[simps -isSimp apply apply_fst apply_snd symm_apply]
 noncomputable def fromBiprodEquiv : Ext.{w} (X₁ ⊞ X₂) Y n ≃+ Ext.{w} X₁ Y n × Ext.{w} X₂ Y n where
   toFun e := ⟨(mk₀ biprod.inl).comp e (zero_add n), (mk₀ biprod.inr).comp e (zero_add n)⟩
   invFun e := (mk₀ biprod.fst).comp e.1 (zero_add n) + (mk₀ biprod.snd).comp e.2 (zero_add n)
@@ -132,36 +132,37 @@ noncomputable def fromBiprodEquiv : Ext.{w} (X₁ ⊞ X₂) Y n ≃+ Ext.{w} X�
 
 variable (X₁ X₂ Y n)
 
-/-- The isomorphism in the category `AddCommGrp` between `AddCommGrp.of (Ext.{w} (X₁ ⊞ X₂) Y n)`
-and `AddCommGrp.of (Ext.{w} X₁ Y n) ⊞ AddCommGrp.of (Ext.{w} X₂ Y n)`. -/
-noncomputable def fromBiprodIso : AddCommGrp.of (Ext.{w} (X₁ ⊞ X₂) Y n) ≅
-    AddCommGrp.of (Ext.{w} X₁ Y n) ⊞ AddCommGrp.of (Ext.{w} X₂ Y n) :=
-  (AddEquiv.toAddCommGrpIso fromBiprodEquiv).trans (AddCommGrp.biprodIsoProd _ _).symm
+/-- The isomorphism in the category `AddCommGrpCat` between
+`AddCommGrpCat.of (Ext.{w} (X₁ ⊞ X₂) Y n)`
+and `AddCommGrpCat.of (Ext.{w} X₁ Y n) ⊞ AddCommGrpCat.of (Ext.{w} X₂ Y n)`. -/
+noncomputable def fromBiprodIso : AddCommGrpCat.of (Ext.{w} (X₁ ⊞ X₂) Y n) ≅
+    AddCommGrpCat.of (Ext.{w} X₁ Y n) ⊞ AddCommGrpCat.of (Ext.{w} X₂ Y n) :=
+  (AddEquiv.toAddCommGrpIso fromBiprodEquiv).trans (AddCommGrpCat.biprodIsoProd _ _).symm
 
 variable {X₁ X₂ Y n}
 
 lemma fromBiprodIso_inv_apply (e₁ : Ext.{w} X₁ Y n) (e₂ : Ext.{w} X₂ Y n) :
   (fromBiprodIso X₁ X₂ Y n).inv
-    ((AddCommGrp.biprodIsoProd _ _).inv ⟨e₁, e₂⟩) =
+    ((AddCommGrpCat.biprodIsoProd _ _).inv ⟨e₁, e₂⟩) =
       fromBiprodEquiv.symm ⟨e₁, e₂⟩ :=
   fromBiprodEquiv.injective (by simp [fromBiprodIso, ← ConcreteCategory.comp_apply])
 
 lemma biprod_inl_comp_fromBiprodIso_inv_apply
-    (x : ((AddCommGrp.of (Ext X₁ Y n) ⊞ AddCommGrp.of (Ext X₂ Y n)) :)) :
+    (x : ((AddCommGrpCat.of (Ext X₁ Y n) ⊞ AddCommGrpCat.of (Ext X₂ Y n)) :)) :
     (mk₀ biprod.inl).comp ((fromBiprodIso X₁ X₂ Y n).inv x) (zero_add n) =
-      (biprod.fst : AddCommGrp.of (Ext X₁ Y n) ⊞ AddCommGrp.of (Ext X₂ Y n) ⟶ _) x := by
-  obtain ⟨⟨x₁, x₂⟩, rfl⟩ := (AddCommGrp.biprodIsoProd _ _).inv_surjective x
+      (biprod.fst : AddCommGrpCat.of (Ext X₁ Y n) ⊞ AddCommGrpCat.of (Ext X₂ Y n) ⟶ _) x := by
+  obtain ⟨⟨x₁, x₂⟩, rfl⟩ := (AddCommGrpCat.biprodIsoProd _ _).inv_surjective x
   rw [fromBiprodIso_inv_apply, fromBiprodEquiv_symm_apply,
-    ← ConcreteCategory.comp_apply, AddCommGrp.biprodIsoProd_inv_comp_fst]
+    ← ConcreteCategory.comp_apply, AddCommGrpCat.biprodIsoProd_inv_comp_fst]
   simp
 
 lemma biprod_inr_comp_fromBiprodIso_inv_apply
-    (x : ((AddCommGrp.of (Ext X₁ Y n) ⊞ AddCommGrp.of (Ext X₂ Y n)) :)) :
+    (x : ((AddCommGrpCat.of (Ext X₁ Y n) ⊞ AddCommGrpCat.of (Ext X₂ Y n)) :)) :
     (mk₀ biprod.inr).comp ((fromBiprodIso X₁ X₂ Y n).inv x) (zero_add n) =
-      (biprod.snd : AddCommGrp.of (Ext X₁ Y n) ⊞ AddCommGrp.of (Ext X₂ Y n) ⟶ _) x := by
-  obtain ⟨⟨x₁, x₂⟩, rfl⟩ := (AddCommGrp.biprodIsoProd _ _).inv_surjective x
+      (biprod.snd : AddCommGrpCat.of (Ext X₁ Y n) ⊞ AddCommGrpCat.of (Ext X₂ Y n) ⟶ _) x := by
+  obtain ⟨⟨x₁, x₂⟩, rfl⟩ := (AddCommGrpCat.biprodIsoProd _ _).inv_surjective x
   rw [fromBiprodIso_inv_apply, fromBiprodEquiv_symm_apply,
-    ← ConcreteCategory.comp_apply, AddCommGrp.biprodIsoProd_inv_comp_snd]
+    ← ConcreteCategory.comp_apply, AddCommGrpCat.biprodIsoProd_inv_comp_snd]
   simp
 
 end Ext

@@ -28,12 +28,12 @@ namespace CategoryTheory
 open Category Opposite Limits Abelian
 
 variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
-  [HasWeakSheafify J (Type v)] [HasSheafify J AddCommGrp.{v}]
-  [HasExt.{w} (Sheaf J AddCommGrp.{v})]
+  [HasWeakSheafify J (Type v)] [HasSheafify J AddCommGrpCat.{v}]
+  [HasExt.{w} (Sheaf J AddCommGrpCat.{v})]
 
 namespace GrothendieckTopology.MayerVietorisSquare
 
-variable (S : J.MayerVietorisSquare) (F : Sheaf J AddCommGrp.{v})
+variable (S : J.MayerVietorisSquare) (F : Sheaf J AddCommGrpCat.{v})
 
 /-- The sum of two restriction maps in sheaf cohomology. -/
 noncomputable def toBiprod (n : ℕ) :
@@ -42,18 +42,18 @@ noncomputable def toBiprod (n : ℕ) :
       ((F.cohomologyPresheaf n).map S.f₃₄.op)
 
 lemma toBiprod_apply {n : ℕ} (y : F.H' n S.X₄) :
-    S.toBiprod F n y = (AddCommGrp.biprodIsoProd _ _).inv
+    S.toBiprod F n y = (AddCommGrpCat.biprodIsoProd _ _).inv
       ⟨(F.cohomologyPresheaf n).map S.f₂₄.op y,
         (F.cohomologyPresheaf n).map S.f₃₄.op y⟩ := by
-  apply (AddCommGrp.biprodIsoProd _ _).hom_injective
+  apply (AddCommGrpCat.biprodIsoProd _ _).hom_injective
   dsimp [toBiprod]
   ext
-  · rw [← AddCommGrp.biprodIsoProd_inv_comp_fst_apply, ← ConcreteCategory.comp_apply,
+  · rw [← AddCommGrpCat.biprodIsoProd_inv_comp_fst_apply, ← ConcreteCategory.comp_apply,
       ← ConcreteCategory.comp_apply, ← ConcreteCategory.comp_apply,
       Iso.hom_inv_id_assoc, biprod.lift_fst,
       ← ConcreteCategory.comp_apply, Iso.inv_hom_id]
     dsimp
-  · rw [← AddCommGrp.biprodIsoProd_inv_comp_snd_apply, ← ConcreteCategory.comp_apply,
+  · rw [← AddCommGrpCat.biprodIsoProd_inv_comp_snd_apply, ← ConcreteCategory.comp_apply,
       ← ConcreteCategory.comp_apply, ← ConcreteCategory.comp_apply,
       Iso.hom_inv_id_assoc, biprod.lift_snd,
       ← ConcreteCategory.comp_apply, Iso.inv_hom_id]
@@ -67,10 +67,10 @@ noncomputable def fromBiprod (n : ℕ) :
 
 lemma fromBiprod_biprodIsoProd_inv_apply {n : ℕ}
     (y₁ : F.H' n S.X₂) (y₂ : F.H' n S.X₃) :
-    S.fromBiprod F n ((AddCommGrp.biprodIsoProd _ _).inv ⟨y₁, y₂⟩) =
+    S.fromBiprod F n ((AddCommGrpCat.biprodIsoProd _ _).inv ⟨y₁, y₂⟩) =
       (F.cohomologyPresheaf n).map S.f₁₂.op y₁ - (F.cohomologyPresheaf n).map S.f₁₃.op y₂ := by
   dsimp [fromBiprod]
-  rw [← ConcreteCategory.comp_apply, AddCommGrp.biprodIsoProd_inv_comp_apply,
+  rw [← ConcreteCategory.comp_apply, AddCommGrpCat.biprodIsoProd_inv_comp_apply,
     biprod.inl_desc, biprod.inr_desc, sub_eq_add_neg]
   dsimp
 
@@ -80,13 +80,13 @@ variable (n₀ n₁ : ℕ) (h : n₀ + 1 = n₁)
 in sheaf cohomology. -/
 noncomputable def δ :
     F.H' n₀ S.X₁ ⟶ F.H' n₁ S.X₄ :=
-  AddCommGrp.ofHom (S.shortComplex_shortExact.extClass.precomp _ (by omega))
+  AddCommGrpCat.ofHom (S.shortComplex_shortExact.extClass.precomp _ (by omega))
 
 open ComposableArrows
 
 /-- The Mayer-Vietoris long exact sequence of an abelian sheaf `F : Sheaf J AddCommGrp`
 for a Mayer-Vietoris square `S : J.MayerVietorisSquare`. -/
-noncomputable def sequence : ComposableArrows AddCommGrp.{w} 5 :=
+noncomputable def sequence : ComposableArrows AddCommGrpCat.{w} 5 :=
   mk₅ (S.toBiprod F n₀) (S.fromBiprod F n₀) (S.δ F n₀ n₁ h)
     (S.toBiprod F n₁) (S.fromBiprod F n₁)
 
@@ -98,18 +98,18 @@ lemma fromBiprodIso_inv_toBiprod_apply {n : ℕ} (x : F.H' n S.X₄) :
     rw [Ext.mk₀_comp_mk₀_assoc, biprod.inl_desc,
       Ext.biprod_inl_comp_fromBiprodIso_inv_apply]
     rw [toBiprod_apply]
-    apply AddCommGrp.biprodIsoProd_inv_comp_fst_apply
+    apply AddCommGrpCat.biprodIsoProd_inv_comp_fst_apply
   · dsimp
     rw [Ext.mk₀_comp_mk₀_assoc, biprod.inr_desc,
       Ext.biprod_inr_comp_fromBiprodIso_inv_apply]
     rw [toBiprod_apply]
-    apply AddCommGrp.biprodIsoProd_inv_comp_snd_apply
+    apply AddCommGrpCat.biprodIsoProd_inv_comp_snd_apply
 
 lemma mk₀_f_comp_fromBiprodIso_inv_apply
-    {n : ℕ} (x : (F.H' n S.X₂ ⊞ F.H' n S.X₃ : AddCommGrp)) :
+    {n : ℕ} (x : (F.H' n S.X₂ ⊞ F.H' n S.X₃ : AddCommGrpCat)) :
     (Ext.mk₀ S.shortComplex.f).comp ((Ext.fromBiprodIso _ _ _ _).inv x) (zero_add _) =
       S.fromBiprod F n x := by
-  obtain ⟨⟨y₁, y₂⟩, rfl⟩ := (AddCommGrp.biprodIsoProd _ _).inv_surjective x
+  obtain ⟨⟨y₁, y₂⟩, rfl⟩ := (AddCommGrpCat.biprodIsoProd _ _).inv_surjective x
   erw [Ext.fromBiprodIso_inv_apply y₁ y₂]
   rw [Ext.fromBiprodEquiv_symm_apply]
   dsimp
