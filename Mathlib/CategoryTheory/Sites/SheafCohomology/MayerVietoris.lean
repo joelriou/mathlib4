@@ -3,10 +3,12 @@ Copyright (c) 2024 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joël Riou
 -/
-import Mathlib.Algebra.Homology.DerivedCategory.Ext.ExactSequences
-import Mathlib.Algebra.Homology.DerivedCategory.Ext.Biprod
-import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
-import Mathlib.CategoryTheory.Sites.MayerVietorisSquare
+module
+
+public import Mathlib.Algebra.Homology.DerivedCategory.Ext.ExactSequences
+public import Mathlib.Algebra.Homology.DerivedCategory.Ext.Biprod
+public import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
+public import Mathlib.CategoryTheory.Sites.MayerVietorisSquare
 
 /-!
 # The Mayer-Vietoris exact sequence in sheaf cohomology
@@ -20,6 +22,8 @@ In this file, we obtain a long exact Mayer-Vietoris sequence:
 `... ⟶ H^n₀(S.X₄, F) ⟶ H^n₀(S.X₂, F) ⊞ H^n₀(S.X₃, F) ⟶ H^n₀(S.X₁, F) ⟶ H^n₁(S.X₄, F) ⟶ ...`
 
 -/
+
+@[expose] public section
 
 universe w v u
 
