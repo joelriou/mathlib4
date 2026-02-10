@@ -3,8 +3,10 @@ Copyright (c) 2025 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joël Riou
 -/
-import Mathlib.Algebra.Category.Grp.Biproducts
-import Mathlib.Algebra.Homology.DerivedCategory.Ext.Basic
+module
+
+public import Mathlib.Algebra.Category.Grp.Biproducts
+public import Mathlib.Algebra.Homology.DerivedCategory.Ext.Basic
 
 /-!
 # Ext and binary biproducts
@@ -13,6 +15,8 @@ In this file, we decompose the abelian group
 `Ext (X₁ ⊞ X₂) Y n` as the product of `Ext X₁ Y n` and `Ext X₂ Y n`.
 
 -/
+
+@[expose] public section
 
 universe w v u
 
