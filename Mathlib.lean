@@ -593,6 +593,7 @@ public import Mathlib.Algebra.Homology.ExactSequenceFour
 public import Mathlib.Algebra.Homology.Factorizations.Basic
 public import Mathlib.Algebra.Homology.Factorizations.CM5b
 public import Mathlib.Algebra.Homology.Functor
+public import Mathlib.Algebra.Homology.FunctorCategory
 public import Mathlib.Algebra.Homology.GrothendieckAbelian
 public import Mathlib.Algebra.Homology.HasNoLoop
 public import Mathlib.Algebra.Homology.HomologicalBicomplex

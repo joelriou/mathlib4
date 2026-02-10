@@ -5,9 +5,7 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.Algebra.Homology.ShortComplex.Abelian
-public import Mathlib.Algebra.Homology.QuasiIso
-public import Mathlib.CategoryTheory.Abelian.FunctorCategory
+public import Mathlib.Algebra.Homology.FunctorCategory
 public import Mathlib.CategoryTheory.Comma.LocallySmall
 public import Mathlib.CategoryTheory.Limits.Constructions.Over.Basic
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.ExtraDegeneracy
@@ -227,8 +225,15 @@ instance :
     QuasiIso (AlternatingFaceMapComplex.ε.app
       (((SimplicialObject.Augmented.whiskeringObj
         ((whiskeringRight Cᵒᵖ _ _).obj (sigmaFunctor.obj M))).obj U.shrinkYonedaCech))) := by
-  dsimp
-  sorry
+  rw [HomologicalComplex.quasiIso_iff_evaluation]
+  intro X
+  obtain ⟨ed⟩ := U.nonempty_extraDegeneracy_shrinkYonedaCech_evaluation X
+  refine ((HomologicalComplex.quasiIso A (.down ℕ)).arrow_mk_iso_iff ?_).1
+    (ed.map (sigmaFunctor.obj M)).homotopyEquiv.quasiIso_hom
+  refine NatTrans.arrowMkAppIso (AlternatingFaceMapComplex.ε) ?_ ≪≫
+    (AlternatingFaceMapComplex.arrowMkεAppWhiskeringObjIso _ _).symm
+  exact (SimplicialObject.Augmented.whiskeringObjCompIso ..).app _ ≪≫ by rfl ≪≫
+    (SimplicialObject.Augmented.whiskeringObjCompIso ..).symm.app _
 
 end Limits.FormalCoproduct
 

@@ -466,6 +466,12 @@ def whiskeringObj {D : Type*} [Category* D] (F : C ⥤ D) : Augmented C ⥤ Augm
         erw [η.w]
         rfl }
 
+@[simps!]
+def whiskeringObjCompIso {D : Type*} [Category* D] {E : Type*} [Category* E]
+    (F : C ⥤ D) (G : D ⥤ E) :
+    whiskeringObj F ⋙ whiskeringObj G ≅ whiskeringObj (F ⋙ G) :=
+  NatIso.ofComponents (fun _ ↦ Comma.isoMk (Iso.refl _) (Iso.refl _))
+
 variable (C)
 
 /-- Functor composition induces a functor on augmented simplicial objects. -/
