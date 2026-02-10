@@ -504,6 +504,29 @@ noncomputable def Ext.addEquivBiproduct (X : C) {J : Type*} [Fintype J] {Y : J �
 
 end biproduct
 
+/-- `Ext` commutes with binary biproducts on the first variable. -/
+@[simps apply_fst apply_snd, simps -isSimp symm_apply]
+noncomputable def Ext.biprodAddEquiv {X₁ X₂ Y : C} {n : ℕ} :
+    Ext (X₁ ⊞ X₂) Y n ≃+ Ext X₁ Y n × Ext X₂ Y n where
+  toFun e := ⟨(mk₀ biprod.inl).comp e (zero_add n), (mk₀ biprod.inr).comp e (zero_add n)⟩
+  invFun e := (mk₀ biprod.fst).comp e.1 (zero_add n) + (mk₀ biprod.snd).comp e.2 (zero_add n)
+  left_inv _ := by
+    simp only [mk₀_comp_mk₀_assoc, ← add_comp, ← mk₀_add, biprod.total, mk₀_id_comp]
+  right_inv _ := by simp
+  map_add' := by simp
+
+/-- `Ext` commutes with binary biproducts on the second variable. -/
+@[simps apply_fst apply_snd, simps -isSimp symm_apply]
+noncomputable def Ext.addEquivBiprod {X : C} {Y₁ Y₂ : C} {n : ℕ} :
+    Ext X (Y₁ ⊞ Y₂) n ≃+ Ext X Y₁ n × Ext X Y₂ n where
+  toFun e := ⟨e.comp (mk₀ biprod.fst) (add_zero n), e.comp (mk₀ biprod.snd) (add_zero n)⟩
+  invFun e := e.1.comp (mk₀ biprod.inl) (add_zero n) + e.2.comp (mk₀ biprod.inr) (add_zero n)
+  left_inv e := by
+    simp only [comp_assoc_of_second_deg_zero, mk₀_comp_mk₀, ← comp_add, ← mk₀_add,
+      biprod.total, comp_mk₀_id]
+  right_inv _ := by simp
+  map_add' := by simp
+
 section ChangeOfUniverse
 
 namespace Ext

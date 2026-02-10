@@ -6,9 +6,9 @@ Authors: Joël Riou
 module
 
 public import Mathlib.Algebra.Homology.DerivedCategory.Ext.ExactSequences
-public import Mathlib.Algebra.Homology.DerivedCategory.Ext.Biprod
-public import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
+public import Mathlib.Algebra.Category.Grp.Biproducts
 public import Mathlib.CategoryTheory.Sites.MayerVietorisSquare
+public import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
 
 /-!
 # The Mayer-Vietoris exact sequence in sheaf cohomology
@@ -49,19 +49,19 @@ lemma toBiprod_apply {n : ℕ} (y : F.H' n S.X₄) :
     S.toBiprod F n y = (AddCommGrpCat.biprodIsoProd _ _).inv
       ⟨(F.cohomologyPresheaf n).map S.f₂₄.op y,
         (F.cohomologyPresheaf n).map S.f₃₄.op y⟩ := by
-  apply (AddCommGrpCat.biprodIsoProd _ _).hom_injective
+  apply (AddCommGrpCat.biprodIsoProd _ _).addCommGroupIsoToAddEquiv.injective
   dsimp [toBiprod]
   ext
-  · rw [← AddCommGrpCat.biprodIsoProd_inv_comp_fst_apply, ← ConcreteCategory.comp_apply,
-      ← ConcreteCategory.comp_apply, ← ConcreteCategory.comp_apply,
-      Iso.hom_inv_id_assoc, biprod.lift_fst,
-      ← ConcreteCategory.comp_apply, Iso.inv_hom_id]
-    dsimp
-  · rw [← AddCommGrpCat.biprodIsoProd_inv_comp_snd_apply, ← ConcreteCategory.comp_apply,
-      ← ConcreteCategory.comp_apply, ← ConcreteCategory.comp_apply,
-      Iso.hom_inv_id_assoc, biprod.lift_snd,
-      ← ConcreteCategory.comp_apply, Iso.inv_hom_id]
-    dsimp
+  · rw [Iso.addCommGroupIsoToAddEquiv_apply,
+      Iso.addCommGroupIsoToAddEquiv_apply,
+      ← AddCommGrpCat.biprodIsoProd_inv_comp_fst_apply,
+      Iso.hom_inv_id_apply, ← ConcreteCategory.comp_apply,
+      biprod.lift_fst, Iso.inv_hom_id_apply]
+  · rw [Iso.addCommGroupIsoToAddEquiv_apply,
+      Iso.addCommGroupIsoToAddEquiv_apply,
+      ← AddCommGrpCat.biprodIsoProd_inv_comp_snd_apply,
+      Iso.hom_inv_id_apply, ← ConcreteCategory.comp_apply,
+      biprod.lift_snd, Iso.inv_hom_id_apply]
 
 /-- The sum of two restriction maps in sheaf cohomology. -/
 noncomputable def fromBiprod (n : ℕ) :
@@ -74,9 +74,29 @@ lemma fromBiprod_biprodIsoProd_inv_apply {n : ℕ}
     S.fromBiprod F n ((AddCommGrpCat.biprodIsoProd _ _).inv ⟨y₁, y₂⟩) =
       (F.cohomologyPresheaf n).map S.f₁₂.op y₁ - (F.cohomologyPresheaf n).map S.f₁₃.op y₂ := by
   dsimp [fromBiprod]
-  rw [← ConcreteCategory.comp_apply, AddCommGrpCat.biprodIsoProd_inv_comp_apply,
-    biprod.inl_desc, biprod.inr_desc, sub_eq_add_neg]
+  rw [← ConcreteCategory.comp_apply]
+  simp [AddCommGrpCat.biprodIsoProd_inv_comp_desc, sub_eq_add_neg]
+
+attribute [local simp] toBiprod_apply in
+lemma biprodAddEquiv_symm_biprodIsoProd_hom_toBiprod_apply
+    {n : ℕ} (x : F.H' n S.X₄) :
+    Ext.biprodAddEquiv.symm ((AddCommGrpCat.biprodIsoProd _ _).hom (S.toBiprod F n x)) =
+      (Ext.mk₀ S.shortComplex.g).comp x (zero_add n) :=
+  Ext.biprodAddEquiv.injective (by cat_disch)
+
+attribute [local simp] sub_eq_add_neg in
+lemma mk₀_f_comp_biprodAddEquiv_symm_biprodIsoProd_hom
+    {n : ℕ} (x : ↑(F.H' n S.X₂ ⊞ F.H' n S.X₃)) :
+    (Ext.mk₀ S.shortComplex.f).comp
+      (Ext.biprodAddEquiv.symm ((AddCommGrpCat.biprodIsoProd _ _).hom x)) (zero_add n) =
+    (S.fromBiprod F n x) := by
+  obtain ⟨⟨x₂, x₃⟩, rfl⟩ :=
+    (AddCommGrpCat.biprodIsoProd _ _).addCommGroupIsoToAddEquiv.symm.surjective x
   dsimp
+  rw [Ext.biprodAddEquiv_symm_apply,
+    Iso.addCommGroupIsoToAddEquiv_symm_apply,
+    fromBiprod_biprodIsoProd_inv_apply]
+  cat_disch
 
 variable (n₀ n₁ : ℕ) (h : n₀ + 1 = n₁)
 
@@ -90,48 +110,24 @@ open ComposableArrows
 
 /-- The Mayer-Vietoris long exact sequence of an abelian sheaf `F : Sheaf J AddCommGrp`
 for a Mayer-Vietoris square `S : J.MayerVietorisSquare`. -/
-noncomputable def sequence : ComposableArrows AddCommGrpCat.{w} 5 :=
+noncomputable abbrev sequence : ComposableArrows AddCommGrpCat.{w} 5 :=
   mk₅ (S.toBiprod F n₀) (S.fromBiprod F n₀) (S.δ F n₀ n₁ h)
     (S.toBiprod F n₁) (S.fromBiprod F n₁)
-
-lemma fromBiprodIso_inv_toBiprod_apply {n : ℕ} (x : F.H' n S.X₄) :
-    (Ext.fromBiprodIso _ _ _ _).inv (S.toBiprod F n x) =
-      (Ext.mk₀ S.shortComplex.g).comp x (zero_add _) := by
-  apply Ext.biprod_ext
-  · dsimp
-    rw [Ext.mk₀_comp_mk₀_assoc, biprod.inl_desc,
-      Ext.biprod_inl_comp_fromBiprodIso_inv_apply]
-    rw [toBiprod_apply]
-    apply AddCommGrpCat.biprodIsoProd_inv_comp_fst_apply
-  · dsimp
-    rw [Ext.mk₀_comp_mk₀_assoc, biprod.inr_desc,
-      Ext.biprod_inr_comp_fromBiprodIso_inv_apply]
-    rw [toBiprod_apply]
-    apply AddCommGrpCat.biprodIsoProd_inv_comp_snd_apply
-
-lemma mk₀_f_comp_fromBiprodIso_inv_apply
-    {n : ℕ} (x : (F.H' n S.X₂ ⊞ F.H' n S.X₃ : AddCommGrpCat)) :
-    (Ext.mk₀ S.shortComplex.f).comp ((Ext.fromBiprodIso _ _ _ _).inv x) (zero_add _) =
-      S.fromBiprod F n x := by
-  obtain ⟨⟨y₁, y₂⟩, rfl⟩ := (AddCommGrpCat.biprodIsoProd _ _).inv_surjective x
-  erw [Ext.fromBiprodIso_inv_apply y₁ y₂]
-  rw [Ext.fromBiprodEquiv_symm_apply]
-  dsimp
-  simp only [Ext.comp_add, Ext.mk₀_comp_mk₀_assoc, biprod.lift_fst, biprod.lift_snd]
-  rw [fromBiprod_biprodIsoProd_inv_apply, Ext.mk₀_neg, Ext.neg_comp, sub_eq_add_neg]
-  rfl
 
 /-- Comparison isomorphism from the Mayer-Vietoris sequence and the
 contravariant sequence of `Ext`-groups. -/
 noncomputable def sequenceIso : S.sequence F n₀ n₁ h ≅
     Ext.contravariantSequence S.shortComplex_shortExact F n₀ n₁ (by omega) :=
-  isoMk₅ (Iso.refl _) (Ext.fromBiprodIso _ _ _ _).symm
-    (Iso.refl _) (Iso.refl _) (Ext.fromBiprodIso _ _ _ _).symm (Iso.refl _)
-    (by ext; apply fromBiprodIso_inv_toBiprod_apply)
-    (by ext; symm; apply mk₀_f_comp_fromBiprodIso_inv_apply)
+  isoMk₅ (Iso.refl _)
+    ((AddCommGrpCat.biprodIsoProd _ _).trans (Ext.biprodAddEquiv.symm).toAddCommGrpIso)
+    (Iso.refl _) (Iso.refl _)
+    ((AddCommGrpCat.biprodIsoProd _ _).trans (Ext.biprodAddEquiv.symm).toAddCommGrpIso)
+    (Iso.refl _)
+    (by ext; apply biprodAddEquiv_symm_biprodIsoProd_hom_toBiprod_apply)
+    (by ext; symm; apply mk₀_f_comp_biprodAddEquiv_symm_biprodIsoProd_hom)
     (by dsimp; rw [comp_id, id_comp]; rfl)
-    (by ext; apply fromBiprodIso_inv_toBiprod_apply)
-    (by ext; symm; apply mk₀_f_comp_fromBiprodIso_inv_apply)
+    (by ext; apply biprodAddEquiv_symm_biprodIsoProd_hom_toBiprod_apply)
+    (by ext; symm; apply mk₀_f_comp_biprodAddEquiv_symm_biprodIsoProd_hom)
 
 lemma sequence_exact : (S.sequence F n₀ n₁ h).Exact :=
   exact_of_iso (S.sequenceIso F n₀ n₁ h).symm (Ext.contravariantSequence_exact _ _ _ _ _)
