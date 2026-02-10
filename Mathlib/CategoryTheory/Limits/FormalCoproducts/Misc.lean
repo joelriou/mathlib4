@@ -54,6 +54,35 @@ def ofObjectsIsoOfAdj :
 
 end Subfunctor
 
+namespace Adjunction
+
+variable [LocallySmall.{w} C] [LocallySmall.{w} D]
+  {F : D ⥤ C} {G : C ⥤ D} (adj : F ⊣ G)
+
+noncomputable def shrinkYonedaIso :
+    (shrinkYoneda.{w} ⋙ (Functor.whiskeringLeft _ _ _).obj F.op) ≅
+      G ⋙ shrinkYoneda.{w} :=
+  NatIso.ofComponents
+    (fun X ↦ NatIso.ofComponents
+      (fun Y ↦ Equiv.toIso (
+        shrinkYonedaObjObjEquiv.trans ((adj.homEquiv Y.unop X).trans
+          shrinkYonedaObjObjEquiv.symm))) (fun f ↦ by
+            ext g
+            obtain ⟨g, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective g
+            dsimp
+            rw [shrinkYoneda_obj_map_shrinkYonedaObjObjEquiv_symm,
+              shrinkYoneda_obj_map_shrinkYonedaObjObjEquiv_symm]
+            simp [adj.homEquiv_naturality_left])) (fun f ↦ by
+            ext _ g
+            obtain ⟨g, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective g
+            dsimp
+            rw [shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm,
+              shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm,
+              Equiv.apply_symm_apply, Equiv.apply_symm_apply,
+              adj.homEquiv_naturality_right])
+
+end Adjunction
+
 namespace Limits.FormalCoproduct
 
 variable [LocallySmall.{w} C] [LocallySmall.{w} D]
@@ -64,10 +93,10 @@ section
 
 variable {F : D ⥤ C} {G : C ⥤ D} (adj : F ⊣ G)
 
-def evalShrinkYonedaCompIsoOfAdj :
-    (eval C _).obj shrinkYoneda.{w} ⋙ (Functor.whiskeringLeft _ _ _).obj F.op ≅
+noncomputable def evalShrinkYonedaCompIsoOfAdj :
+    (eval C _).obj shrinkYoneda.{w} ⋙ (whiskeringLeft _ _ _).obj F.op ≅
       G.mapFormalCoproduct ⋙ (eval _ _).obj shrinkYoneda := by
-  have := adj
+  refine ?_ ≪≫ (eval C _).mapIso (adj.shrinkYonedaIso)
   sorry
 
 end
@@ -140,23 +169,17 @@ variable {F : D ⥤ C} {G : C ⥤ D} (adj : F ⊣ G) [HasFiniteProducts C]
 
 noncomputable def shrinkYonedaCechIsoOfAdj :
     ((SimplicialObject.Augmented.whiskering _ _).obj
-      ((Functor.whiskeringLeft _ _ _).obj F.op)).obj U.shrinkYonedaCech ≅
+      ((whiskeringLeft _ _ _).obj F.op)).obj U.shrinkYonedaCech ≅
     (G.mapFormalCoproduct.obj U).shrinkYonedaCech :=
   haveI := adj.isRightAdjoint
-  Comma.isoMk ((Functor.whiskeringRightObjCompIso _ _).app _ ≪≫
-      Functor.isoWhiskerLeft _
+  Comma.isoMk ((whiskeringRightObjCompIso _ _).app _ ≪≫
+      isoWhiskerLeft _
         (FormalCoproduct.evalShrinkYonedaCompIsoOfAdj adj) ≪≫
-        (Functor.associator _ _ _).symm ≪≫
-      Functor.isoWhiskerRight (U.cechCompMapFormalCoproductIso G) _)
+        (associator _ _ _).symm ≪≫
+      isoWhiskerRight (U.cechCompMapFormalCoproductIso G) _)
     (Subfunctor.ofObjectsIsoOfAdj adj _) rfl
 
 end
-
---def shrinkYonedaCechOverIso (X : C) :
---    ((SimplicialObject.Augmented.whiskering _ _).obj
---      ((Functor.whiskeringLeft _ _ _).obj (Over.forget X).op)).obj U.shrinkYonedaCech ≅
---        ((Over.star X).mapFormalCoproduct.obj U).shrinkYonedaCech := by
---  exact U.shrinkYonedaCechIsoOfAdj (Over.forgetAdjStar X)
 
 variable [HasFiniteLimits C]
 
