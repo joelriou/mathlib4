@@ -5,6 +5,9 @@ Authors: Joël Riou
 -/
 module
 
+public import Mathlib.Algebra.Homology.ShortComplex.Abelian
+public import Mathlib.Algebra.Homology.QuasiIso
+public import Mathlib.CategoryTheory.Abelian.FunctorCategory
 public import Mathlib.CategoryTheory.Comma.LocallySmall
 public import Mathlib.CategoryTheory.Limits.Constructions.Over.Basic
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.ExtraDegeneracy
@@ -21,10 +24,11 @@ public import Mathlib.CategoryTheory.ShrinkYoneda
 
 universe w t v v' v'' u u' u''
 
+open AlgebraicTopology
+
 namespace CategoryTheory
 
 variable {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D]
-  {E : Type u''} [Category.{v''} E]
 
 open Opposite Limits
 
@@ -85,6 +89,8 @@ noncomputable def shrinkYonedaIso :
 end Adjunction
 
 namespace Limits.FormalCoproduct
+
+variable {E : Type u''} [Category.{v''} E]
 
 noncomputable def evalObjCompIso [HasCoproducts.{w} D] [HasCoproducts.{w} E] (F : C ⥤ D)
     (G : D ⥤ E)
@@ -205,15 +211,24 @@ instance nonempty_extraDegeneracy_shrinkYonedaCech_evaluation (X : Cᵒᵖ) :
           (SimplicialObject.Augmented.ExtraDegeneracy.map
             (extraDegeneracyShrinkYonedaCech _ (Over.homMk (prod.lift (𝟙 _) f))
               Over.mkIdTerminal) _)⟩
-  · simp only [not_exists, not_nonempty_iff] at hX
-    have := U.isEmpty_shrinkYonedaCechRightObj X hX
+  · have := U.isEmpty_shrinkYonedaCechRightObj X (by simpa using hX)
     exact ⟨.ofIso (Comma.isoMk (NatIso.ofComponents
       (fun n ↦ Types.isInitialPEmpty.uniqueUpToIso (Nonempty.some (by
         rw [Types.initial_iff_empty]
-        exact Function.isEmpty (β := (U.shrinkYonedaCech.right.obj X))
+        exact Function.isEmpty (β := U.shrinkYonedaCech.right.obj X)
           ((U.shrinkYonedaCech.hom.app n).app X)))) (fun _ ↦ by ext ⟨⟩))
       (Types.isInitialPEmpty.uniqueUpToIso (Nonempty.some (by rwa [Types.initial_iff_empty])))
-        (by ext : 1; apply Types.isInitialPEmpty.hom_ext)) (.const (PEmpty.{w + 1}))⟩
+        (by ext : 1; apply Types.isInitialPEmpty.hom_ext)) (.const PEmpty.{w + 1})⟩
+
+variable {A : Type u'} [Category.{v'} A] [∀ (α : Type w), HasColimitsOfShape (Discrete α) A]
+  [Abelian A] (M : A)
+
+instance :
+    QuasiIso (AlternatingFaceMapComplex.ε.app
+      (((SimplicialObject.Augmented.whiskeringObj
+        ((whiskeringRight Cᵒᵖ _ _).obj (sigmaFunctor.obj M))).obj U.shrinkYonedaCech))) := by
+  dsimp
+  sorry
 
 end Limits.FormalCoproduct
 

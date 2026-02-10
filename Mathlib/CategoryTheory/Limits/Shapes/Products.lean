@@ -559,6 +559,16 @@ lemma Sigma.ι_isoColimit_inv (j : α) :
 
 end
 
+/-- The functor `C ⥤ Type w ⥤ C` which sends `X : C` and `α : Type w` to
+the coproduct of copies of `X` indexed by `α`. -/
+@[simps]
+def sigmaFunctor [∀ (T : Type w), HasColimitsOfShape (Discrete T) C] :
+    C ⥤ Type w ⥤ C where
+  obj X :=
+    { obj α := ∐ (fun (t : α) ↦ X)
+      map f := Sigma.map' f (fun _ ↦ 𝟙 _) }
+  map f := { app T := Sigma.map (fun _ ↦ f) }
+
 /-- Two products which differ by an equivalence in the indexing type,
 and up to isomorphism in the factors, are isomorphic.
 -/
