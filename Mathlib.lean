@@ -2639,6 +2639,7 @@ public import Mathlib.CategoryTheory.Limits.FormalCoproducts
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.Basic
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.Cech
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.ExtraDegeneracy
+public import Mathlib.CategoryTheory.Limits.FormalCoproducts.Misc
 public import Mathlib.CategoryTheory.Limits.Fubini
 public import Mathlib.CategoryTheory.Limits.FullSubcategory
 public import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic

@@ -54,4 +54,20 @@ theorem family_of_elements_compatible {U : Cᵒᵖ} (s : F.obj U) :
 @[deprecated (since := "2025-12-11")] alias Subpresheaf.family_of_elements_compatible :=
   family_of_elements_compatible
 
+/-- Given a family of objects `X : ι → C` in a category `C`, this is the subfunctor
+of the constant functor `Cᵒᵖ ⥤ Type w` with value `PUnit` which sends an object
+`U : C` to `Set.univ` when there exists a morphism `U ⟶ X i` for some `i`,
+and `∅` otherwise. -/
+def ofObjects {ι : Type*} (X : ι → C) : Subfunctor ((Functor.const Cᵒᵖ).obj PUnit.{w + 1}) where
+  obj U := setOf (fun _ ↦ ∃ (i : ι), Nonempty (U.unop ⟶ X i))
+  map := by
+    rintro _ _ f _ ⟨i, ⟨g⟩⟩
+    exact ⟨i, ⟨f.unop ≫ g⟩⟩
+
+lemma ofObjects_obj_eq_univ {ι : Type*} {X : ι → C} {U : Cᵒᵖ} {i : ι} (f : U.unop ⟶ X i) :
+    (ofObjects X).obj U = ⊤ := by
+  ext
+  simp only [ofObjects, Set.top_eq_univ, Set.mem_univ, iff_true]
+  exact ⟨i, ⟨f⟩⟩
+
 end CategoryTheory.Subfunctor
