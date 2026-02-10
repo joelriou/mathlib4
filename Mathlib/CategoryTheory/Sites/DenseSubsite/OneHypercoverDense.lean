@@ -159,7 +159,6 @@ lemma isDenseSubsite_of_isOneHypercoverDense [F.IsLocallyFull J] [F.IsLocallyFai
 
 end
 
-
 variable [IsDenseSubsite J₀ J F]
 
 namespace OneHypercoverDenseData
