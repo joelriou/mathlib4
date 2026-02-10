@@ -113,7 +113,7 @@ noncomputable def δ :
 
 open ComposableArrows
 
-/-- The Mayer-Vietoris long exact sequence of an abelian sheaf `F : Sheaf J AddCommGrp`
+/-- The Mayer-Vietoris long exact sequence of an abelian sheaf `F : Sheaf J AddCommGrpCat`
 for a Mayer-Vietoris square `S : J.MayerVietorisSquare`. -/
 noncomputable abbrev sequence : ComposableArrows AddCommGrpCat.{w} 5 :=
   mk₅ (S.toBiprod F n₀) (S.fromBiprod F n₀) (S.δ F n₀ n₁ h)
