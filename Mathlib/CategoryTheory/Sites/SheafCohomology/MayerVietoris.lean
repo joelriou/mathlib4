@@ -63,11 +63,16 @@ lemma toBiprod_apply {n : ℕ} (y : F.H' n S.X₄) :
       Iso.hom_inv_id_apply, ← ConcreteCategory.comp_apply,
       biprod.lift_snd, Iso.inv_hom_id_apply]
 
-/-- The sum of two restriction maps in sheaf cohomology. -/
+/-- The difference of two restriction maps in sheaf cohomology. -/
 noncomputable def fromBiprod (n : ℕ) :
     F.H' n S.X₂ ⊞ F.H' n S.X₃ ⟶ F.H' n S.X₁ :=
   biprod.desc ((F.cohomologyPresheaf n).map S.f₁₂.op)
       (-(F.cohomologyPresheaf n).map S.f₁₃.op)
+
+@[reassoc (attr := simp)]
+lemma toBiprod_fromBiprod (n : ℕ) : S.toBiprod F n ≫ S.fromBiprod F n = 0 := by
+  simp only [toBiprod, fromBiprod, biprod.lift_desc, Preadditive.comp_neg,
+    ← sub_eq_add_neg, sub_eq_zero, ← Functor.map_comp, ← op_comp, S.toSquare.fac]
 
 lemma fromBiprod_biprodIsoProd_inv_apply {n : ℕ}
     (y₁ : F.H' n S.X₂) (y₂ : F.H' n S.X₃) :
@@ -131,6 +136,14 @@ noncomputable def sequenceIso : S.sequence F n₀ n₁ h ≅
 
 lemma sequence_exact : (S.sequence F n₀ n₁ h).Exact :=
   exact_of_iso (S.sequenceIso F n₀ n₁ h).symm (Ext.contravariantSequence_exact _ _ _ _ _)
+
+@[reassoc (attr := simp)]
+lemma δ_toBiprod : S.δ F n₀ n₁ h ≫ S.toBiprod F n₁ = 0 :=
+  (S.sequence_exact F n₀ n₁ h).zero 2
+
+@[reassoc (attr := simp)]
+lemma fromBiprod_δ : S.fromBiprod F n₀ ≫ S.δ F n₀ n₁ h = 0 :=
+  (S.sequence_exact F n₀ n₁ h).zero 1
 
 end GrothendieckTopology.MayerVietorisSquare
 
