@@ -70,4 +70,10 @@ lemma ofObjects_obj_eq_univ {ι : Type*} {X : ι → C} {U : Cᵒᵖ} {i : ι} (
   simp only [ofObjects, Set.top_eq_univ, Set.mem_univ, iff_true]
   exact ⟨i, ⟨f⟩⟩
 
+lemma ofObjects_obj_eq_empty {ι : Type*} {X : ι → C} {U : Cᵒᵖ}
+    (h : ∀ (i : ι), IsEmpty (U.unop ⟶ X i)) :
+    (ofObjects X).obj U = ∅ := by
+  ext
+  simpa [ofObjects]
+
 end CategoryTheory.Subfunctor
