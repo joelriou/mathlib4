@@ -592,8 +592,7 @@ lemma presheafMap_comp {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
 
 /-- Let `F : C₀ ⥤ C` be a dense subsite and `data : ∀ X, F.OneHypercoverDenseData J₀ J X`
 be a family of structures. Let `G₀` be a sheaf on `C₀`. This is a presheaf on `C` which
-extends `G₀` (see `OneHypercoverDenseData.essSurj.compPresheafIso`) and is a sheaf
-(see `OneHypercoverDenseData.essSurj.isSheaf`). -/
+extends `G₀` (TODO). -/
 @[simps]
 noncomputable def presheaf : Cᵒᵖ ⥤ A where
   obj X := presheafObj data G₀ X.unop
