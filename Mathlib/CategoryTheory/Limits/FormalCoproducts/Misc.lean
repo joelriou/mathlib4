@@ -19,11 +19,12 @@ public import Mathlib.CategoryTheory.ShrinkYoneda
 
 @[expose] public section
 
-universe w t v v' u u'
+universe w t v v' v'' u u' u''
 
 namespace CategoryTheory
 
 variable {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D]
+  {E : Type u''} [Category.{v''} E]
 
 open Opposite Limits
 
@@ -85,6 +86,17 @@ end Adjunction
 
 namespace Limits.FormalCoproduct
 
+noncomputable def evalObjCompIso [HasCoproducts.{w} D] [HasCoproducts.{w} E] (F : C ⥤ D)
+    (G : D ⥤ E)
+    [∀ (α : Type w), PreservesColimitsOfShape (Discrete α) G] :
+    (eval.{w} C E).obj (F ⋙ G) ≅
+      (eval.{w} C D).obj F ⋙ G :=
+  NatIso.ofComponents (fun _ ↦ (PreservesCoproduct.iso G _).symm) (fun {U V} f ↦ by
+    dsimp
+    ext i
+    simpa [-ι_comp_sigmaComparison] using
+      G.map (F.map (f.φ i)) ≫= ι_comp_sigmaComparison G (fun i ↦ F.obj (V.obj i)) (f.f i))
+
 variable [LocallySmall.{w} C] [LocallySmall.{w} D]
 
 open Functor
@@ -95,9 +107,8 @@ variable {F : D ⥤ C} {G : C ⥤ D} (adj : F ⊣ G)
 
 noncomputable def evalShrinkYonedaCompIsoOfAdj :
     (eval C _).obj shrinkYoneda.{w} ⋙ (whiskeringLeft _ _ _).obj F.op ≅
-      G.mapFormalCoproduct ⋙ (eval _ _).obj shrinkYoneda := by
-  refine ?_ ≪≫ (eval C _).mapIso (adj.shrinkYonedaIso)
-  sorry
+      G.mapFormalCoproduct ⋙ (eval _ _).obj shrinkYoneda :=
+  (evalObjCompIso _ _).symm ≪≫ (eval C _).mapIso adj.shrinkYonedaIso
 
 end
 
