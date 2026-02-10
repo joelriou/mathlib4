@@ -19,15 +19,21 @@ public import Mathlib.CategoryTheory.ShrinkYoneda
 
 @[expose] public section
 
-universe w v v' u u'
+universe w t v v' u u'
 
 namespace CategoryTheory
 
 variable {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D]
+
 open Opposite Limits
 
---(eval C (Cᵒᵖ ⥤ Type w)).obj shrinkYoneda.{w, v, u} ⋙
--- (Functor.whiskeringLeft Dᵒᵖ Cᵒᵖ (Type w)).obj F.op
+-- to be moved
+noncomputable def isTerminalShrinkYonedaObj [LocallySmall.{w} C]
+    {T : C} (hT : IsTerminal T) :
+    IsTerminal (shrinkYoneda.{w}.obj T) :=
+  Functor.isTerminal (fun _ ↦ (Types.isTerminalEquivUnique _).2
+    { default := shrinkYonedaObjObjEquiv.symm (hT.from _)
+      uniq _ := shrinkYonedaObjObjEquiv.injective (hT.hom_ext _ _)})
 
 namespace Subfunctor
 
@@ -48,18 +54,47 @@ def ofObjectsIsoOfAdj :
 
 end Subfunctor
 
-variable [LocallySmall.{w} C] [LocallySmall.{w} D]
-
--- to be moved
-noncomputable def isTerminalShrinkYonedaObj {T : C} (hT : IsTerminal T) :
-    IsTerminal (shrinkYoneda.{w}.obj T) :=
-  Functor.isTerminal (fun _ ↦ (Types.isTerminalEquivUnique _).2
-    { default := shrinkYonedaObjObjEquiv.symm (hT.from _)
-      uniq _ := shrinkYonedaObjObjEquiv.injective (hT.hom_ext _ _)})
-
 namespace Limits.FormalCoproduct
 
+variable [LocallySmall.{w} C] [LocallySmall.{w} D]
+
+open Functor
+
+section
+
+variable {F : D ⥤ C} {G : C ⥤ D} (adj : F ⊣ G)
+
+def evalShrinkYonedaCompIsoOfAdj :
+    (eval C _).obj shrinkYoneda.{w} ⋙ (Functor.whiskeringLeft _ _ _).obj F.op ≅
+      G.mapFormalCoproduct ⋙ (eval _ _).obj shrinkYoneda := by
+  have := adj
+  sorry
+
+end
+
 variable (U : FormalCoproduct.{w} C)
+
+@[simps!]
+noncomputable def mapFormalCoproductObjPowerIso
+    (G : C ⥤ D) (α : Type t) [HasProductsOfShape α C]
+    [HasProductsOfShape α D] [PreservesLimitsOfShape (Discrete α) G] :
+    G.mapFormalCoproduct.obj (U.power α) ≅
+      (G.mapFormalCoproduct.obj U).power α :=
+  FormalCoproduct.isoOfComponents (Equiv.refl _)
+    (fun _ ↦ PreservesProduct.iso _ _)
+
+noncomputable def cechCompMapFormalCoproductIso
+    [HasFiniteProducts C] [HasFiniteProducts D] (G : C ⥤ D)
+    [PreservesFiniteProducts G] :
+    U.cech ⋙ G.mapFormalCoproduct ≅ (G.mapFormalCoproduct.obj U).cech :=
+  NatIso.ofComponents (fun _ ↦ mapFormalCoproductObjPowerIso _ _ _) (fun f ↦ by
+    ext g
+    · dsimp
+    · dsimp
+      ext i
+      simp only [map_lift_piComparison, Function.comp_apply, Category.comp_id,
+        Category.assoc, limit.lift_π, Fan.mk_pt, Fan.mk_π_app]
+      exact (Pi.lift_π ..).trans (piComparison_comp_π _ _ _).symm)
 
 /-- The augmented simplicial Cech presheaf of types attached to `U : FormalCoproduct.{w} C`,
 the target of the augmentation is the subfunctor of the constant functor `Cᵒᵖ ⥤ Type w`
@@ -107,10 +142,13 @@ noncomputable def shrinkYonedaCechIsoOfAdj :
     ((SimplicialObject.Augmented.whiskering _ _).obj
       ((Functor.whiskeringLeft _ _ _).obj F.op)).obj U.shrinkYonedaCech ≅
     (G.mapFormalCoproduct.obj U).shrinkYonedaCech :=
-  Comma.isoMk (by
-    dsimp [shrinkYonedaCech]
-    refine (Functor.whiskeringRightObjCompIso ..).app _ ≪≫ ?_
-    sorry) (Subfunctor.ofObjectsIsoOfAdj adj _) rfl
+  haveI := adj.isRightAdjoint
+  Comma.isoMk ((Functor.whiskeringRightObjCompIso _ _).app _ ≪≫
+      Functor.isoWhiskerLeft _
+        (FormalCoproduct.evalShrinkYonedaCompIsoOfAdj adj) ≪≫
+        (Functor.associator _ _ _).symm ≪≫
+      Functor.isoWhiskerRight (U.cechCompMapFormalCoproductIso G) _)
+    (Subfunctor.ofObjectsIsoOfAdj adj _) rfl
 
 end
 
