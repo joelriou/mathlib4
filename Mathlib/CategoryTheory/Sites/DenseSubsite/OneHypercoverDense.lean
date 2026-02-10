@@ -281,13 +281,13 @@ variable {S} (s : Multifork (S.index G))
 /-- Auxiliary definition for `lift`. -/
 noncomputable def liftAux (i : (data X).I₀) : s.pt ⟶ G.obj (op (F.obj ((data X).X i))) :=
   hG₀.amalgamate ⟨_, cover_lift F J₀ _ (J.pullback_stable ((data X).f i) S.2)⟩
-      (fun ⟨W₀, a, ha⟩ ↦ s.ι ⟨_, F.map a ≫ (data X).f i, ha⟩) (by
-        rintro ⟨W₀, a, ha⟩ ⟨Z₀, b, hb⟩ ⟨U₀, p₁, p₂, fac⟩
-        exact s.condition
-          { fst := ⟨_, _, ha⟩
-            snd := ⟨_, _, hb⟩
-            r := ⟨_, F.map p₁, F.map p₂, by
-                simp only [← Functor.map_comp_assoc, fac]⟩ })
+    (fun ⟨W₀, a, ha⟩ ↦ s.ι ⟨_, F.map a ≫ (data X).f i, ha⟩) (by
+      rintro ⟨W₀, a, ha⟩ ⟨Z₀, b, hb⟩ ⟨U₀, p₁, p₂, fac⟩
+      exact s.condition
+        { fst := ⟨_, _, ha⟩
+          snd := ⟨_, _, hb⟩
+          r := ⟨_, F.map p₁, F.map p₂, by
+              simp only [← Functor.map_comp_assoc, fac]⟩ })
 
 lemma liftAux_fac {i : (data X).I₀} {W₀ : C₀} (a : W₀ ⟶ (data X).X i)
     (ha : S (F.map a ≫ (data X).f i)) :
@@ -302,13 +302,12 @@ noncomputable def lift : s.pt ⟶ G.obj (op X) :=
     refine Presheaf.IsSheaf.hom_ext
       hG₀ ⟨_, cover_lift F J₀ _
         (J.pullback_stable (F.map ((data X).p₁ j) ≫ (data X).f i₁) S.2)⟩ _ _ ?_
-    rintro ⟨W₀, a, ha : S _⟩
+    rintro ⟨W₀, a, ha⟩
     dsimp
     simp only [assoc, ← Functor.map_comp, ← op_comp]
     have ha₁ : S (F.map (a ≫ (data X).p₁ j) ≫ (data X).f i₁) := by simpa using ha
     have ha₂ : S (F.map (a ≫ (data X).p₂ j) ≫ (data X).f i₂) := by
-      rw [Functor.map_comp_assoc, ← (data X).w j]
-      exact ha
+      rwa [Functor.map_comp_assoc, ← (data X).w j]
     rw [liftAux_fac _ _ _ ha₁, liftAux_fac _ _ _ ha₂]
     congr 2
     rw [map_comp_assoc, map_comp_assoc, (data X).w j])
@@ -325,23 +324,23 @@ lemma fac (a : S.Arrow) :
     Presheaf.IsSheaf.hom_ext hG₀
       ⟨_, cover_lift F J₀ _
         (J.pullback_stable ((data a.Y).f i ≫ a.f) (data X).mem₀)⟩ _ _ (by
-      rintro ⟨X₀, b, ⟨_, c, _, h, fac₁⟩⟩
-      obtain ⟨j⟩ := h
-      refine Presheaf.IsSheaf.hom_ext hG₀
-        ⟨_, IsDenseSubsite.imageSieve_mem J₀ J F c⟩ _ _ ?_
-      rintro ⟨Y₀, d, e, fac₂⟩
-      dsimp at i j c fac₁ ⊢
-      have he : S (F.map e ≫ (data X).f j) := by
-        rw [fac₂, assoc, fac₁]
-        simpa only [assoc] using S.1.downward_closed a.hf (F.map d ≫ F.map b ≫ (data a.Y).f i)
-      simp only [assoc, ← Functor.map_comp, ← op_comp, ← fac₁]
-      conv_lhs => simp only [op_comp, Functor.map_comp, assoc, lift_map_assoc]
-      rw [← Functor.map_comp, ← op_comp, ← fac₂, liftAux_fac _ _ _ he]
-      simpa using s.condition
-        { fst := { hf := he, .. }
-          snd := a
-          r := ⟨_, 𝟙 _, F.map d ≫ F.map b ≫ (data a.Y).f i, by
-            simp only [fac₁, fac₂, assoc, id_comp]⟩ }))
+        rintro ⟨X₀, b, ⟨_, c, _, h, fac₁⟩⟩
+        obtain ⟨j⟩ := h
+        refine Presheaf.IsSheaf.hom_ext hG₀
+          ⟨_, IsDenseSubsite.imageSieve_mem J₀ J F c⟩ _ _ ?_
+        rintro ⟨Y₀, d, e, fac₂⟩
+        dsimp at i j c fac₁ ⊢
+        have he : S (F.map e ≫ (data X).f j) := by
+          rw [fac₂, assoc, fac₁]
+          simpa only [assoc] using S.1.downward_closed a.hf (F.map d ≫ F.map b ≫ (data a.Y).f i)
+        simp only [assoc, ← Functor.map_comp, ← op_comp, ← fac₁]
+        conv_lhs => simp only [op_comp, Functor.map_comp, assoc, lift_map_assoc]
+        rw [← Functor.map_comp, ← op_comp, ← fac₂, liftAux_fac _ _ _ he]
+        simpa using s.condition
+          { fst := { hf := he, .. }
+            snd := a
+            r := ⟨_, 𝟙 _, F.map d ≫ F.map b ≫ (data a.Y).f i, by
+              simp only [fac₁, fac₂, assoc, id_comp]⟩ }))
 
 variable {s} in
 include hG hG₀ in
