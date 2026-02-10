@@ -504,13 +504,6 @@ noncomputable def Ext.addEquivBiproduct (X : C) {J : Type*} [Fintype J] {Y : J �
 
 end biproduct
 
-instance (n : ℕ) : (extFunctor (C := C) n).Additive where
-
-attribute [local simp] Ext.mk₀_add in
-instance (X : Cᵒᵖ) (n : ℕ) : ((extFunctor n).obj X).Additive where
-
-instance (Y : C) (n : ℕ) : ((extFunctor n).flip.obj Y).Additive where
-
 section ChangeOfUniverse
 
 namespace Ext
