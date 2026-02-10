@@ -266,11 +266,10 @@ end
 
 section
 
-variable (data : ∀ X, F.OneHypercoverDenseData J₀ J X) (G : Cᵒᵖ ⥤ A)
-
 namespace isSheaf_iff
 
-variable {data G} (hG₀ : Presheaf.IsSheaf J₀ (F.op ⋙ G))
+variable {data : ∀ X, F.OneHypercoverDenseData J₀ J X} {G : Cᵒᵖ ⥤ A}
+  (hG₀ : Presheaf.IsSheaf J₀ (F.op ⋙ G))
   (hG : ∀ (X : C), IsLimit ((data X).toOneHypercover.multifork G))
   {X : C} (S : J.Cover X)
 
@@ -369,7 +368,7 @@ end isSheaf_iff
 This lemma shows that `G : Cᵒᵖ ⥤ A` is a sheaf iff `F.op F.op ⋙ G : C₀ᵒᵖ ⥤ A`
 is a sheaf and for any `X : C`, the multifork for `G` and the `1`-hypercover
 given by `data X` is a limit. -/
-lemma isSheaf_iff :
+lemma isSheaf_iff (data : ∀ X, F.OneHypercoverDenseData J₀ J X) (G : Cᵒᵖ ⥤ A) :
     Presheaf.IsSheaf J G ↔
       Presheaf.IsSheaf J₀ (F.op ⋙ G) ∧
         ∀ (X : C), Nonempty (IsLimit ((data X).toOneHypercover.multifork G)) := by
