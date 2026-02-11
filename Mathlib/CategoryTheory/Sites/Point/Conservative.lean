@@ -16,8 +16,15 @@ Let `J` be a Grothendieck topology on a category `C`.
 Let `P : ObjectProperty J.Point` be a family of points. We say that
 `P` is a conservative family of points if the corresponding
 fiber functors `Sheaf J (Type w) ⥤ Type w` jointly reflect
-isomorphisms. This implies that they jointly reflect epimorphisms and
-monomorphisms, and they are also jointly faithful.
+isomorphisms. Under suitable assumptions on the coefficient
+category `A`, this implies that the fiber functors
+`Sheaf J A ⥤ A` corresponding to the points in `P`
+jointly reflect isomorphisms, epimorphisms and monomorphisms,
+and they are also jointly faithful.
+
+## TODO
+* Formalize SGA 4 IV 6.5 (a) which characterizes conservatice family
+of points.
 
 -/
 
