@@ -30,17 +30,17 @@ variable {C : Type*} [Category C] {I : Type*} {D : I → Type*} [∀ i, Category
 
 /-- A family of functors jointly reflects isomorphisms if for every morphism `f : X ⟶ Y`
 such that the image of `f` under all `F i` is an isomorphism, then `f` is an isomorphism. -/
-class JointlyReflectIsomorphisms (F : ∀ i, C ⥤ D i) : Prop where
+structure JointlyReflectIsomorphisms (F : ∀ i, C ⥤ D i) : Prop where
   isIso {X Y : C} (f : X ⟶ Y) [∀ i, IsIso ((F i).map f)] : IsIso f
 
 /-- A family of functors jointly reflects monomorphisms if for every morphism `f : X ⟶ Y`
 such that the image of `f` under all `F i` is an monomorphism, then `f` is an monomorphism. -/
-class JointlyReflectMonomorphisms (F : ∀ i, C ⥤ D i) : Prop where
+structure JointlyReflectMonomorphisms (F : ∀ i, C ⥤ D i) : Prop where
   mono {X Y : C} (f : X ⟶ Y) [∀ i, Mono ((F i).map f)] : Mono f
 
 /-- A family of functors jointly reflects epimorphisms if for every morphism `f : X ⟶ Y`
 such that the image of `f` under all `F i` is an epimorphism, then `f` is an epimorphism. -/
-class JointlyReflectEpimorphisms (F : ∀ i, C ⥤ D i) : Prop where
+structure JointlyReflectEpimorphisms (F : ∀ i, C ⥤ D i) : Prop where
   epi {X Y : C} (f : X ⟶ Y) [∀ i, Epi ((F i).map f)] : Epi f
 
 namespace JointlyReflectIsomorphisms
