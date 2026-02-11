@@ -43,6 +43,8 @@ such that the image of `f` under all `F i` is an epimorphism, then `f` is an epi
 structure JointlyReflectEpimorphisms (F : ∀ i, C ⥤ D i) : Prop where
   epi {X Y : C} (f : X ⟶ Y) [∀ i, Epi ((F i).map f)] : Epi f
 
+/-- A family of functors is jointly faithful if whenever two morphisms `f : X ⟶ Y`
+and `g : X ⟶ Y` become equal after applying all functors `F i`, then `f = g`. -/
 structure JointlyFaithful (F : ∀ i, C ⥤ D i) : Prop where
   map_injective {X Y : C} (f g : X ⟶ Y) (h : ∀ i, (F i).map f = (F i).map g) : f = g
 
