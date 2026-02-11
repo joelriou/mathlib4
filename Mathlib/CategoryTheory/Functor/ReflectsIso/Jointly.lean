@@ -48,12 +48,8 @@ namespace JointlyReflectIsomorphisms
 variable {F} (h : JointlyReflectIsomorphisms F)
 
 include h in
-lemma isIso_iff {X Y : C} (f : X ⟶ Y) : IsIso f ↔ ∀ i, IsIso ((F i).map f) := by
-  constructor
-  · intro hf i
-    infer_instance
-  · intro
-    exact h.isIso f
+lemma isIso_iff {X Y : C} (f : X ⟶ Y) : IsIso f ↔ ∀ i, IsIso ((F i).map f) :=
+  ⟨fun _ _ ↦ inferInstance, fun _ ↦ h.isIso f⟩
 
 include h in
 lemma mono {X Y : C} (f : X ⟶ Y) [hf : ∀ i, Mono ((F i).map f)]
@@ -93,12 +89,8 @@ variable {F} (h : JointlyReflectMonomorphisms F)
 
 include h in
 lemma mono_iff [∀ i, (F i).PreservesMonomorphisms] {X Y : C} (f : X ⟶ Y) :
-    Mono f ↔ ∀ i, Mono ((F i).map f) := by
-  constructor
-  · intros
-    infer_instance
-  · intro
-    exact h.mono f
+    Mono f ↔ ∀ i, Mono ((F i).map f) :=
+  ⟨fun _ _ ↦ inferInstance, fun _ ↦ h.mono f⟩
 
 end JointlyReflectMonomorphisms
 
@@ -108,12 +100,8 @@ variable {F} (h : JointlyReflectEpimorphisms F)
 
 include h in
 lemma epi_iff [∀ i, (F i).PreservesEpimorphisms] {X Y : C} (f : X ⟶ Y) :
-    Epi f ↔ ∀ i, Epi ((F i).map f) := by
-  constructor
-  · intros
-    infer_instance
-  · intro
-    exact h.epi f
+    Epi f ↔ ∀ i, Epi ((F i).map f) :=
+  ⟨fun _ _ ↦ inferInstance, fun _ ↦ h.epi f⟩
 
 end JointlyReflectEpimorphisms
 
