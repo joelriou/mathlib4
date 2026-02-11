@@ -6,6 +6,7 @@ Authors: Joël Riou
 module
 
 public import Mathlib.CategoryTheory.Sites.Point.Category
+public import Mathlib.CategoryTheory.Abelian.GrothendieckAxioms.Types
 public import Mathlib.CategoryTheory.Functor.ReflectsIso.Jointly
 
 /-!
@@ -20,7 +21,7 @@ fiber functors `Sheaf J (Type w) ⥤ Type w` are conservative.
 
 @[expose] public section
 
-universe w v u
+universe w w' v v' u u'
 
 namespace CategoryTheory
 
@@ -46,25 +47,32 @@ end ObjectProperty
 namespace GrothendieckTopology.Point
 
 variable [P.IsConservativeFamilyOfPoints]
+  (A : Type u') [Category.{v'} A] [LocallySmall.{w} C]
+  [HasColimitsOfSize.{w, w} A] [HasFiniteLimits A]
+  {FC : A → A → Type*} {CC : A → Type w'}
+  [∀ (X Y : A), FunLike (FC X Y) (CC X) (CC Y)]
+  [ConcreteCategory.{w'} A FC]
+  [AB5OfSize.{w, w} A]
+  [(forget A).ReflectsIsomorphisms]
+  [PreservesFilteredColimitsOfSize.{w, w} (forget A)]
 
--- extend this to concrete categories?
 lemma jointlyReflectIsomorphisms :
     JointlyReflectIsomorphisms
-      (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := Type w)) :=
-  ObjectProperty.IsConservativeFamilyOfPoints.jointlyReflectIsomorphisms
-
-instance : AB5OfSize.{w, w} (Type w) := sorry
+      (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
+  have := ObjectProperty.IsConservativeFamilyOfPoints.jointlyReflectIsomorphisms
+    (P := P)
+  sorry
 
 lemma jointlyReflectMonomorphisms [LocallySmall.{w} C] :
     JointlyReflectMonomorphisms
-      (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := Type w)) :=
-  (jointlyReflectIsomorphisms P).jointlyReflectMonomorphisms
+      (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
+  (jointlyReflectIsomorphisms P A).jointlyReflectMonomorphisms
 
 lemma jointlyReflectEpimorphisms [LocallySmall.{w} C]
-    [J.WEqualsLocallyBijective (Type w)] [HasSheafify J (Type w)] :
+    [J.WEqualsLocallyBijective A] [HasSheafify J A] :
     JointlyReflectEpimorphisms
-      (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := Type w)) :=
-  (jointlyReflectIsomorphisms P).jointlyReflectEpimorphisms
+      (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
+  (jointlyReflectIsomorphisms P A).jointlyReflectEpimorphisms
 
 end GrothendieckTopology.Point
 
