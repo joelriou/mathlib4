@@ -7,6 +7,7 @@ module
 
 public import Mathlib.CategoryTheory.Filtered.FinallySmall
 public import Mathlib.CategoryTheory.Functor.TypeValuedFlat
+public import Mathlib.CategoryTheory.Comma.StructuredArrow.Small
 public import Mathlib.CategoryTheory.Sites.Over
 public import Mathlib.CategoryTheory.Sites.Point.Basic
 
@@ -18,18 +19,11 @@ we define a point `Φ.over x` of the site `(Over X, J.over X)`.
 
 -/
 
+@[expose] public section
+
 universe w v u
 
 namespace CategoryTheory
-
-section
-
-instance {C₀ C : Type*} [Category* C] [Category* C₀] (F : C₀ ⥤ C) (X : C)
-    [EssentiallySmall.{w} C₀] [LocallySmall.{w} C] :
-    EssentiallySmall.{w} (CostructuredArrow F X) := by
-  sorry
-
-end
 
 section
 
