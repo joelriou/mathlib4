@@ -12,6 +12,11 @@ public import Mathlib.CategoryTheory.MorphismProperty.Basic
 /-!
 # Families of functors which jointly reflect isomorphisms
 
+Let `Fᵢ : C ⥤ Dᵢ` be a family of functors. The family is said to jointly reflect
+isomorphisms (resp. monomorphisms, resp. epimorphisms) if every `f : X ⟶ Y`
+in `C` for which `Fᵢ.map f` is an isomorphism (resp. monomorphism, resp. epimorphism)
+for all `i` is an isomorphism.
+
 -/
 
 @[expose] public section
