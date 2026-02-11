@@ -23,7 +23,7 @@ jointly reflect isomorphisms, epimorphisms and monomorphisms,
 and they are also jointly faithful.
 
 ## TODO
-* Formalize SGA 4 IV 6.5 (a) which characterizes conservatice family
+* Formalize SGA 4 IV 6.5 (a) which characterizes conservative families
 of points.
 
 -/
