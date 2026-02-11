@@ -157,51 +157,27 @@ instance : (Etale.forget X).Full :=
 instance : (Etale.forget X).Faithful :=
   inferInstanceAs <| (MorphismProperty.Comma.forget _ _ _ _ _).Faithful
 
-instance : HasPullbacks X.Etale := by
-  unfold Scheme.Etale
-  infer_instance
-
 variable {X} in
-abbrev Etale.mk (Y : Scheme.{u}) [OverClass Y X] [Etale (Y ↘ X)] : X.Etale :=
-  MorphismProperty.Over.mk _ (Y ↘ X) inferInstance
+abbrev Etale.mk {Y : Scheme.{u}} (f : Y ⟶ X) [Etale f] : X.Etale :=
+  MorphismProperty.Over.mk _ f inferInstance
 
 variable {X} in
 @[simp]
-lemma Etale.forget_mk (Y : Scheme.{u}) [OverClass Y X] [Etale (Y ↘ X)] :
-    (Etale.forget X).obj (.mk Y) = Over.mk (Y ↘ X) := rfl
+lemma Etale.forget_mk {Y : Scheme.{u}} (f : Y ⟶ X) [Etale f] :
+    (Etale.forget X).obj (.mk f) = Over.mk f := rfl
 
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 def Etale.rec {motive : X.Etale → Sort*}
-    (mk : ∀ (Y : Scheme.{u}) (_ : OverClass Y X) (_ : Etale (Y ↘ X)), motive (Etale.mk Y))
+    (mk : ∀ (Y : Scheme.{u}) (f : Y ⟶ X) (_ : Etale f), motive (Etale.mk f))
     (T : X.Etale) :
     motive T :=
-  mk T.left inferInstance T.prop
-
-/-- Let `X` be a scheme. Then, `X` considered as an object of `X.Etale` is
-a terminal object. -/
-def Etale.isTerminal :
-    IsTerminal (MorphismProperty.Over.mk ⊤ (𝟙 X) inferInstance : X.Etale) :=
-  .ofUnique _
-
-instance : HasTerminal X.Etale := (Etale.isTerminal X).hasTerminal
+  mk _ _ T.prop
 
 instance : HasFiniteLimits X.Etale :=
-  hasFiniteLimits_of_hasTerminal_and_pullbacks
-
-instance : PreservesLimitsOfShape WalkingCospan (Etale.forget X) := by
-  sorry
-
-instance : PreservesLimit (Functor.empty.{0} X.Etale) (Etale.forget X) :=
-  preservesLimit_of_preserves_limit_cone (Etale.isTerminal X) (by
-    refine (IsLimit.equivOfNatIsoOfIso (Functor.emptyExt _ _) _ _ ?_).1
-      CostructuredArrow.mkIdTerminal
-    exact Cones.ext (Iso.refl _))
-
-instance : PreservesLimitsOfShape (Discrete PEmpty.{1}) (Etale.forget X) := by
-  exact preservesLimitsOfShape_pempty_of_preservesTerminal _
+  inferInstanceAs (HasFiniteLimits (MorphismProperty.Over _ ⊤ X))
 
 instance : PreservesFiniteLimits (Etale.forget X) :=
-  preservesFiniteLimits_of_preservesTerminal_and_pullbacks _
+  inferInstanceAs (PreservesFiniteLimits (MorphismProperty.Over.forget _ ⊤ X))
 
 end Scheme
 

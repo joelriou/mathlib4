@@ -90,30 +90,7 @@ noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
   isCofiltered := Functor.isCofiltered_elements _
   initiallySmall := sorry
   jointly_surjective := by
-    rintro T R hR f
-    induction T with | mk T
-    obtain ⟨f, hf, rfl⟩ := CategoryTheory.Over.homMk_surjective f
-    dsimp at f hf
-    obtain ⟨⟨x, a⟩, rfl⟩ := (Scheme.SpecToEquivOfField _ _).symm.surjective f
-    obtain ⟨𝒰, _, h𝒰, le⟩ := (mem_smallGrothendieckTopology _ _).1 hR
-    dsimp at 𝒰
-    obtain ⟨i, y, rfl⟩ := 𝒰.exists_eq x
-    let m : T.residueField (𝒰.f i y) ⟶ (𝒰.X i).residueField y :=
-      (𝒰.f i).residueFieldMap y
-    algebraize [((𝒰.f i).residueFieldMap y).hom, a.hom]
-    let b : (𝒰.X i).residueField y →ₐ[T.residueField (𝒰.f i y)] Ω :=
-      IsSepClosed.lift
-    have hfac : (𝒰.f i).residueFieldMap y ≫ CommRingCat.ofHom b.toRingHom = a := by
-      ext1; exact b.comp_algebraMap
-    refine ⟨.mk (𝒰.X i), MorphismProperty.Over.homMk (𝒰.f i), le _ ⟨i⟩,
-      Over.homMk (Spec.map (CommRingCat.ofHom b.toRingHom) ≫
-        (𝒰.X i).fromSpecResidueField y) ?_, ?_⟩
-    · dsimp
-      rw [← hf]
-      sorry
-    · dsimp
-      ext : 1
-      simp [SpecToEquivOfField, ← hfac, Etale.forget]
+    sorry
 
 end
 

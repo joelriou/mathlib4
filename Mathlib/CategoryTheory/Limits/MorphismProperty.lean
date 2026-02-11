@@ -199,8 +199,13 @@ instance (priority := 900) hasPullbacks [HasPullbacks T] [P.IsStableUnderComposi
   · exact inferInstanceAs (HasLimitsOfShape WalkingCospan (Over X))
   · apply Over.closedUnderLimitsOfShape_pullback
 
-variable [HasPullbacks T] [P.IsStableUnderComposition] [P.ContainsIdentities]
+variable [HasPullbacks T] [P.IsMultiplicative]
   [P.IsStableUnderBaseChange] [P.HasOfPostcompProperty P]
+
+instance hasFiniteLimits [HasPullbacks T] [P.IsMultiplicative]
+    [P.IsStableUnderBaseChange] [P.HasOfPostcompProperty P] :
+    HasFiniteLimits (P.Over ⊤ X) :=
+  hasFiniteLimits_of_hasTerminal_and_pullbacks
 
 noncomputable instance : CreatesFiniteLimits (Over.forget P ⊤ X) :=
   createsFiniteLimitsOfCreatesTerminalAndPullbacks _
