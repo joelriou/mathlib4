@@ -23,73 +23,10 @@ we define a point `Φ.over x` of the site `(Over X, J.over X)`.
 
 universe w v u
 
-namespace CategoryTheory
-
-section
-
-variable {C : Type u} [Category.{v} C] {C₀ : Type w} [SmallCategory C₀]
-  (F : C₀ ⥤ C) {X : C} (Y : Over X)
-
-namespace CostructuredArrow.costructuredArrowToOverEquivalence
-
-@[simps]
-def functor : CostructuredArrow (toOver F X) Y ⥤ CostructuredArrow F Y.left where
-  obj Z := CostructuredArrow.mk Z.hom.left
-  map f :=
-    CostructuredArrow.homMk f.left.left (by rw [← CostructuredArrow.w f]; dsimp)
-
-@[simps]
-def inverse : CostructuredArrow F Y.left ⥤ CostructuredArrow (toOver F X) Y where
-  obj Z :=
-    CostructuredArrow.mk (Y := CostructuredArrow.mk (Z.hom ≫ Y.hom))
-      (Over.homMk Z.hom)
-  map f :=
-    CostructuredArrow.homMk
-      (CostructuredArrow.homMk f.left)
-        (by ext; exact CostructuredArrow.w f)
-
-end CostructuredArrow.costructuredArrowToOverEquivalence
-
-def CostructuredArrow.costructuredArrowToOverEquivalence :
-    CostructuredArrow (toOver F X) Y ≌ CostructuredArrow F Y.left where
-  functor := costructuredArrowToOverEquivalence.functor F Y
-  inverse := costructuredArrowToOverEquivalence.inverse F Y
-  unitIso :=
-    NatIso.ofComponents (fun _ ↦
-      CostructuredArrow.isoMk (CostructuredArrow.isoMk (Iso.refl _)))
-  counitIso := Iso.refl _
-
-end
-
-namespace InitiallySmall
-
-variable {C : Type u} [Category.{v} C] {C₀ : Type w} [SmallCategory C₀]
-
-section
-
-instance (F : C₀ ⥤ C) (X : C) [F.Initial] :
-    (CostructuredArrow.toOver F X).Initial where
-  out Y := by
-    rw [isConnected_iff_of_equivalence
-      (CostructuredArrow.costructuredArrowToOverEquivalence F Y)]
-    infer_instance
-
-end
-
-instance [LocallySmall.{w} C] [InitiallySmall.{w} C] (X : C) :
-    InitiallySmall.{w} (Over X) := by
-  have : InitiallySmall.{w} (CostructuredArrow (fromInitialModel.{w} C) X) :=
-    initiallySmall_of_essentiallySmall _
-  exact initiallySmall_of_initial_of_initiallySmall
-    (CostructuredArrow.toOver (fromInitialModel.{w} C) X)
-
-end InitiallySmall
+namespace CategoryTheory.GrothendieckTopology.Point
 
 variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
-
-namespace GrothendieckTopology.Point
-
-variable [LocallySmall.{w} C] (Φ : Point.{w} J) {X : C} (x : Φ.fiber.obj X)
+  [LocallySmall.{w} C] (Φ : Point.{w} J) {X : C} (x : Φ.fiber.obj X)
 
 open InitiallySmall in
 /-- Given a point `Φ` of a site `(C, J)`, an object `X : C`, and `x : Φ.fiber.obj X`,
@@ -111,6 +48,4 @@ def over : Point.{w} (J.over X) where
     rw [FunctorToTypes.mem_fromOverSubfunctor_iff] at hu ⊢
     simpa
 
-end GrothendieckTopology.Point
-
-end CategoryTheory
+end CategoryTheory.GrothendieckTopology.Point
