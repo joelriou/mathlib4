@@ -75,10 +75,7 @@ theorem biprodIsoProd_inv_comp_snd (G H : AddCommGrpCat.{u}) :
 lemma biprodIsoProd_inv_comp_desc {G H K : AddCommGrpCat.{u}} (f : G ⟶ K) (g : H ⟶ K) :
     (biprodIsoProd G H).inv ≫ biprod.desc f g =
       ofHom (AddMonoidHom.fst G H) ≫ f + ofHom (AddMonoidHom.snd G H) ≫ g := by
-  rw [← biprodIsoProd_inv_comp_fst, ← biprodIsoProd_inv_comp_snd, Category.assoc,
-    Category.assoc, ← Preadditive.comp_add]
-  congr 1
-  apply biprod.hom_ext' <;> simp
+  simp [biprod.desc_eq, ← biprodIsoProd_inv_comp_fst, ← biprodIsoProd_inv_comp_snd]
 
 namespace HasLimit
 
