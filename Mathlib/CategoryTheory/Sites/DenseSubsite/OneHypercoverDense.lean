@@ -532,8 +532,7 @@ noncomputable def presheafMap {X Y : C} (f : X ⟶ Y) :
     dsimp at fac ⊢
     simp only [assoc, ← map_comp, ← op_comp]
     rw [restriction_map (p := p), restriction_map (p := p)]
-    · rw [fac, h₂, map_comp_assoc]
-    · rw [fac, h₁, map_comp_assoc])
+    all_goals simp_all)
 
 @[reassoc (attr := simp)]
 lemma presheafMap_π {X Y : C} (f : X ⟶ Y) (i : (data X).I₀) :
