@@ -27,20 +27,17 @@ variable {C D : Type*} [Category* C] [Category D]
 /-- If `F : C ⥤ D` is such that `F.obj X` is terminal for any `X : C`,
 then `F` is a terminal object. -/
 def isTerminal {F : C ⥤ D} (hF : ∀ (X : C), IsTerminal (F.obj X)) :
-    IsTerminal F := evaluationJointlyReflectsLimits _ fun X ↦ by
-  refine IsLimit.equivOfNatIsoOfIso (Functor.emptyExt _ _) _ _ ?_ (hF X)
-  exact Cones.ext (Iso.refl _) (by cat_disch)
+    IsTerminal F := by
+  refine evaluationJointlyReflectsLimits _
+    fun X ↦ IsLimit.equivOfNatIsoOfIso (Functor.emptyExt _ _) _ _ ?_ (hF X)
+  exact Cones.ext (Iso.refl _)
 
 /-- If `F : C ⥤ D` is such that `F.obj X` is initial for any `X : C`,
 then `F` is an initial object. -/
 def isInitial {F : C ⥤ D} (hF : ∀ (X : C), IsInitial (F.obj X)) :
-    IsInitial F :=
-  IsInitial.ofUniqueHom
-    (fun G ↦
-      { app _ := (hF _).to _
-        naturality _ _ _ := (hF _).hom_ext _ _ })
-    (fun _ _ ↦ by
-      ext
-      apply (hF _).hom_ext )
+    IsInitial F := by
+  refine evaluationJointlyReflectsColimits _
+    fun X ↦ IsColimit.equivOfNatIsoOfIso (Functor.emptyExt _ _) _ _ ?_ (hF X)
+  exact Cocones.ext (Iso.refl _)
 
 end CategoryTheory.Functor
