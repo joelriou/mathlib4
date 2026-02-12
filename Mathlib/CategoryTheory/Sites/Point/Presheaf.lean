@@ -80,6 +80,9 @@ instance :
   exact fun _ ↦ (colimit.isColimit _).isIso_ι_app_of_isTerminal _
     (isInitialElementsMkShrinkYonedaObjObjEquivId X).op
 
+/-- The fiber functor `(Cᵒᵖ ⥤ A) ⥤ A` corresponding to the point
+of the Grothendieck topology `⊥` attached to an object `X : C`
+identifies to the evaluation functor at `X`. -/
 @[simps! inv]
 noncomputable def pointBotPresheafFiberIso :
     (pointBot.{w} X).presheafFiber (A := A) ≅
