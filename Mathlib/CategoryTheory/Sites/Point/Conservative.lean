@@ -61,14 +61,11 @@ variable [P.IsConservativeFamilyOfPoints]
   {FC : A → A → Type*} {CC : A → Type w}
   [∀ (X Y : A), FunLike (FC X Y) (CC X) (CC Y)]
   [ConcreteCategory.{w} A FC]
-  [(forget A).ReflectsIsomorphisms]
   [PreservesFilteredColimitsOfSize.{w, w} (forget A)]
-  [hJ : J.HasSheafCompose (forget A)]
-
-include hJ
 
 @[stacks 00YJ "(1)"]
-lemma jointlyReflectIsomorphisms :
+lemma jointlyReflectIsomorphisms
+    [J.HasSheafCompose (forget A)] [(forget A).ReflectsIsomorphisms] :
     JointlyReflectIsomorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) where
   isIso {K L} f _ := by
@@ -81,23 +78,69 @@ lemma jointlyReflectIsomorphisms :
           (inferInstanceAs (IsIso ((forget A).map (Φ.obj.sheafFiber.map f))))
 
 @[stacks 00YK "(1)"]
-lemma jointlyReflectMonomorphisms [AB5OfSize.{w, w} A] [HasFiniteLimits A] :
+lemma jointlyReflectMonomorphisms [AB5OfSize.{w, w} A] [HasFiniteLimits A]
+    [J.HasSheafCompose (forget A)] [(forget A).ReflectsIsomorphisms] :
     JointlyReflectMonomorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
   (jointlyReflectIsomorphisms P A).jointlyReflectMonomorphisms
 
 @[stacks 00YK "(2)"]
 lemma jointlyReflectEpimorphisms
-    [J.WEqualsLocallyBijective A] [HasSheafify J A] :
+    [J.WEqualsLocallyBijective A] [HasSheafify J A]
+    [J.HasSheafCompose (forget A)] [(forget A).ReflectsIsomorphisms] :
     JointlyReflectEpimorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
   (jointlyReflectIsomorphisms P A).jointlyReflectEpimorphisms
 
 @[stacks 00YK "(3)"]
-lemma jointlyFaithful [AB5OfSize.{w, w} A] [HasFiniteLimits A] :
+lemma jointlyFaithful [AB5OfSize.{w, w} A] [HasFiniteLimits A]
+    [J.HasSheafCompose (forget A)] [(forget A).ReflectsIsomorphisms] :
     JointlyFaithful
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
   (jointlyReflectIsomorphisms P A).jointlyFaithful
+
+variable {A} in
+lemma jointly_reflect_isLocallySurjective
+    [J.WEqualsLocallyBijective (Type w)] [HasSheafify J (Type w)]
+    {X Y : Cᵒᵖ ⥤ A} (f : X ⟶ Y)
+    (hf : ∀ (Φ : P.FullSubcategory),
+      Function.Surjective (Φ.obj.presheafFiber.map f)) :
+    Presheaf.IsLocallySurjective J f := by
+  simp only [← epi_iff_surjective] at hf
+  rw [Presheaf.isLocallySurjective_iff_whisker_forget,
+    ← Presheaf.isLocallySurjective_presheafToSheaf_map_iff,
+    Sheaf.isLocallySurjective_iff_epi,
+    (jointlyReflectEpimorphisms P (Type w)).epi_iff]
+  exact fun Φ ↦ ((MorphismProperty.epimorphisms (Type w)).arrow_mk_iso_iff
+    (((Functor.mapArrowFunctor _ _).mapIso
+      ((Φ.obj.presheafFiberCompIso (forget A)).symm ≪≫
+        Functor.isoWhiskerLeft _ (Φ.obj.presheafToSheafCompSheafFiber (Type w)).symm)).app
+          (Arrow.mk f))).1 (hf Φ)
+
+section
+
+variable [HasSheafify J (Type w)] [J.WEqualsLocallyBijective (Type w)]
+  {X : C} {ι : Type*} [Small.{w} ι] {U : ι → C} (f : ∀ i, U i ⟶ X)
+
+lemma jointly_reflect_ofArrows_mem :
+    Sieve.ofArrows _ f ∈ J X ↔
+      ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
+        ∃ (i : ι) (y : Φ.obj.fiber.obj (U i)), Φ.obj.fiber.map (f i) y = x := by
+  refine ⟨fun hf Φ x ↦ ?_, fun hf ↦ ?_⟩
+  · obtain ⟨Z, _, ⟨_, p, _, ⟨i⟩, rfl⟩, z, rfl⟩ := Φ.obj.jointly_surjective _ hf x
+    exact ⟨i, Φ.obj.fiber.map p z, by simp⟩
+  · rw [ofArrows_mem_iff_isLocallySurjective]
+    refine jointly_reflect_isLocallySurjective P _ (fun Φ x ↦ ?_)
+    obtain ⟨x, rfl⟩ := (Φ.obj.shrinkYonedaCompPresheafFiberIso.app X).toEquiv.symm.surjective x
+    obtain ⟨i, y, rfl⟩ := hf Φ x
+    refine ⟨Φ.obj.presheafFiber.map (Sigma.ι (fun i ↦ shrinkYoneda.{w}.obj (U i)) i)
+      (Φ.obj.shrinkYonedaCompPresheafFiberIso.inv.app _ y), ?_⟩
+    have  := congr_fun (Φ.obj.shrinkYonedaCompPresheafFiberIso.inv.naturality (f i)) y
+    dsimp at this ⊢
+    rw [this, ← Sigma.ι_desc (fun i ↦ shrinkYoneda.{w}.map (f i)) i, Functor.map_comp]
+    rfl
+
+end
 
 end GrothendieckTopology.Point
 

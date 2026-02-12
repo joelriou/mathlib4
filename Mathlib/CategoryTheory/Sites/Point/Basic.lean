@@ -148,6 +148,16 @@ lemma toPresheafFiber_presheafFiberDesc (X : C) (x : Φ.fiber.obj X) :
 
 end
 
+section
+
+variable [LocallySmall.{w} C]
+
+def shrinkYonedaCompPresheafFiberIso :
+    shrinkYoneda.{w} ⋙ Φ.presheafFiber ≅ Φ.fiber := by
+  sorry
+
+end
+
 variable {FC : A → A → Type*} {CC : A → Type w'}
   [∀ (X Y : A), FunLike (FC X Y) (CC X) (CC Y)]
   [ConcreteCategory.{w'} A FC]
