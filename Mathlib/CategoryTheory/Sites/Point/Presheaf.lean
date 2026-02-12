@@ -10,14 +10,11 @@ public import Mathlib.CategoryTheory.Sites.Point.Conservative
 /-!
 # Points of presheaf toposes
 
-Let `C` be a category. For the Grothendieck topology `⊥`, we know
+Let `C` be a category. For the Grothendieck topology `⊥` on `C`, we know
 that the category of sheaves with values in `A` identify to `Cᵒᵖ ⥤ A`
 (see `sheafBotEquivalence` in the file `Mathlib/CategoryTheory/Sites/Sheaf.lean`).
 In this file, we show that any `X : C` defines a point for this site, and that
 these point form a conservative family of points.
-
-## TODO
-* show that the fiber functors identify the evaluation functors
 
 -/
 
@@ -29,7 +26,9 @@ namespace CategoryTheory
 
 open Opposite Limits
 
-variable {C : Type u} [Category.{v} C] [LocallySmall.{w} C]
+variable {C : Type u} [Category.{v} C]
+
+variable [LocallySmall.{w} C]
 
 -- to be moved
 /-- The object of the category of elements `shrinkYoneda.{w}.flip.obj (op X)`
@@ -57,10 +56,38 @@ sheaves are presheaves, see `sheafBotEquivalence`) corresponding to `X`. -/
 @[simps]
 noncomputable def pointBot (X : C) :
     Point.{w} (⊥ : GrothendieckTopology C) where
-  fiber := shrinkYoneda.flip.{w}.obj (op X)
+  fiber := shrinkYoneda.flip.obj (op X)
   jointly_surjective {U} R hR x := by
     obtain rfl : R = ⊤ := by simpa using hR
     exact ⟨U, 𝟙 _, by simp, x, by simp⟩
+
+/-- The functor `C ⥤ Point.{w} (⊥ : GrothendieckTopology C)` which sends
+`X : C` to the point corresponding to `X`. -/
+@[simps]
+noncomputable def pointBotFunctor :
+    C ⥤ Point.{w} (⊥ : GrothendieckTopology C) where
+  obj := pointBot
+  map f := { hom := shrinkYoneda.flip.map f.op }
+
+section
+
+variable (X : C) (A : Type*) [Category A] [HasColimitsOfSize.{w, w} A]
+
+instance :
+    IsIso ((pointBot.{w} X).toPresheafFiberNatTrans (A := A) X
+      (shrinkYonedaObjObjEquiv.symm (𝟙 X))) := by
+  rw [NatTrans.isIso_iff_isIso_app]
+  exact fun _ ↦ (colimit.isColimit _).isIso_ι_app_of_isTerminal _
+    (isInitialElementsMkShrinkYonedaObjObjEquivId X).op
+
+@[simps! inv]
+noncomputable def pointBotPresheafFiberIso :
+    (pointBot.{w} X).presheafFiber (A := A) ≅
+      (evaluation Cᵒᵖ A).obj (op X) :=
+  (asIso ((pointBot X).toPresheafFiberNatTrans X
+      (shrinkYonedaObjObjEquiv.symm (𝟙 X)))).symm
+
+end
 
 variable (C) in
 /-- The family of points on the site `(C, ⊥)` (whose
