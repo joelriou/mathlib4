@@ -473,7 +473,7 @@ lemma res_eq_res {X : C} {X₀ Y₀ : C₀} {f : F.obj X₀ ⟶ X} {g : Y₀ ⟶
   dsimp [res]
   simp only [assoc, IsDenseSubsite.mapPreimage_comp_map]
   apply presheafObj_mapPreimage_condition
-  simp only [assoc, h₁.fac, h₂.fac]
+  simp
 
 end restriction
 
