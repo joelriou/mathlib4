@@ -563,10 +563,8 @@ lemma presheafMap_restriction {X Y : C} {X₀ : C₀} (f : F.obj X₀ ⟶ X) (g 
   dsimp
   rw [assoc, assoc,
     IsDenseSubsite.mapPreimage_map_of_fac J F G₀ _ _ x₂ (by simpa using fac₂.symm),
-    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ _ _ x₁ fac₁.symm]
-  rw [restriction_map data G₀ _ _ (F.map x₁)
-    (by rw [fac₁, fac₂, assoc, assoc, map_comp_assoc, hc']),
-    IsDenseSubsite.mapPreimage_map]
+    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ _ _ x₁ fac₁.symm,
+    restriction_map data G₀ _ _ (F.map x₁) (by grind), IsDenseSubsite.mapPreimage_map]
 
 lemma presheafMap_id (X : C) :
     presheafMap data G₀ (𝟙 X) = 𝟙 _ := by
