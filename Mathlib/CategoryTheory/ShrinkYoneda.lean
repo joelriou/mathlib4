@@ -131,6 +131,13 @@ lemma shrinkYonedaEquiv_symm_map {X Y : Cᵒᵖ} (f : X ⟶ Y) {P : Cᵒᵖ ⥤ 
     rw [← shrinkYonedaEquiv_naturality]
     simp)
 
+lemma shrinkYonedaEquiv_symm_app_shrinkYonedaObjObjEquiv_symm {X : C} {P : Cᵒᵖ ⥤ Type w}
+    (s : P.obj (op X)) {Y : C} (f : Y ⟶ X) :
+    (shrinkYonedaEquiv.symm s).app (op Y) (shrinkYonedaObjObjEquiv.symm f) =
+      P.map f.op s := by
+  obtain ⟨g, rfl⟩ := shrinkYonedaEquiv.surjective s
+  simp [map_shrinkYonedaEquiv]
+
 variable (C) in
 /-- The functor `shrinkYoneda : C ⥤ Cᵒᵖ ⥤ Type w` for a locally `w`-small category `C`
 is fully faithful. -/

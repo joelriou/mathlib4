@@ -53,6 +53,13 @@ def imageSieve {F G : Cᵒᵖ ⥤ A} (f : F ⟶ G) {U : C} (s : ToType (G.obj (o
     refine ⟨F.map j.op t, ?_⟩
     rw [op_comp, G.map_comp, ConcreteCategory.comp_apply, ← ht, NatTrans.naturality_apply f]
 
+lemma pullback_imageSieve
+    {F G : Cᵒᵖ ⥤ A} (f : F ⟶ G) {U : C} (s : ToType (G.obj (op U)))
+    {V : C} (g : V ⟶ U) :
+    (imageSieve f s).pullback g = imageSieve f (G.map g.op s) := by
+  ext W g
+  simp [imageSieve]
+
 theorem imageSieve_eq_sieveOfSection {F G : Cᵒᵖ ⥤ A} (f : F ⟶ G) {U : C}
     (s : ToType (G.obj (op U))) :
     imageSieve f s = (Subfunctor.range (whiskerRight f (forget A))).sieveOfSection s :=

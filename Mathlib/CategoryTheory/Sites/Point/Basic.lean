@@ -126,6 +126,18 @@ noncomputable def shrinkYonedaCompWhiskeringLeftObjπCompColimIso
         intro u
         simp [shrinkYoneda_map_app_coconeπOpCompShrinkYoneda_ι_app F f u.unop]))
 
+lemma shrinkYonedaCompWhiskeringLeftObjπCompColimIso_inv_app_apply
+    [HasColimitsOfShape F.Elementsᵒᵖ (Type w)] (u : F.Elements) :
+      (shrinkYonedaCompWhiskeringLeftObjπCompColimIso F).inv.app _ u.snd =
+      (colimit.ι ((CategoryOfElements.π F).op ⋙ shrinkYoneda.{w}.obj u.fst) (op u)
+        (shrinkYonedaObjObjEquiv.symm (𝟙 _))) := by
+  have :
+      (coconeπOpCompShrinkYoneda F u.fst).ι.app (op u) ≫
+        (shrinkYonedaCompWhiskeringLeftObjπCompColimIso F).inv.app u.fst =
+      colimit.ι ((CategoryOfElements.π F).op ⋙ shrinkYoneda.{w}.obj u.fst) (op u) :=
+    IsColimit.comp_coconePointUniqueUpToIso_inv (colimit.isColimit _) _ (op u)
+  simpa using congr_fun this (shrinkYonedaObjObjEquiv.symm (𝟙 _))
+
 end Functor.Elements
 
 namespace GrothendieckTopology
@@ -166,11 +178,6 @@ instance [LocallySmall.{w} C] [AB5OfSize.{w, w} A] [HasFiniteLimits A] :
 noncomputable def presheafFiber : (Cᵒᵖ ⥤ A) ⥤ A :=
   (Functor.whiskeringLeft _ _ _).obj (CategoryOfElements.π Φ.fiber).op ⋙ colim
 
-/-- The isomorphism `shrinkYoneda.{w} ⋙ Φ.presheafFiber ≅ Φ.fiber`. -/
-noncomputable def shrinkYonedaCompPresheafFiberIso [LocallySmall.{w} C] :
-    shrinkYoneda.{w} ⋙ Φ.presheafFiber ≅ Φ.fiber :=
-  Functor.Elements.shrinkYonedaCompWhiskeringLeftObjπCompColimIso _
-
 /-- Given a point `Φ` of a site `(C, J)`, `X : C` and `x : Φ.fiber.obj X`, this
 is the canonical map `P.obj (op X) ⟶ Φ.presheafFiber.obj P`. -/
 noncomputable def toPresheafFiber (X : C) (x : Φ.fiber.obj X) (P : Cᵒᵖ ⥤ A) :
@@ -205,6 +212,30 @@ lemma toPresheafFiber_naturality {P Q : Cᵒᵖ ⥤ A} (g : P ⟶ Q) (X : C) (x 
     Φ.toPresheafFiber X x P ≫ Φ.presheafFiber.map g =
       g.app (op X) ≫ Φ.toPresheafFiber X x Q :=
   ((Φ.toPresheafFiberNatTrans X x).naturality g).symm
+
+/-- The isomorphism `shrinkYoneda.{w} ⋙ Φ.presheafFiber ≅ Φ.fiber`. -/
+noncomputable def shrinkYonedaCompPresheafFiberIso [LocallySmall.{w} C] :
+    shrinkYoneda.{w} ⋙ Φ.presheafFiber ≅ Φ.fiber :=
+  Functor.Elements.shrinkYonedaCompWhiskeringLeftObjπCompColimIso _
+
+lemma shrinkYonedaCompPresheafFiberIso_inv_app_toPresheafFiber
+    [LocallySmall.{w} C] {X : C} (x : Φ.fiber.obj X) :
+    Φ.shrinkYonedaCompPresheafFiberIso.inv.app X x =
+      Φ.toPresheafFiber X x (shrinkYoneda.{w}.obj X)
+        (shrinkYonedaObjObjEquiv.symm (𝟙 X)) :=
+  Functor.Elements.shrinkYonedaCompWhiskeringLeftObjπCompColimIso_inv_app_apply
+    _ (Functor.elementsMk (Φ.fiber) _ x)
+
+lemma presheafFiber_map_shrinkYoneda_map_shrinkYonedaCompPresheafFiberIso_inv_app
+    [LocallySmall.{w} C] {X Y : C} (f : X ⟶ Y) (x : Φ.fiber.obj X) :
+      Φ.presheafFiber.map (shrinkYoneda.{w}.map f)
+        (Φ.shrinkYonedaCompPresheafFiberIso.inv.app X x) =
+      Φ.toPresheafFiber X x (shrinkYoneda.{w}.obj Y)
+        (shrinkYonedaObjObjEquiv.symm f) := by
+  rw [shrinkYonedaCompPresheafFiberIso_inv_app_toPresheafFiber]
+  refine (Φ.toPresheafFiber_naturality_apply (shrinkYoneda.{w}.map f) _ x
+    (shrinkYonedaObjObjEquiv.symm (𝟙 X))).trans (congr_arg _ ?_)
+  simpa using shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm.{w} (𝟙 _) f
 
 section
 
