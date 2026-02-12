@@ -74,11 +74,11 @@ instance : (pointsBot.{w} C).IsConservativeFamilyOfPoints :=
     obtain ⟨Y, a, ha, b, hb⟩ := hS ⟨_, ⟨X⟩⟩ (shrinkYonedaObjObjEquiv.symm (𝟙 X))
     obtain ⟨b, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective b
     dsimp at b hb
-    simp only [bot_covering, ← Sieve.id_mem_iff_eq_top]
     have : b ≫ a = 𝟙 _ :=
       shrinkYonedaObjObjEquiv.symm.injective (by
         rw [← hb, shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm])
-    simpa [this] using S.downward_closed ha b)
+    simpa only [bot_covering, ← Sieve.id_mem_iff_eq_top, this]
+      using S.downward_closed ha b)
 
 end GrothendieckTopology
 
