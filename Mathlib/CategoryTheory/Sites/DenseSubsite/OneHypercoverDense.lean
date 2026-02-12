@@ -363,7 +363,7 @@ noncomputable def isLimit : IsLimit (S.multifork G) :=
 
 end isSheaf_iff
 
-/-- Let `F : C₀ ⥤ C` be a dense subsite, and assume we have a family of structures
+/-- Let `F : C₀ ⥤ C` be a dense subsite, and assume we have a family
 `data : ∀ X, F.OneHypercoverDenseData J₀ J X`.
 This lemma shows that `G : Cᵒᵖ ⥤ A` is a sheaf iff `F.op F.op ⋙ G : C₀ᵒᵖ ⥤ A`
 is a sheaf and for any `X : C`, the multifork for `G` and the `1`-hypercover
@@ -389,7 +389,7 @@ namespace essSurj
 
 variable (G₀ : Sheaf J₀ A)
 
-/-- Given a dense subsite `F : C₀ ⥤ C` and a family of structures
+/-- Given a dense subsite `F : C₀ ⥤ C` and a family
 `data : ∀ X, OneHypercoverDenseData F J₀ J X` and a sheaf `G₀` on `J₀`,
 this is the value on an object `X : C` of the "extension" of `G₀`
 as a sheaf on `J` (see `OneHypercoverDenseData.essSurj.presheaf` and
@@ -474,7 +474,7 @@ lemma res_eq_res {X : C} {X₀ Y₀ : C₀} {f : F.obj X₀ ⟶ X} {g : Y₀ ⟶
 end restriction
 
 /-- Let `F : C₀ ⥤ C` be a dense subsite and `data : ∀ X, F.OneHypercoverDenseData J₀ J X`
-be a family of structures. Let `G₀` be a sheaf on `C₀`. Let `f : F.obj X₀ ⟶ X`.
+be a family. Let `G₀` be a sheaf on `C₀`. Let `f : F.obj X₀ ⟶ X`.
 This is the canonical morphism
 `presheafObj data G₀ X ⟶ G₀.val.obj (op X₀)` (where `presheafObj data G₀ X`
 is the value on `X` of the extension to `C` of the sheaf `G₀`,
@@ -581,8 +581,8 @@ lemma presheafMap_comp {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
   rw [assoc, presheafMap_π, presheafMap_π, presheafMap_restriction, assoc]
 
 /-- Let `F : C₀ ⥤ C` be a dense subsite and `data : ∀ X, F.OneHypercoverDenseData J₀ J X`
-be a family of structures. Let `G₀` be a sheaf on `C₀`. This is a presheaf on `C` which
-extends `G₀` (TODO). -/
+be a family. Let `G₀` be a sheaf on `C₀`. This is a presheaf on `C` which
+extends `G₀`, and we shall also show that it is a sheaf (TODO). -/
 @[simps]
 noncomputable def presheaf : Cᵒᵖ ⥤ A where
   obj X := presheafObj data G₀ X.unop
