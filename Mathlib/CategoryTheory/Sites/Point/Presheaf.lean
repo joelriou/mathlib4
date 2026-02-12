@@ -10,10 +10,10 @@ public import Mathlib.CategoryTheory.Sites.Point.Conservative
 /-!
 # Points of presheaf toposes
 
-Let `C` be a category. For the Grothendieck topologyy `⊥`, we know
+Let `C` be a category. For the Grothendieck topology `⊥`, we know
 that the category of sheaves with values in `A` identify to `Cᵒᵖ ⥤ A`
 (see `sheafBotEquivalence` in the file `Mathlib/CategoryTheory/Sites/Sheaf.lean`).
-In this file, we show that any `X : C` defines a point for this site, and
+In this file, we show that any `X : C` defines a point for this site, and that
 these point form a conservative family of points.
 
 ## TODO
