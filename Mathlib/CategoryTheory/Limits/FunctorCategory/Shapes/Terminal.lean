@@ -27,14 +27,9 @@ variable {C D : Type*} [Category* C] [Category D]
 /-- If `F : C ⥤ D` is such that `F.obj X` is terminal for any `X : C`,
 then `F` is a terminal object. -/
 def isTerminal {F : C ⥤ D} (hF : ∀ (X : C), IsTerminal (F.obj X)) :
-    IsTerminal F :=
-  IsTerminal.ofUniqueHom
-    (fun G ↦
-      { app _ := (hF _).from _
-        naturality _ _ _ := (hF _).hom_ext _ _ })
-    (fun _ _ ↦ by
-      ext
-      apply (hF _).hom_ext )
+    IsTerminal F := evaluationJointlyReflectsLimits _ fun X ↦ by
+  refine IsLimit.equivOfNatIsoOfIso (Functor.emptyExt _ _) _ _ ?_ (hF X)
+  exact Cones.ext (Iso.refl _) (by cat_disch)
 
 /-- If `F : C ⥤ D` is such that `F.obj X` is initial for any `X : C`,
 then `F` is an initial object. -/
