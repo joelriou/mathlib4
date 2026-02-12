@@ -135,7 +135,7 @@ lemma jointly_reflect_ofArrows_mem :
     obtain ⟨i, y, rfl⟩ := hf Φ x
     refine ⟨Φ.obj.presheafFiber.map (Sigma.ι (fun i ↦ shrinkYoneda.{w}.obj (U i)) i)
       (Φ.obj.shrinkYonedaCompPresheafFiberIso.inv.app _ y), ?_⟩
-    have  := congr_fun (Φ.obj.shrinkYonedaCompPresheafFiberIso.inv.naturality (f i)) y
+    have := congr_fun (Φ.obj.shrinkYonedaCompPresheafFiberIso.inv.naturality (f i)) y
     dsimp at this ⊢
     rw [this, ← Sigma.ι_desc (fun i ↦ shrinkYoneda.{w}.map (f i)) i, Functor.map_comp]
     rfl
@@ -143,5 +143,18 @@ lemma jointly_reflect_ofArrows_mem :
 end
 
 end GrothendieckTopology.Point
+
+variable [LocallySmall.{w} C] [Balanced (Sheaf J (Type w))]
+
+lemma ObjectProperty.IsConservativeFamilyOfPoints.mk'
+    (hP : ∀ ⦃X : C⦄ ⦃ι : Type w⦄ ⦃U : ι → C⦄ (f : ∀ i, U i ⟶ X)
+      (hf : ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
+        ∃ (i : ι) (y : Φ.obj.fiber.obj (U i)), Φ.obj.fiber.map (f i) y = x),
+          Sieve.ofArrows _ f ∈ J X) :
+    P.IsConservativeFamilyOfPoints where
+  jointlyReflectIsomorphisms :=
+    JointlyFaithful.jointlyReflectsIsomorphisms
+      (JointlyFaithful.of_jointly_reflects_isIso_of_mono (fun _ _ f _ hf ↦ by
+        sorry))
 
 end CategoryTheory

@@ -59,6 +59,9 @@ namespace Functor.Elements
 
 variable [LocallySmall.{w} C] (F : C ⥤ Type w)
 
+/-- If `F : C ⥤ Type w` and `C` is locally `w`-small, then for any `X : C`,
+this is the colimit cocone which identifies `F.obj X` to the colimit of
+`(CategoryOfElements.π F).op ⋙ shrinkYoneda.obj X`. -/
 @[simps]
 noncomputable def coconeπOpCompShrinkYoneda (X : C) :
     Cocone ((CategoryOfElements.π F).op ⋙ shrinkYoneda.{w}.obj X) where
@@ -71,6 +74,9 @@ noncomputable def coconeπOpCompShrinkYoneda (X : C) :
     rw [shrinkYoneda_obj_map_shrinkYonedaObjObjEquiv_symm]
     simp
 
+/-- If `F : C ⥤ Type w` and `C` is locally `w`-small, then for any `X : C`,
+`F.obj X` identifies to the colimit of
+`(CategoryOfElements.π F).op ⋙ shrinkYoneda.obj X`. -/
 noncomputable def isColimitCoconeπOpCompShrinkYoneda (X : C) :
     IsColimit (coconeπOpCompShrinkYoneda F X) := by
   refine Nonempty.some ((Types.isColimit_iff_coconeTypesIsColimit _).2
@@ -108,6 +114,8 @@ lemma shrinkYoneda_map_app_coconeπOpCompShrinkYoneda_ι_app
   rw [shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm]
   simp
 
+/-- If `F : C ⥤ Type w` and `C` is locally `w`-small, then `F` identifies to the composition
+`shrinkYoneda ⋙ (Functor.whiskeringLeft _ _ _).obj (CategoryOfElements.π F).op ⋙ colim`. -/
 noncomputable def shrinkYonedaCompWhiskeringLeftObjπCompColimIso
     [HasColimitsOfShape F.Elementsᵒᵖ (Type w)] :
     shrinkYoneda.{w} ⋙
@@ -157,6 +165,11 @@ instance [LocallySmall.{w} C] [AB5OfSize.{w, w} A] [HasFiniteLimits A] :
 /-- The fiber functor on categories of presheaves that is given by a point of a site. -/
 noncomputable def presheafFiber : (Cᵒᵖ ⥤ A) ⥤ A :=
   (Functor.whiskeringLeft _ _ _).obj (CategoryOfElements.π Φ.fiber).op ⋙ colim
+
+/-- The isomorphism `shrinkYoneda.{w} ⋙ Φ.presheafFiber ≅ Φ.fiber`. -/
+noncomputable def shrinkYonedaCompPresheafFiberIso [LocallySmall.{w} C] :
+    shrinkYoneda.{w} ⋙ Φ.presheafFiber ≅ Φ.fiber :=
+  Functor.Elements.shrinkYonedaCompWhiskeringLeftObjπCompColimIso _
 
 /-- Given a point `Φ` of a site `(C, J)`, `X : C` and `x : Φ.fiber.obj X`, this
 is the canonical map `P.obj (op X) ⟶ Φ.presheafFiber.obj P`. -/
@@ -211,16 +224,6 @@ set_option backward.privateInPublic true in
 lemma toPresheafFiber_presheafFiberDesc (X : C) (x : Φ.fiber.obj X) :
     Φ.toPresheafFiber X x P ≫ Φ.presheafFiberDesc φ hφ = φ X x :=
   colimit.ι_desc _ _
-
-end
-
-section
-
-variable [LocallySmall.{w} C]
-
-noncomputable def shrinkYonedaCompPresheafFiberIso :
-    shrinkYoneda.{w} ⋙ Φ.presheafFiber ≅ Φ.fiber :=
-  Functor.Elements.shrinkYonedaCompWhiskeringLeftObjπCompColimIso _
 
 end
 
