@@ -427,18 +427,14 @@ lemma presheafObj_mapPreimage_condition
   refine Presheaf.IsSheaf.hom_ext G₀.cond ⟨_,
     J₀.intersection_covering (IsDenseSubsite.imageSieve_mem J₀ J F p₁)
       (IsDenseSubsite.imageSieve_mem J₀ J F p₂)⟩ _ _ ?_
-  rintro ⟨W₀, a, ⟨b₁, h₁⟩, ⟨b₂, h₂⟩⟩
+  intro ⟨W₀, a, ⟨b₁, h₁⟩, ⟨b₂, h₂⟩⟩
   refine Presheaf.IsSheaf.hom_ext G₀.cond
     ⟨_, (data X).mem₁₀ i₁ i₂ b₁ b₂ (by simp only [h₁, h₂, assoc, fac])⟩ _ _ ?_
-  rintro ⟨U₀, c, ⟨j, t, fac₁, fac₂⟩⟩
-  dsimp
-  simp only [assoc, ← Functor.map_comp, ← op_comp]
-  rw [IsDenseSubsite.mapPreimage_map_of_fac J F G₀ p₁ (c ≫ a) (c ≫ b₁)
-      (by rw [map_comp_assoc, ← h₁, map_comp]),
-    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ p₂ (c ≫ a) (c ≫ b₂)
-      (by rw [map_comp_assoc, ← h₂, map_comp]), fac₁, fac₂,
-    op_comp, op_comp, map_comp, map_comp]
-  apply presheafObj_condition_assoc
+  intro ⟨U₀, c, ⟨j, t, fac₁, fac₂⟩⟩
+  simp only [assoc, ← Functor.map_comp, ← op_comp,
+    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ p₁ (c ≫ a) (c ≫ b₁) (by simp [← h₁]),
+    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ p₂ (c ≫ a) (c ≫ b₂) (by simp [← h₂])]
+  simpa [fac₁, fac₂] using presheafObj_condition_assoc _ _ _ _ _ _ _
 
 /-- The (limit) multifork with point `presheafObjπ data G₀ X` for
 the diagram given by `G₀` and `data X`. -/
