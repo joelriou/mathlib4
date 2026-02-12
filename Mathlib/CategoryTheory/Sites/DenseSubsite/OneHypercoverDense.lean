@@ -392,8 +392,8 @@ variable (G₀ : Sheaf J₀ A)
 /-- Given a dense subsite `F : C₀ ⥤ C` and a family
 `data : ∀ X, OneHypercoverDenseData F J₀ J X` and a sheaf `G₀` on `J₀`,
 this is the value on an object `X : C` of the "extension" of `G₀`
-as a sheaf on `J` (see `OneHypercoverDenseData.essSurj.presheaf` and
-`OneHypercoverDenseData.essSurj.isSheaf`): it is defined as
+as a sheaf on `J` (see `OneHypercoverDenseData.essSurj.presheaf` for the
+construction of this extension as a presheaf): it is defined as
 a multiequalizer using `data X`. -/
 noncomputable def presheafObj (X : C) : A :=
   multiequalizer ((data X).multicospanIndex G₀.val)
