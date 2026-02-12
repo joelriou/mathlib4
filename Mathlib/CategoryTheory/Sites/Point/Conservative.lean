@@ -144,9 +144,9 @@ end
 
 end GrothendieckTopology.Point
 
-variable [LocallySmall.{w} C] [Balanced (Sheaf J (Type w))]
-
+variable {P} in
 lemma ObjectProperty.IsConservativeFamilyOfPoints.mk'
+    [LocallySmall.{w} C] [Balanced (Sheaf J (Type w))]
     (hP : ∀ ⦃X : C⦄ ⦃ι : Type w⦄ ⦃U : ι → C⦄ (f : ∀ i, U i ⟶ X)
       (hf : ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
         ∃ (i : ι) (y : Φ.obj.fiber.obj (U i)), Φ.obj.fiber.map (f i) y = x),
