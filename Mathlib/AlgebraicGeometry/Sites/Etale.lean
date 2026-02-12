@@ -88,7 +88,8 @@ variable {S : Scheme.{u}} {Ω : Type u} [Field Ω] [IsSepClosed Ω]
 noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
   fiber := Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))
   isCofiltered := Functor.isCofiltered_elements _
-  initiallySmall := sorry
+  initiallySmall := by
+    sorry
   jointly_surjective {X} R hR φ := by
     induction X with | _ X f
     obtain ⟨φ : Spec (.of Ω) ⟶ X, rfl : φ ≫ f = s, rfl⟩ := Over.homMk_surjective φ
@@ -101,8 +102,6 @@ noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
     algebraize [m, a.hom]
     let b : (𝒰.X i).residueField y →ₐ[X.residueField (𝒰.f i y)] Ω :=
       IsSepClosed.lift
-    have hfac : (𝒰.f i).residueFieldMap y ≫ CommRingCat.ofHom b.toRingHom = a := by
-      ext1; exact b.comp_algebraMap
     have fac : Spec.map (CommRingCat.ofHom b.toRingHom) ≫
           (𝒰.X i).fromSpecResidueField y ≫ 𝒰.f i =
         (SpecToEquivOfField Ω X).symm ⟨(𝒰.f i) y, a⟩ := by
@@ -110,12 +109,10 @@ noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
         ext1; exact b.comp_algebraMap
       simp [SpecToEquivOfField, ← this]
     dsimp at fac
-    refine ⟨(𝒰.X i).asOverProp S inferInstance,
+    exact ⟨(𝒰.X i).asOverProp S inferInstance,
       MorphismProperty.Over.homMk (𝒰.f i), le _ ⟨i⟩,
       Over.homMk (Spec.map (CommRingCat.ofHom b.toRingHom) ≫
-        (𝒰.X i).fromSpecResidueField y) ?_, ?_⟩
-    · simp [Etale.forget, ← fac, hf]
-    · cat_disch
+        (𝒰.X i).fromSpecResidueField y) (by simp [Etale.forget, ← fac, hf]), by cat_disch⟩
 
 end
 
