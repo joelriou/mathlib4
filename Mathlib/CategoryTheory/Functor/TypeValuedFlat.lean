@@ -5,16 +5,10 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.CategoryTheory.Elements
 public import Mathlib.CategoryTheory.Filtered.Final
-public import Mathlib.CategoryTheory.Limits.Preserves.Finite
-public import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts
 public import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Equalizers
-public import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Terminal
 public import Mathlib.CategoryTheory.Limits.Types.Equalizers
-public import Mathlib.CategoryTheory.Limits.Types.Products
 public import Mathlib.CategoryTheory.Subfunctor.Basic
-public import Mathlib.CategoryTheory.Types.Basic
 
 /-!
 # Type-valued flat functors
