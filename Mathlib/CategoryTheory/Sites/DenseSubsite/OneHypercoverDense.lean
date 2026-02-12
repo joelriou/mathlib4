@@ -552,11 +552,9 @@ lemma presheafMap_restriction {X Y : C} {X₀ : C₀} (f : F.obj X₀ ⟶ X) (g 
   have hd' := Sieve.ofArrows.fac hd
   dsimp at hc hd hc' hd' ⊢
   rw [assoc, ← op_comp, restriction_map (i := Sieve.ofArrows.i hd)
-    (p := F.map c ≫ Sieve.ofArrows.h hd),
-    restriction_map (i := Sieve.ofArrows.i hc) (p := Sieve.ofArrows.h hc),
-    presheafMap_π_assoc]; rotate_left
-  · simp only [map_comp_assoc, hc', reassoc_of% hd']
-  · simp only [assoc, map_comp_assoc, hd']
+    (p := F.map c ≫ Sieve.ofArrows.h hd) (fac := by grind),
+    restriction_map (i := Sieve.ofArrows.i hc) (p := Sieve.ofArrows.h hc) (fac := by grind),
+    presheafMap_π_assoc]
   dsimp
   have := J₀.intersection_covering (IsDenseSubsite.imageSieve_mem J₀ J F (Sieve.ofArrows.h hc))
     (J₀.pullback_stable c (IsDenseSubsite.imageSieve_mem J₀ J F (Sieve.ofArrows.h hd)))
