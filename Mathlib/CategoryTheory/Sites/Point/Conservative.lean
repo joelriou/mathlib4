@@ -23,6 +23,10 @@ category `A`, this implies that the fiber functors
 jointly reflect isomorphisms, epimorphisms and monomorphisms,
 and they are also jointly faithful.
 
+We provide a constructor `ObjectProperty.IsConservativeFamilyOfPoints.mk'`
+which allows to verify that a family of points is conservative
+using a condition involving covering sieves (SGA 4 IV 6.5 (a)).
+
 ## TODO
 * Formalize SGA 4 IV 6.5 (a) which characterizes conservative families
 of points.
@@ -148,15 +152,12 @@ end GrothendieckTopology.Point
 namespace ObjectProperty.IsConservativeFamilyOfPoints
 
 variable {P} [LocallySmall.{w} C]
-  (hP : ∀ ⦃X : C⦄ (S : Sieve X)
-    (_ : ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
-      ∃ (Y : C) (g : Y ⟶ X) (_ : S g) (y : Φ.obj.fiber.obj Y), Φ.obj.fiber.map g y = x), S ∈ J X)
 
-namespace mk'
-
-include hP
-
-lemma isLocallySurjective {F₁ F₂ : Cᵒᵖ ⥤ Type w} (f : F₁ ⟶ F₂) [Mono f]
+private lemma mk'.isLocallySurjective
+    (hP : ∀ ⦃X : C⦄ (S : Sieve X) (_ : ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
+      ∃ (Y : C) (g : Y ⟶ X) (_ : S g) (y : Φ.obj.fiber.obj Y), Φ.obj.fiber.map g y = x),
+        S ∈ J X)
+    {F₁ F₂ : Cᵒᵖ ⥤ Type w} (f : F₁ ⟶ F₂) [Mono f]
     (hf : ∀ (Φ : P.FullSubcategory), Function.Surjective (Φ.obj.presheafFiber.map f)) :
     Presheaf.IsLocallySurjective J f := by
   wlog hF₂ : ∃ (U : C), F₂ = shrinkYoneda.obj U generalizing F₁ F₂
@@ -203,10 +204,15 @@ lemma isLocallySurjective {F₁ F₂ : Cᵒᵖ ⥤ Type w} (f : F₁ ⟶ F₂) [
       refine Eq.trans (congr_arg _ ht)
         (Φ.obj.toPresheafFiber_naturality_apply f _ v y).symm
 
-end mk'
-
-include hP in
-lemma mk' [HasSheafify J (Type w)] :
+/- Let `P` be family of points of a site `(C, J)`, we show that `P` is a conservative
+family of points if the following condition is satisfied:
+for any sieve `S : Sieve X`, if the family of maps `Φ.map.fiber.map f`
+for all morphisms `f` in the sieve `S` is jointly surjective for any `Φ` in `P`,
+then `S` is a covering sieve for `J`. SGA 4 IV 6.5 (a) -/
+lemma mk' [HasSheafify J (Type w)]
+    (hP : ∀ ⦃X : C⦄ (S : Sieve X) (_ : ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
+      ∃ (Y : C) (g : Y ⟶ X) (_ : S g) (y : Φ.obj.fiber.obj Y), Φ.obj.fiber.map g y = x),
+        S ∈ J X) :
     P.IsConservativeFamilyOfPoints where
   jointlyReflectIsomorphisms :=
     JointlyFaithful.jointlyReflectsIsomorphisms
