@@ -31,15 +31,6 @@ universe u v u'
 
 open CategoryTheory Opposite Limits MorphismProperty
 
--- to be moved
-/-- The equivalence of rings between two equals subrings. -/
-@[simps!]
-def Subring.equivOfEq {R : Type u} [Ring R] {s t : Subring R} (h : s = t) :
-    s ≃+* t where
-  toEquiv := (Equiv.refl _).subtypeEquiv (by simp [h])
-  map_mul' := by simp
-  map_add' := by simp
-
 namespace AlgebraicGeometry.Scheme
 
 variable {S : Scheme.{u}}
@@ -159,7 +150,6 @@ lemma exists_subring
   /- We consider the map `φ : A →+* ∀ i, ((P ∘ α) i).Ring` that is essentially given by
   the restriction to the opens `U (α i)`, and show that it is injective by
   using the sheaf property of the structure sheaf. -/
-  have (i : Fin n) := (U (α i)).ι
   let β (i : Fin n) : A →+* ((P ∘ α) i).Ring :=
     (Spec.preimage ((iso (α i)).inv ≫ (U (α i)).ι)).hom
   let φ : A →+* ∀ i, ((P ∘ α) i).Ring := Pi.ringHom β
@@ -197,8 +187,8 @@ lemma essentiallySmall_costructuredArrow_Spec
     rw [essentiallySmall_iff_objectPropertyEssentiallySmall_top]
     obtain ⟨ι, R, hR⟩ := this
     let P₀ : ObjectProperty (P.CostructuredArrow ⊤ Scheme.Spec S) :=
-      .ofObj (fun (t : Σ (i : ι) (f : Scheme.Spec.obj (Opposite.op (R i)) ⟶ S), PLift (P f)) ↦
-        .mk (A := op (R t.1)) _ t.2.1 t.2.2.down)
+      .ofObj (fun (t : Σ (i : ι) (f : Scheme.Spec.obj (op (R i)) ⟶ S), PLift (P f)) ↦
+        .mk _ t.2.1 t.2.2.down)
     refine ObjectProperty.EssentiallySmall.of_le (Q := P₀.isoClosure) (fun Z _ ↦ ?_)
     obtain ⟨i, ⟨e⟩⟩ := hR Z
     refine ⟨_, ⟨i, Spec.map e.inv ≫ Z.hom, ⟨RespectsIso.precomp _ _ _ Z.prop⟩⟩, ⟨?_⟩⟩
