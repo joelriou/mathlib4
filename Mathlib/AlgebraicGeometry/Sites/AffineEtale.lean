@@ -26,6 +26,15 @@ universe u v u'
 
 open CategoryTheory Opposite Limits MorphismProperty
 
+-- to be moved
+/-- The equivalence of rings between two equals subrings. -/
+@[simps!]
+def Subring.equivOfEq {R : Type u} [Ring R] {s t : Subring R} (h : s = t) :
+    s ≃+* t where
+  toEquiv := (Equiv.refl _).subtypeEquiv (by simp [h])
+  map_mul' := by simp
+  map_add' := by simp
+
 namespace AlgebraicGeometry.Scheme
 
 variable {S : Scheme.{u}}
@@ -119,7 +128,7 @@ lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] 
   letI := (f.appLE V U hUV).hom.toAlgebra
   obtain ⟨n, φ, h₁, h₂⟩ := (LocallyOfFinitePresentation.finitePresentation_appLE f V.prop U.prop hUV).out
   obtain ⟨r, ρ, hρ⟩ : ∃ (r : ℕ) (γ : Fin r → MvPolynomial (Fin n) Γ(S, V)),
-      RingHom.ker φ.toRingHom = Ideal.span (Set.range γ) := by
+      Ideal.span (Set.range γ) = RingHom.ker φ.toRingHom := by
     obtain ⟨s, hs⟩ := h₂
     exact ⟨s.card, Subtype.val ∘  s.equivFin.symm, by rw [← hs]; simp⟩
   let P : S.FinitelyPresentedOverAffineOpen :=
@@ -128,7 +137,9 @@ lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] 
       g := n
       r := r
       rel := ρ }
-  let e : P.R ≃+* Γ(X, U.1) := sorry
+  let e : P.R ≃+* Γ(X, U.1) :=
+    (Ideal.quotEquivOfEq hρ).trans (φ.toRingHom.quotientKerEquivRange.trans
+      ((Subring.equivOfEq (RingHom.range_eq_top_of_surjective _ h₁)).trans Subring.topEquiv))
   exact ⟨U, hx, P, ⟨asIso (toSpecΓ U) ≪≫ Scheme.Spec.mapIso U.1.topIso.op.symm ≪≫
     Scheme.Spec.mapIso e.toCommRingCatIso.op⟩⟩
 
