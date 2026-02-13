@@ -133,11 +133,7 @@ lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] 
     obtain ⟨s, hs⟩ := h₂
     exact ⟨s.card, Subtype.val ∘ s.equivFin.symm, by rw [← hs]; simp⟩
   let P : S.FinitelyPresentedOverAffineOpen :=
-    { U := V.1
-      hU := V.prop
-      g := n
-      r := r
-      rel := ρ }
+    { U := V.1, hU := V.prop, g := n, r := r, rel := ρ }
   let e : P.Ring ≃+* Γ(X, U.1) :=
     (Ideal.quotEquivOfEq hρ).trans (φ.toRingHom.quotientKerEquivRange.trans
       ((Subring.equivOfEq (RingHom.range_eq_top_of_surjective _ h₁)).trans Subring.topEquiv))
