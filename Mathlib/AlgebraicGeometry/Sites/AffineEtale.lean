@@ -62,16 +62,13 @@ instance isCoverDense_toOver_Spec (P : MorphismProperty Scheme.{u}) [P.IsMultipl
       U.left.affineCover.changeProp
       (fun _ ↦ IsZariskiLocalAtSource.of_isOpenImmersion _)
     let _ (i : 𝒰.I₀) : (𝒰.X i).Over S := ⟨𝒰.f i ≫ U.hom⟩
-    refine ⟨𝒰, ⟨fun i ↦ inferInstance, fun i ↦ ⟨rfl⟩⟩, ?_, ?_⟩
-    · intro i
-      exact P.comp_mem _ _ (𝒰.map_prop i) U.prop
-    · rintro X f ⟨i⟩
-      rw [Sieve.coverByImage]
-      refine ⟨⟨affineOverMk (𝒰.f i ≫ U.hom) (P.comp_mem _ _ (𝒰.map_prop i) U.prop), ?_, ?_, ?_⟩⟩
-      · exact CostructuredArrow.homMk (𝟙 _) ⟨⟩ rfl
-      · exact Over.homMk (𝒰.f i) (by simp) trivial
-      · ext
-        simp
+    let _ : Cover.Over S 𝒰 := { isOver_map _ := ⟨rfl⟩ }
+    refine ⟨𝒰, inferInstance,
+      fun i ↦ P.comp_mem _ _ (𝒰.map_prop i) U.prop, fun X f ⟨i⟩ ↦ ?_⟩
+    rw [Sieve.coverByImage]
+    exact ⟨⟨affineOverMk (𝒰.f i ≫ U.hom) (P.comp_mem _ _ (𝒰.map_prop i) U.prop),
+      CostructuredArrow.homMk (𝟙 _) ⟨⟩ rfl, Over.homMk (𝒰.f i) (by simp) trivial,
+      by cat_disch⟩⟩
 
 instance isOneHypercoverDense_toOver_Spec
     (P : MorphismProperty Scheme.{u}) [P.IsMultiplicative]
@@ -88,10 +85,9 @@ instance isOneHypercoverDense_toOver_Spec
     let 𝒱 : Cover (precoverage P) X.left :=
       𝒰.openCover.changeProp (fun _ ↦ IsZariskiLocalAtSource.of_isOpenImmersion _)
     let _ (i : 𝒱.I₀) : (𝒱.X i).Over S := ⟨𝒰.f i ≫ X.hom⟩
-    let : Cover.Over S 𝒱 := { isOver_map _ := by cat_disch }
-    refine ⟨𝒱, inferInstance, fun i ↦ P.comp_mem _ _ (𝒱.map_prop i) X.prop, ?_⟩
-    rintro _ _ ⟨i⟩
-    exact (Sieve.mem_ofArrows_iff ..).2 ⟨i, 𝟙 _, by cat_disch⟩)
+    let : Cover.Over S 𝒱 := { isOver_map _ := ⟨rfl⟩ }
+    exact ⟨𝒱, inferInstance, fun i ↦ P.comp_mem _ _ (𝒱.map_prop i) X.prop,
+      fun _ _ ⟨i⟩ ↦ (Sieve.mem_ofArrows_iff ..).2 ⟨i, 𝟙 _, by cat_disch⟩⟩)
 
 variable (S) in
 structure FinitelyPresentedOverAffineOpen : Type u where
