@@ -7,6 +7,7 @@ module
 
 public import Mathlib.AlgebraicTopology.ModelCategory.CofibrantObjectHomotopy
 public import Mathlib.AlgebraicTopology.ModelCategory.FibrantObjectHomotopy
+public import Mathlib.CategoryTheory.Localization.CalculusOfFractions.OfAdjunction
 
 /-!
 # The homotopy category of bifibrant objects
