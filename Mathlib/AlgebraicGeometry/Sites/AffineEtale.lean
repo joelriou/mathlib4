@@ -122,13 +122,15 @@ lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] 
       RingHom.ker φ.toRingHom = Ideal.span (Set.range γ) := by
     obtain ⟨s, hs⟩ := h₂
     exact ⟨s.card, Subtype.val ∘  s.equivFin.symm, by rw [← hs]; simp⟩
-  refine ⟨U, hx,
+  let P : S.FinitelyPresentedOverAffineOpen :=
     { U := V.1
       hU := V.prop
       g := n
       r := r
-      rel := ρ }, ⟨?_⟩⟩
-  sorry
+      rel := ρ }
+  let e : P.R ≃+* Γ(X, U.1) := sorry
+  exact ⟨U, hx, P, ⟨asIso (toSpecΓ U) ≪≫ Scheme.Spec.mapIso U.1.topIso.op.symm ≪≫
+    Scheme.Spec.mapIso e.toCommRingCatIso.op⟩⟩
 
 lemma exists_subring
     {A : CommRingCat.{u}} (f : Spec (.of A) ⟶ S) [LocallyOfFinitePresentation f] :
