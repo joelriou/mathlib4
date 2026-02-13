@@ -371,7 +371,7 @@ noncomputable def isLimit : IsLimit (S.multifork G) :=
 
 end isSheaf_iff
 
-/-- Let `F : C₀ ⥤ C` be a dense subsite, and assume we have a family of structures
+/-- Let `F : C₀ ⥤ C` be a dense subsite, and assume we have a family
 `data : ∀ X, F.OneHypercoverDenseData J₀ J X`.
 This lemma shows that `G : Cᵒᵖ ⥤ A` is a sheaf iff `F.op F.op ⋙ G : C₀ᵒᵖ ⥤ A`
 is a sheaf and for any `X : C`, the multifork for `G` and the `1`-hypercover
@@ -397,7 +397,7 @@ namespace essSurj
 
 variable (G₀ : Sheaf J₀ A)
 
-/-- Given a dense subsite `F : C₀ ⥤ C` and a family of structures
+/-- Given a dense subsite `F : C₀ ⥤ C` and a family
 `data : ∀ X, OneHypercoverDenseData F J₀ J X` and a sheaf `G₀` on `J₀`,
 this is the value on an object `X : C` of the "extension" of `G₀`
 as a sheaf on `J` (see `OneHypercoverDenseData.essSurj.presheaf` and
@@ -435,18 +435,14 @@ lemma presheafObj_mapPreimage_condition
   refine Presheaf.IsSheaf.hom_ext G₀.cond ⟨_,
     J₀.intersection_covering (IsDenseSubsite.imageSieve_mem J₀ J F p₁)
       (IsDenseSubsite.imageSieve_mem J₀ J F p₂)⟩ _ _ ?_
-  rintro ⟨W₀, a, ⟨b₁, h₁⟩, ⟨b₂, h₂⟩⟩
+  intro ⟨W₀, a, ⟨b₁, h₁⟩, ⟨b₂, h₂⟩⟩
   refine Presheaf.IsSheaf.hom_ext G₀.cond
     ⟨_, (data X).mem₁₀ i₁ i₂ b₁ b₂ (by simp only [h₁, h₂, assoc, fac])⟩ _ _ ?_
-  rintro ⟨U₀, c, ⟨j, t, fac₁, fac₂⟩⟩
-  dsimp
-  simp only [assoc, ← Functor.map_comp, ← op_comp]
-  rw [IsDenseSubsite.mapPreimage_map_of_fac J F G₀ p₁ (c ≫ a) (c ≫ b₁)
-      (by rw [map_comp_assoc, ← h₁, map_comp]),
-    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ p₂ (c ≫ a) (c ≫ b₂)
-      (by rw [map_comp_assoc, ← h₂, map_comp]), fac₁, fac₂,
-    op_comp, op_comp, map_comp, map_comp]
-  apply presheafObj_condition_assoc
+  intro ⟨U₀, c, ⟨j, t, fac₁, fac₂⟩⟩
+  simp only [assoc, ← Functor.map_comp, ← op_comp,
+    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ p₁ (c ≫ a) (c ≫ b₁) (by simp [← h₁]),
+    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ p₂ (c ≫ a) (c ≫ b₂) (by simp [← h₂])]
+  simpa [fac₁, fac₂] using presheafObj_condition_assoc _ _ _ _ _ _ _
 
 /-- The (limit) multifork with point `presheafObjπ data G₀ X` for
 the diagram given by `G₀` and `data X`. -/
@@ -481,12 +477,12 @@ lemma res_eq_res {X : C} {X₀ Y₀ : C₀} {f : F.obj X₀ ⟶ X} {g : Y₀ ⟶
   dsimp [res]
   simp only [assoc, IsDenseSubsite.mapPreimage_comp_map]
   apply presheafObj_mapPreimage_condition
-  simp only [assoc, h₁.fac, h₂.fac]
+  simp
 
 end restriction
 
 /-- Let `F : C₀ ⥤ C` be a dense subsite and `data : ∀ X, F.OneHypercoverDenseData J₀ J X`
-be a family of structures. Let `G₀` be a sheaf on `C₀`. Let `f : F.obj X₀ ⟶ X`.
+be a family. Let `G₀` be a sheaf on `C₀`. Let `f : F.obj X₀ ⟶ X`.
 This is the canonical morphism
 `presheafObj data G₀ X ⟶ G₀.val.obj (op X₀)` (where `presheafObj data G₀ X`
 is the value on `X` of the extension to `C` of the sheaf `G₀`,
@@ -544,8 +540,7 @@ noncomputable def presheafMap {X Y : C} (f : X ⟶ Y) :
     dsimp at fac ⊢
     simp only [assoc, ← map_comp, ← op_comp]
     rw [restriction_map (p := p), restriction_map (p := p)]
-    · rw [fac, h₂, map_comp_assoc]
-    · rw [fac, h₁, map_comp_assoc])
+    all_goals simp_all)
 
 @[reassoc (attr := simp)]
 lemma presheafMap_π {X Y : C} (f : X ⟶ Y) (i : (data X).I₀) :
@@ -565,11 +560,9 @@ lemma presheafMap_restriction {X Y : C} {X₀ : C₀} (f : F.obj X₀ ⟶ X) (g 
   have hd' := Sieve.ofArrows.fac hd
   dsimp at hc hd hc' hd' ⊢
   rw [assoc, ← op_comp, restriction_map (i := Sieve.ofArrows.i hd)
-    (p := F.map c ≫ Sieve.ofArrows.h hd),
-    restriction_map (i := Sieve.ofArrows.i hc) (p := Sieve.ofArrows.h hc),
-    presheafMap_π_assoc]; rotate_left
-  · simp only [map_comp_assoc, hc', reassoc_of% hd']
-  · simp only [assoc, map_comp_assoc, hd']
+    (p := F.map c ≫ Sieve.ofArrows.h hd) (fac := by grind),
+    restriction_map (i := Sieve.ofArrows.i hc) (p := Sieve.ofArrows.h hc) (fac := by grind),
+    presheafMap_π_assoc]
   dsimp
   have := J₀.intersection_covering (IsDenseSubsite.imageSieve_mem J₀ J F (Sieve.ofArrows.h hc))
     (J₀.pullback_stable c (IsDenseSubsite.imageSieve_mem J₀ J F (Sieve.ofArrows.h hd)))
@@ -578,10 +571,8 @@ lemma presheafMap_restriction {X Y : C} {X₀ : C₀} (f : F.obj X₀ ⟶ X) (g 
   dsimp
   rw [assoc, assoc,
     IsDenseSubsite.mapPreimage_map_of_fac J F G₀ _ _ x₂ (by simpa using fac₂.symm),
-    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ _ _ x₁ fac₁.symm]
-  rw [restriction_map data G₀ _ _ (F.map x₁)
-    (by rw [fac₁, fac₂, assoc, assoc, map_comp_assoc, hc']),
-    IsDenseSubsite.mapPreimage_map]
+    IsDenseSubsite.mapPreimage_map_of_fac J F G₀ _ _ x₁ fac₁.symm,
+    restriction_map data G₀ _ _ (F.map x₁) (by grind), IsDenseSubsite.mapPreimage_map]
 
 lemma presheafMap_id (X : C) :
     presheafMap data G₀ (𝟙 X) = 𝟙 _ := by
@@ -598,8 +589,8 @@ lemma presheafMap_comp {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
   rw [assoc, presheafMap_π, presheafMap_π, presheafMap_restriction, assoc]
 
 /-- Let `F : C₀ ⥤ C` be a dense subsite and `data : ∀ X, F.OneHypercoverDenseData J₀ J X`
-be a family of structures. Let `G₀` be a sheaf on `C₀`. This is a presheaf on `C` which
-extends `G₀` (see `OneHypercoverDenseData.essSurj.compPresheafIso`) and is a sheaf
+be a family. Let `G₀` be a sheaf on `C₀`. This is a presheaf on `C` which
+extends `G₀` (see `OneHypercoverDenseData.essSurj.compPresheafIso`) and it is a sheaf
 (see `OneHypercoverDenseData.essSurj.isSheaf`). -/
 @[simps]
 noncomputable def presheaf : Cᵒᵖ ⥤ A where
