@@ -45,17 +45,15 @@ namespace ObjectProperty
 site `(C, J)`). We say that it is a conservative family of points
 if the corresponding fiber functors `Sheaf J (Type w) ⥤ Type w`
 jointly reflect isomorphisms. -/
-@[stacks 00YJ "(1)"]
-class IsConservativeFamilyOfPoints : Prop where
-  jointlyReflectIsomorphisms :
+@[stacks 00YK "(1)"]
+structure IsConservativeFamilyOfPoints : Prop where
+  jointlyReflectIsomorphisms_type :
     JointlyReflectIsomorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := Type w))
 
-end ObjectProperty
+namespace IsConservativeFamilyOfPoints
 
-namespace GrothendieckTopology.Point
-
-variable [P.IsConservativeFamilyOfPoints]
+variable {P} (hP : P.IsConservativeFamilyOfPoints)
   (A : Type u') [Category.{v'} A] [LocallySmall.{w} C]
   [HasColimitsOfSize.{w, w} A]
   {FC : A → A → Type*} {CC : A → Type w}
@@ -65,40 +63,41 @@ variable [P.IsConservativeFamilyOfPoints]
   [PreservesFilteredColimitsOfSize.{w, w} (forget A)]
   [hJ : J.HasSheafCompose (forget A)]
 
-include hJ
+include hP hJ
 
-@[stacks 00YJ "(1)"]
+@[stacks 00YK "(1)"]
 lemma jointlyReflectIsomorphisms :
     JointlyReflectIsomorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) where
   isIso {K L} f _ := by
     rw [← isIso_iff_of_reflects_iso _ (sheafCompose J (forget A)),
-      (ObjectProperty.IsConservativeFamilyOfPoints.jointlyReflectIsomorphisms
-        (P := P)).isIso_iff]
+      hP.jointlyReflectIsomorphisms_type.isIso_iff]
     exact fun Φ ↦ ((MorphismProperty.isomorphisms _).arrow_mk_iso_iff
       (((Functor.mapArrowFunctor _ _).mapIso
         (Φ.obj.sheafFiberCompIso (forget A))).app (Arrow.mk f))).2
           (inferInstanceAs (IsIso ((forget A).map (Φ.obj.sheafFiber.map f))))
 
-@[stacks 00YK "(1)"]
+@[stacks 00YL "(1)"]
 lemma jointlyReflectMonomorphisms [AB5OfSize.{w, w} A] [HasFiniteLimits A] :
     JointlyReflectMonomorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
-  (jointlyReflectIsomorphisms P A).jointlyReflectMonomorphisms
+  (hP.jointlyReflectIsomorphisms A).jointlyReflectMonomorphisms
 
-@[stacks 00YK "(2)"]
+@[stacks 00YL "(2)"]
 lemma jointlyReflectEpimorphisms
     [J.WEqualsLocallyBijective A] [HasSheafify J A] :
     JointlyReflectEpimorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
-  (jointlyReflectIsomorphisms P A).jointlyReflectEpimorphisms
+  (hP.jointlyReflectIsomorphisms A).jointlyReflectEpimorphisms
 
-@[stacks 00YK "(3)"]
+@[stacks 00YL "(3)"]
 lemma jointlyFaithful [AB5OfSize.{w, w} A] [HasFiniteLimits A] :
     JointlyFaithful
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
-  (jointlyReflectIsomorphisms P A).jointlyFaithful
+  (hP.jointlyReflectIsomorphisms A).jointlyFaithful
 
-end GrothendieckTopology.Point
+end IsConservativeFamilyOfPoints
+
+end ObjectProperty
 
 end CategoryTheory
