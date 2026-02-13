@@ -22,7 +22,7 @@ morphism `Spec R ⟶ S`.
 
 @[expose] public section
 
-universe u
+universe u v u'
 
 open CategoryTheory Opposite Limits MorphismProperty
 
@@ -82,6 +82,39 @@ instance isOneHypercoverDense_toOver_Spec
     rintro _ _ ⟨i⟩
     exact (Sieve.mem_ofArrows_iff ..).2 ⟨i, 𝟙 _, by cat_disch⟩)
 
+variable (S) in
+structure FinitelyPresentedOverAffineOpen : Type u where
+  U : Opens S
+  hU : IsAffineOpen U
+  g : ℕ
+  r : ℕ
+  rel (x : Fin r) : MvPolynomial (Fin g) Γ(S, U)
+
+namespace FinitelyPresentedOverAffineOpen
+
+variable (P : S.FinitelyPresentedOverAffineOpen)
+
+abbrev R : Type u :=
+  MvPolynomial (Fin P.g) Γ(S, P.U) ⧸ Ideal.span (Set.range P.rel)
+
+noncomputable abbrev scheme : Scheme.{u} := Spec (.of P.R)
+
+noncomputable def π : P.scheme ⟶ P.U :=
+  Spec.map (CommRingCat.ofHom (algebraMap _ _)) ≫ P.hU.isoSpec.inv
+
+noncomputable def a : P.scheme ⟶ S := P.π ≫ P.U.ι
+
+@[reassoc (attr := simp)]
+lemma fac : P.π ≫ P.U.ι = P.a := rfl
+
+lemma exists_subring
+    {A : CommRingCat.{u}} (f : Spec (.of A) ⟶ S) [LocallyOfFinitePresentation f] :
+    ∃ (n : ℕ) (P : Fin n → S.FinitelyPresentedOverAffineOpen)
+      (R₀ : Subring (∀ i, (P i).R)), Nonempty (A ≅ CommRingCat.of R₀) := by
+  sorry
+
+end FinitelyPresentedOverAffineOpen
+
 lemma essentiallySmall_costructuredArrow_Spec
     (P : MorphismProperty Scheme.{u}) (hP : P ≤ @LocallyOfFinitePresentation) [P.RespectsIso] :
     EssentiallySmall.{u} (P.CostructuredArrow ⊤ Scheme.Spec S) := by
@@ -98,7 +131,11 @@ lemma essentiallySmall_costructuredArrow_Spec
     refine ⟨_, ⟨i, Spec.map e.inv ≫ Z.hom, ⟨RespectsIso.precomp _ _ _ Z.prop⟩⟩, ⟨?_⟩⟩
     exact MorphismProperty.CostructuredArrow.isoMk e.op (by simp) (by simp)
       (by simp [← Spec.map_comp_assoc, e.inv_hom_id])
-  sorry
+  refine ⟨Σ (n : ℕ) (P : Fin n → S.FinitelyPresentedOverAffineOpen), Subring (∀ i, (P i).R),
+    fun ⟨n, P, R₀⟩ ↦ .of R₀, fun Z ↦ ?_⟩
+  have : LocallyOfFinitePresentation Z.hom := hP _ Z.prop
+  obtain ⟨n, P, R₀, ⟨e⟩⟩ := FinitelyPresentedOverAffineOpen.exists_subring Z.hom
+  exact ⟨⟨n, P, R₀⟩, ⟨e.symm⟩⟩
 
 variable {P : MorphismProperty Scheme.{u}} [IsZariskiLocalAtSource P]
 
@@ -171,6 +208,22 @@ instance : Functor.IsDenseSubsite (topology S) (S.smallEtaleTopology) (AffineEta
 instance : Functor.IsOneHypercoverDense.{u} (AffineEtale.Spec S)
     (topology S) (S.smallEtaleTopology) :=
   isOneHypercoverDense_toOver_Spec _
+
+instance : EssentiallySmall.{u} S.AffineEtale :=
+  essentiallySmall_costructuredArrow_Spec _ (fun _ _ _ _ ↦ inferInstance)
+
+section
+
+variable {A : Type u'} [Category.{u} A]
+  {FA : A → A → Type*} {CD : A → Type u}
+  [∀ X Y, FunLike (FA X Y) (CD X) (CD Y)] [ConcreteCategory.{u} A FA]
+  [PreservesLimits (CategoryTheory.forget A)] [HasColimits A] [HasLimits A]
+  [(CategoryTheory.forget A).ReflectsIsomorphisms]
+  [PreservesColimitsOfSize.{u, u} (CategoryTheory.forget A)]
+
+instance : HasSheafify (topology S) A := hasSheafifyEssentiallySmallSite.{u} _ _
+
+end
 
 /-- The category of sheafs on the small affine étale site is equivalent to the category of
 sheafs on the small étale site. -/
