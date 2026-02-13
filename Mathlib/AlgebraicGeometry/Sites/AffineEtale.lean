@@ -172,12 +172,17 @@ lemma exists_subring
         rw [← sub_eq_zero] at h ⊢
         exact this _ (by simpa)
     intro a ha
-    have (i : Fin n) : β i a = 0 := congr_fun ha i
+    replace ha (i : Fin n) : β i a = 0 := congr_fun ha i
     obtain ⟨a, rfl⟩ := (ΓSpecIso A).commRingCatIsoToRingEquiv.surjective a
     simp only [EmbeddingLike.map_eq_zero_iff]
-    apply (openCoverOfIsOpenCover _ (U ∘ α) (.mk (by aesop))).ext_elem
-    intro i
-    dsimp at i
+    refine (openCoverOfIsOpenCover _ (U ∘ α) (.mk (by aesop))).ext_elem _ _ (fun i ↦ ?_)
+    dsimp at i ⊢
+    replace ha := ha i
+    replace ha : (ΓSpecIso _).hom (((iso (α i)).inv ≫ (U (α i)).ι).appTop a) = 0 := by
+      simpa [← ha] using (ConcreteCategory.congr_hom (ΓSpecIso_naturality
+        (Spec.preimage ((iso (α i)).inv ≫ (U (α i)).ι))) a)
+    have : IsAffine (U (α i)) := IsAffine.of_isIso (iso (α i)).hom
+    simp only [map_zero]
     sorry
   exact ⟨n, P ∘ α, RingHom.range φ, ⟨RingEquiv.toCommRingCatIso
     (RingEquiv.ofBijective φ.rangeRestrict
