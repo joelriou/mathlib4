@@ -42,67 +42,72 @@ namespace CategoryTheory
 open Limits Opposite
 
 variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
-  (P : ObjectProperty (GrothendieckTopology.Point.{w} J))
+  {P : ObjectProperty (GrothendieckTopology.Point.{w} J)}
 
 namespace ObjectProperty
 
+variable (P) in
 /-- Let `P : ObjectProperty J.Point` a family of points of a
 site `(C, J)`). We say that it is a conservative family of points
 if the corresponding fiber functors `Sheaf J (Type w) ⥤ Type w`
 jointly reflect isomorphisms. -/
-@[stacks 00YJ "(1)"]
-class IsConservativeFamilyOfPoints : Prop where
-  jointlyReflectIsomorphisms :
+@[stacks 00YK "(1)"]
+structure IsConservativeFamilyOfPoints : Prop where
+  jointlyReflectIsomorphisms_type :
     JointlyReflectIsomorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := Type w))
 
-end ObjectProperty
+namespace IsConservativeFamilyOfPoints
 
-namespace GrothendieckTopology.Point
+variable [LocallySmall.{w} C]
 
-variable [P.IsConservativeFamilyOfPoints]
-  (A : Type u') [Category.{v'} A] [LocallySmall.{w} C]
+section
+
+variable
+  (hP : P.IsConservativeFamilyOfPoints)
+  (A : Type u') [Category.{v'} A]
   [HasColimitsOfSize.{w, w} A]
   {FC : A → A → Type*} {CC : A → Type w}
   [∀ (X Y : A), FunLike (FC X Y) (CC X) (CC Y)]
   [ConcreteCategory.{w} A FC]
   [PreservesFilteredColimitsOfSize.{w, w} (forget A)]
 
-@[stacks 00YJ "(1)"]
-lemma jointlyReflectIsomorphisms
-    [J.HasSheafCompose (forget A)] [(forget A).ReflectsIsomorphisms] :
+include hP
+
+@[stacks 00YK "(1)"]
+lemma jointlyReflectIsomorphisms [(forget A).ReflectsIsomorphisms]
+    [J.HasSheafCompose (forget A)] :
     JointlyReflectIsomorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) where
   isIso {K L} f _ := by
     rw [← isIso_iff_of_reflects_iso _ (sheafCompose J (forget A)),
-      (ObjectProperty.IsConservativeFamilyOfPoints.jointlyReflectIsomorphisms
-        (P := P)).isIso_iff]
+      hP.jointlyReflectIsomorphisms_type.isIso_iff]
     exact fun Φ ↦ ((MorphismProperty.isomorphisms _).arrow_mk_iso_iff
       (((Functor.mapArrowFunctor _ _).mapIso
         (Φ.obj.sheafFiberCompIso (forget A))).app (Arrow.mk f))).2
           (inferInstanceAs (IsIso ((forget A).map (Φ.obj.sheafFiber.map f))))
 
-@[stacks 00YK "(1)"]
+@[stacks 00YL "(1)"]
 lemma jointlyReflectMonomorphisms [AB5OfSize.{w, w} A] [HasFiniteLimits A]
-    [J.HasSheafCompose (forget A)] [(forget A).ReflectsIsomorphisms] :
+    [(forget A).ReflectsIsomorphisms] [J.HasSheafCompose (forget A)] :
     JointlyReflectMonomorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
-  (jointlyReflectIsomorphisms P A).jointlyReflectMonomorphisms
+  (hP.jointlyReflectIsomorphisms A).jointlyReflectMonomorphisms
 
-@[stacks 00YK "(2)"]
+@[stacks 00YL "(2)"]
 lemma jointlyReflectEpimorphisms
     [J.WEqualsLocallyBijective A] [HasSheafify J A]
-    [J.HasSheafCompose (forget A)] [(forget A).ReflectsIsomorphisms] :
+    [(forget A).ReflectsIsomorphisms] [J.HasSheafCompose (forget A)] :
     JointlyReflectEpimorphisms
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
-  (jointlyReflectIsomorphisms P A).jointlyReflectEpimorphisms
+  (hP.jointlyReflectIsomorphisms A).jointlyReflectEpimorphisms
 
-@[stacks 00YK "(3)"]
+@[stacks 00YL "(3)"]
 lemma jointlyFaithful [AB5OfSize.{w, w} A] [HasFiniteLimits A]
-    [J.HasSheafCompose (forget A)] [(forget A).ReflectsIsomorphisms] :
+    [(forget A).ReflectsIsomorphisms] [J.HasSheafCompose (forget A)] :
     JointlyFaithful
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
-  (jointlyReflectIsomorphisms P A).jointlyFaithful
+  (hP.jointlyReflectIsomorphisms A).jointlyFaithful
 
 variable {A} in
 lemma jointly_reflect_isLocallySurjective
@@ -115,27 +120,27 @@ lemma jointly_reflect_isLocallySurjective
   rw [Presheaf.isLocallySurjective_iff_whisker_forget,
     ← Presheaf.isLocallySurjective_presheafToSheaf_map_iff,
     Sheaf.isLocallySurjective_iff_epi,
-    (jointlyReflectEpimorphisms P (Type w)).epi_iff]
+    (hP.jointlyReflectEpimorphisms (Type w)).epi_iff]
   exact fun Φ ↦ ((MorphismProperty.epimorphisms (Type w)).arrow_mk_iso_iff
     (((Functor.mapArrowFunctor _ _).mapIso
       ((Φ.obj.presheafFiberCompIso (forget A)).symm ≪≫
         Functor.isoWhiskerLeft _ (Φ.obj.presheafToSheafCompSheafFiber (Type w)).symm)).app
           (Arrow.mk f))).1 (hf Φ)
 
-section
+end
 
-variable [HasSheafify J (Type w)] [J.WEqualsLocallyBijective (Type w)]
-  {X : C} {ι : Type*} [Small.{w} ι] {U : ι → C} (f : ∀ i, U i ⟶ X)
-
-lemma jointly_reflect_ofArrows_mem :
+lemma jointly_reflect_ofArrows_mem
+    [HasSheafify J (Type w)] [J.WEqualsLocallyBijective (Type w)]
+    (hP : P.IsConservativeFamilyOfPoints)
+    {X : C} {ι : Type*} [Small.{w} ι] {U : ι → C} (f : ∀ i, U i ⟶ X) :
     Sieve.ofArrows _ f ∈ J X ↔
       ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
         ∃ (i : ι) (y : Φ.obj.fiber.obj (U i)), Φ.obj.fiber.map (f i) y = x := by
   refine ⟨fun hf Φ x ↦ ?_, fun hf ↦ ?_⟩
   · obtain ⟨Z, _, ⟨_, p, _, ⟨i⟩, rfl⟩, z, rfl⟩ := Φ.obj.jointly_surjective _ hf x
     exact ⟨i, Φ.obj.fiber.map p z, by simp⟩
-  · rw [ofArrows_mem_iff_isLocallySurjective]
-    refine jointly_reflect_isLocallySurjective P _ (fun Φ x ↦ ?_)
+  · rw [J.ofArrows_mem_iff_isLocallySurjective]
+    refine hP.jointly_reflect_isLocallySurjective _ (fun Φ x ↦ ?_)
     obtain ⟨x, rfl⟩ := (Φ.obj.shrinkYonedaCompPresheafFiberIso.app X).toEquiv.symm.surjective x
     obtain ⟨i, y, rfl⟩ := hf Φ x
     refine ⟨Φ.obj.presheafFiber.map (Sigma.ι (fun i ↦ shrinkYoneda.{w}.obj (U i)) i)
@@ -144,14 +149,6 @@ lemma jointly_reflect_ofArrows_mem :
     dsimp at this ⊢
     rw [this, ← Sigma.ι_desc (fun i ↦ shrinkYoneda.{w}.map (f i)) i, Functor.map_comp]
     rfl
-
-end
-
-end GrothendieckTopology.Point
-
-namespace ObjectProperty.IsConservativeFamilyOfPoints
-
-variable {P} [LocallySmall.{w} C]
 
 private lemma mk'.isLocallySurjective
     (hP : ∀ ⦃X : C⦄ (S : Sieve X) (_ : ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
@@ -214,7 +211,7 @@ lemma mk' [HasSheafify J (Type w)]
       ∃ (Y : C) (g : Y ⟶ X) (_ : S g) (y : Φ.obj.fiber.obj Y), Φ.obj.fiber.map g y = x),
         S ∈ J X) :
     P.IsConservativeFamilyOfPoints where
-  jointlyReflectIsomorphisms :=
+  jointlyReflectIsomorphisms_type :=
     JointlyFaithful.jointlyReflectsIsomorphisms
       (JointlyFaithful.of_jointly_reflects_isIso_of_mono (fun F₁ F₂ f _ hf ↦ by
         have : Epi f := by
