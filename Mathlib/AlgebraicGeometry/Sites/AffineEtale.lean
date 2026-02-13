@@ -82,6 +82,24 @@ instance isOneHypercoverDense_toOver_Spec
     rintro _ _ ⟨i⟩
     exact (Sieve.mem_ofArrows_iff ..).2 ⟨i, 𝟙 _, by cat_disch⟩)
 
+lemma essentiallySmall_costructuredArrow_Spec
+    (P : MorphismProperty Scheme.{u}) (hP : P ≤ @LocallyOfFinitePresentation) [P.RespectsIso] :
+    EssentiallySmall.{u} (P.CostructuredArrow ⊤ Scheme.Spec S) := by
+  suffices ∃ (ι : Type u) (R : ι → CommRingCat.{u}),
+      ∀ (Z : P.CostructuredArrow ⊤ Scheme.Spec S),
+        ∃ (i : ι), Nonempty (R i ≅ Z.left.unop) by
+    rw [essentiallySmall_iff_objectPropertyEssentiallySmall_top]
+    obtain ⟨ι, R, hR⟩ := this
+    let P₀ : ObjectProperty (P.CostructuredArrow ⊤ Scheme.Spec S) :=
+      .ofObj (fun (t : Σ (i : ι) (f : Scheme.Spec.obj (Opposite.op (R i)) ⟶ S), PLift (P f)) ↦
+        .mk (A := op (R t.1)) _ t.2.1 t.2.2.down)
+    refine ObjectProperty.EssentiallySmall.of_le (Q := P₀.isoClosure) (fun Z _ ↦ ?_)
+    obtain ⟨i, ⟨e⟩⟩ := hR Z
+    refine ⟨_, ⟨i, Spec.map e.inv ≫ Z.hom, ⟨RespectsIso.precomp _ _ _ Z.prop⟩⟩, ⟨?_⟩⟩
+    exact MorphismProperty.CostructuredArrow.isoMk e.op (by simp) (by simp)
+      (by simp [← Spec.map_comp_assoc, e.inv_hom_id])
+  sorry
+
 variable {P : MorphismProperty Scheme.{u}} [IsZariskiLocalAtSource P]
 
 instance IsZariskiLocalAtSource.isClosedUnderColimitsOfShape_discrete

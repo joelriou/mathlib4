@@ -159,15 +159,6 @@ instance : (Etale.forget X).Full :=
 instance : (Etale.forget X).Faithful :=
   inferInstanceAs <| (MorphismProperty.Comma.forget _ _ _ _ _).Faithful
 
-variable {X} in
-abbrev Etale.mk {Y : Scheme.{u}} (f : Y ⟶ X) [Etale f] : X.Etale :=
-  MorphismProperty.Over.mk _ f inferInstance
-
-variable {X} in
-@[simp]
-lemma Etale.forget_mk {Y : Scheme.{u}} (f : Y ⟶ X) [Etale f] :
-    (Etale.forget X).obj (.mk f) = Over.mk f := rfl
-
 instance : HasPullbacks X.Etale := by
   unfold Scheme.Etale
   infer_instance
