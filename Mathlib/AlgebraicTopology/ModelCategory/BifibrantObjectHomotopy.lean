@@ -5,8 +5,8 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.AlgebraicTopology.ModelCategory.DerivabilityStructureCofibrant
-public import Mathlib.AlgebraicTopology.ModelCategory.DerivabilityStructureFibrant
+public import Mathlib.AlgebraicTopology.ModelCategory.CofibrantObjectHomotopy
+public import Mathlib.AlgebraicTopology.ModelCategory.FibrantObjectHomotopy
 public import Mathlib.CategoryTheory.Localization.CalculusOfFractions.OfAdjunction
 public import Mathlib.CategoryTheory.Quotient.LocallySmall
 
@@ -325,8 +325,7 @@ lemma bifibrantResolutionObj_hom_ext
     ← RightHomotopyClass.mk_eq_mk_iff]
   apply (RightHomotopyClass.precomp_bijective_of_cofibration_of_weakEquivalence
     _ (iBifibrantResolutionObj X).hom).1
-  simpa only [ObjectProperty.ι_obj, ObjectProperty.ιOfLE_obj_obj, ObjectProperty.ι_map,
-    RightHomotopyClass.precomp_mk] using h
+  simpa using h
 
 /-- The bifibrant resolution functor from the category of cofibrant objects
 to the homotopy category of bifibrant objects. -/
@@ -404,7 +403,7 @@ instance (X : BifibrantObject.HoCat C) : IsIso (HoCat.adjCounit'.app X) := by
 
 instance : IsIso (HoCat.adjCounit' (C := C)) := NatIso.isIso_of_isIso_app _
 
-/-- Auxiliary definition for `CofibrantObject.π.adj`. -/
+/-- Auxiliary definition for `CofibrantObject.HoCat.adj`. -/
 noncomputable def HoCat.adjCounitIso :
     BifibrantObject.HoCat.ιCofibrantObject ⋙ bifibrantResolution ≅ 𝟭 (BifibrantObject.HoCat C) :=
   (asIso HoCat.adjCounit').symm
