@@ -99,8 +99,9 @@ noncomputable def pointsBot :
     ObjectProperty (Point.{w} (⊥ : GrothendieckTopology C)) :=
   .ofObj pointBot
 
-instance : (pointsBot.{w} C).IsConservativeFamilyOfPoints :=
-  ObjectProperty.IsConservativeFamilyOfPoints.mk'.{w} (fun X S hS ↦ by
+lemma isConservative_pointsBot :
+    (pointsBot.{w} C).IsConservativeFamilyOfPoints :=
+  .mk' (fun X S hS ↦ by
     obtain ⟨Y, a, ha, b, hb⟩ := hS ⟨_, ⟨X⟩⟩ (shrinkYonedaObjObjEquiv.symm (𝟙 X))
     obtain ⟨b, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective b
     dsimp at b hb
