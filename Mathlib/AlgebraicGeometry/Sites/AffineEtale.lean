@@ -62,6 +62,26 @@ instance isCoverDense_toOver_Spec (P : MorphismProperty Scheme.{u}) [P.IsMultipl
       · ext
         simp
 
+instance isOneHypercoverDense_toOver_Spec
+    (P : MorphismProperty Scheme.{u}) [P.IsMultiplicative]
+    [IsZariskiLocalAtSource P] [P.IsStableUnderBaseChange] [P.HasOfPostcompProperty P] :
+    Functor.IsOneHypercoverDense.{u} (CostructuredArrow.toOver P Scheme.Spec S)
+    ((CostructuredArrow.toOver P Scheme.Spec S).inducedTopology (smallGrothendieckTopology P))
+    (smallGrothendieckTopology P) :=
+  Functor.IsOneHypercoverDense.of_hasPullbacks (fun X ↦ by
+    let 𝒰 := affineOpenCover X.left
+    refine ⟨𝒰.I₀, fun i ↦ affineOverMk (𝒰.f i ≫ X.hom)
+      (P.comp_mem _ _ (IsZariskiLocalAtSource.of_isOpenImmersion (𝒰.f i)) X.prop),
+      fun i ↦ CostructuredArrow.homMk (𝒰.f i) (by simp), ?_⟩
+    rw [Scheme.mem_smallGrothendieckTopology]
+    let 𝒱 : Cover (precoverage P) X.left :=
+      𝒰.openCover.changeProp (fun _ ↦ IsZariskiLocalAtSource.of_isOpenImmersion _)
+    let _ (i : 𝒱.I₀) : (𝒱.X i).Over S := ⟨𝒰.f i ≫ X.hom⟩
+    let : Cover.Over S 𝒱 := { isOver_map _ := by cat_disch }
+    refine ⟨𝒱, inferInstance, fun i ↦ P.comp_mem _ _ (𝒱.map_prop i) X.prop, ?_⟩
+    rintro _ _ ⟨i⟩
+    exact (Sieve.mem_ofArrows_iff ..).2 ⟨i, 𝟙 _, by cat_disch⟩)
+
 variable {P : MorphismProperty Scheme.{u}} [IsZariskiLocalAtSource P]
 
 instance IsZariskiLocalAtSource.isClosedUnderColimitsOfShape_discrete
@@ -132,28 +152,7 @@ instance : Functor.IsDenseSubsite (topology S) (S.smallEtaleTopology) (AffineEta
 
 instance : Functor.IsOneHypercoverDense.{u} (AffineEtale.Spec S)
     (topology S) (S.smallEtaleTopology) :=
-  Functor.IsOneHypercoverDense.of_hasPullbacks (fun X ↦ by
-    let 𝒰 := affineOpenCover X.left
-    refine ⟨𝒰.I₀, fun i ↦ .mk (𝒰.f i ≫ X.hom),
-      fun i ↦ MorphismProperty.CostructuredArrow.homMk (𝒰.f i) (by simp),
-         zariskiTopology_le_etaleTopology _ ?_⟩
-    rw [mem_grothendieckTopology_iff]
-    refine ⟨{
-      I₀ := 𝒰.I₀
-      X i := Spec (𝒰.X i)
-      f := 𝒰.f
-      mem₀ := by
-        refine ⟨?_, ?_⟩
-        · simp only [Comma.forget_obj, Precoverage.mem_comap_iff, forget_obj,
-            Presieve.map_ofArrows, forget_map, Types.ofArrows_mem_jointlySurjectivePrecoverage_iff]
-          exact fun _ ↦ ⟨_, 𝒰.covers _⟩
-        · simp only [Comma.forget_obj, ofArrows_mem_precoverage]
-          infer_instance
-        }, ?_⟩
-    rintro _ _ ⟨i⟩
-    exact ⟨Over.mk (𝒰.f i ≫ X.hom), Over.homMk (𝒰.f i), 𝟙 _,
-      ⟨Etale.mk (𝒰.f i ≫ X.hom), Over.homMk (𝒰.f i), 𝟙 _,
-      ⟨_, 𝟙 _, _, ⟨i⟩, by cat_disch⟩, by simp⟩, by simp⟩)
+  isOneHypercoverDense_toOver_Spec _
 
 /-- The category of sheafs on the small affine étale site is equivalent to the category of
 sheafs on the small étale site. -/
