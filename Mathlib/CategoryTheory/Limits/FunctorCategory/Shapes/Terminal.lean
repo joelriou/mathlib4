@@ -22,7 +22,7 @@ namespace CategoryTheory.Functor
 
 open Limits
 
-variable {C D : Type*} [Category* C] [Category D]
+variable {C D : Type*} [Category* C] [Category* D]
 
 /-- If `F : C ⥤ D` is such that `F.obj X` is terminal for any `X : C`,
 then `F` is a terminal object. -/
