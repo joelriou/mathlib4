@@ -179,7 +179,6 @@ lemma exists_subring
     simp only [EmbeddingLike.map_eq_zero_iff]
     refine (openCoverOfIsOpenCover _ (U ∘ α) (.mk (by aesop))).ext_elem _ _ (fun i ↦ ?_)
     dsimp at i ⊢
-    have : IsAffine (U (α i)) := IsAffine.of_isIso (iso (α i)).hom
     replace ha : (ΓSpecIso _).hom (((iso (α i)).inv ≫ (U (α i)).ι).appTop a) = 0 := by
       simpa [← ha] using (ConcreteCategory.congr_hom (ΓSpecIso_naturality
         (Spec.preimage ((iso (α i)).inv ≫ (U (α i)).ι))) a)
