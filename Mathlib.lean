@@ -1267,6 +1267,7 @@ public import Mathlib.Algebra.WithConv
 public import Mathlib.AlgebraicGeometry.AffineScheme
 public import Mathlib.AlgebraicGeometry.AffineSpace
 public import Mathlib.AlgebraicGeometry.AffineTransitionLimit
+public import Mathlib.AlgebraicGeometry.AlgClosed.Basic
 public import Mathlib.AlgebraicGeometry.Artinian
 public import Mathlib.AlgebraicGeometry.ColimitsOver
 public import Mathlib.AlgebraicGeometry.Cover.Directed
@@ -1297,6 +1298,7 @@ public import Mathlib.AlgebraicGeometry.FunctionField
 public import Mathlib.AlgebraicGeometry.GammaSpecAdjunction
 public import Mathlib.AlgebraicGeometry.Gluing
 public import Mathlib.AlgebraicGeometry.GluingOneHypercover
+public import Mathlib.AlgebraicGeometry.Group.Smooth
 public import Mathlib.AlgebraicGeometry.IdealSheaf.Basic
 public import Mathlib.AlgebraicGeometry.IdealSheaf.Functorial
 public import Mathlib.AlgebraicGeometry.IdealSheaf.Subscheme
@@ -2012,6 +2014,7 @@ public import Mathlib.Analysis.Normed.Module.Basic
 public import Mathlib.Analysis.Normed.Module.Complemented
 public import Mathlib.Analysis.Normed.Module.Completion
 public import Mathlib.Analysis.Normed.Module.Connected
+public import Mathlib.Analysis.Normed.Module.ContinuousInverse
 public import Mathlib.Analysis.Normed.Module.Convex
 public import Mathlib.Analysis.Normed.Module.Dual
 public import Mathlib.Analysis.Normed.Module.ENormedSpace
@@ -2121,6 +2124,7 @@ public import Mathlib.Analysis.PSeriesComplex
 public import Mathlib.Analysis.Polynomial.Basic
 public import Mathlib.Analysis.Polynomial.CauchyBound
 public import Mathlib.Analysis.Polynomial.Factorization
+public import Mathlib.Analysis.Polynomial.Fourier
 public import Mathlib.Analysis.Polynomial.MahlerMeasure
 public import Mathlib.Analysis.Polynomial.Norm
 public import Mathlib.Analysis.Quaternion
@@ -2623,6 +2627,7 @@ public import Mathlib.CategoryTheory.Limits.Constructions.Over.Connected
 public import Mathlib.CategoryTheory.Limits.Constructions.Over.Products
 public import Mathlib.CategoryTheory.Limits.Constructions.Pullbacks
 public import Mathlib.CategoryTheory.Limits.Constructions.WeaklyInitial
+public import Mathlib.CategoryTheory.Limits.Constructions.WidePullbackOfTerminal
 public import Mathlib.CategoryTheory.Limits.Constructions.ZeroObjects
 public import Mathlib.CategoryTheory.Limits.Creates
 public import Mathlib.CategoryTheory.Limits.Elements
@@ -3142,6 +3147,7 @@ public import Mathlib.CategoryTheory.Sites.Plus
 public import Mathlib.CategoryTheory.Sites.Point.Basic
 public import Mathlib.CategoryTheory.Sites.Point.Category
 public import Mathlib.CategoryTheory.Sites.Point.Conservative
+public import Mathlib.CategoryTheory.Sites.Point.Over
 public import Mathlib.CategoryTheory.Sites.Precoverage
 public import Mathlib.CategoryTheory.Sites.PrecoverageToGrothendieck
 public import Mathlib.CategoryTheory.Sites.Preserves
@@ -3153,6 +3159,7 @@ public import Mathlib.CategoryTheory.Sites.Pullback
 public import Mathlib.CategoryTheory.Sites.RegularEpi
 public import Mathlib.CategoryTheory.Sites.Sheaf
 public import Mathlib.CategoryTheory.Sites.SheafCohomology.Basic
+public import Mathlib.CategoryTheory.Sites.SheafCohomology.MayerVietoris
 public import Mathlib.CategoryTheory.Sites.SheafHom
 public import Mathlib.CategoryTheory.Sites.SheafOfTypes
 public import Mathlib.CategoryTheory.Sites.Sheafification
@@ -4072,6 +4079,7 @@ public import Mathlib.Data.Set.Pairwise.Lattice
 public import Mathlib.Data.Set.Pairwise.List
 public import Mathlib.Data.Set.Piecewise
 public import Mathlib.Data.Set.Pointwise.Support
+public import Mathlib.Data.Set.PowersetCard
 public import Mathlib.Data.Set.Prod
 public import Mathlib.Data.Set.Restrict
 public import Mathlib.Data.Set.SMulAntidiagonal
@@ -4886,11 +4894,13 @@ public import Mathlib.LinearAlgebra.TensorPower.Symmetric
 public import Mathlib.LinearAlgebra.TensorProduct.Associator
 public import Mathlib.LinearAlgebra.TensorProduct.Basic
 public import Mathlib.LinearAlgebra.TensorProduct.Basis
+public import Mathlib.LinearAlgebra.TensorProduct.Defs
 public import Mathlib.LinearAlgebra.TensorProduct.DirectLimit
 public import Mathlib.LinearAlgebra.TensorProduct.Finiteness
 public import Mathlib.LinearAlgebra.TensorProduct.Free
 public import Mathlib.LinearAlgebra.TensorProduct.Graded.External
 public import Mathlib.LinearAlgebra.TensorProduct.Graded.Internal
+public import Mathlib.LinearAlgebra.TensorProduct.Map
 public import Mathlib.LinearAlgebra.TensorProduct.Matrix
 public import Mathlib.LinearAlgebra.TensorProduct.Opposite
 public import Mathlib.LinearAlgebra.TensorProduct.Pi
@@ -5567,6 +5577,7 @@ public import Mathlib.Order.ConditionallyCompleteLattice.Defs
 public import Mathlib.Order.ConditionallyCompleteLattice.Finset
 public import Mathlib.Order.ConditionallyCompleteLattice.Group
 public import Mathlib.Order.ConditionallyCompleteLattice.Indexed
+public import Mathlib.Order.ConditionallyCompletePartialOrder.Defs
 public import Mathlib.Order.Copy
 public import Mathlib.Order.CountableDenseLinearOrder
 public import Mathlib.Order.Cover
@@ -5656,6 +5667,7 @@ public import Mathlib.Order.Hom.CompleteLattice
 public import Mathlib.Order.Hom.Lattice
 public import Mathlib.Order.Hom.Lex
 public import Mathlib.Order.Hom.Order
+public import Mathlib.Order.Hom.PowersetCard
 public import Mathlib.Order.Hom.Set
 public import Mathlib.Order.Hom.WithTopBot
 public import Mathlib.Order.Ideal
@@ -6699,6 +6711,7 @@ public import Mathlib.Tactic.Clear_
 public import Mathlib.Tactic.Coe
 public import Mathlib.Tactic.Common
 public import Mathlib.Tactic.ComputeAsymptotics.Lemmas
+public import Mathlib.Tactic.ComputeAsymptotics.Multiseries.Basis
 public import Mathlib.Tactic.ComputeAsymptotics.Multiseries.Corecursion
 public import Mathlib.Tactic.ComputeAsymptotics.Multiseries.Majorized
 public import Mathlib.Tactic.ComputeDegree
@@ -7475,6 +7488,7 @@ public import Mathlib.Topology.Order.ProjIcc
 public import Mathlib.Topology.Order.Real
 public import Mathlib.Topology.Order.Rolle
 public import Mathlib.Topology.Order.ScottTopology
+public import Mathlib.Topology.Order.SuccPred
 public import Mathlib.Topology.Order.T5
 public import Mathlib.Topology.Order.UpperLowerSetTopology
 public import Mathlib.Topology.Order.WithTop
