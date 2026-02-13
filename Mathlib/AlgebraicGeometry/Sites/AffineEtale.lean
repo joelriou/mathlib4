@@ -110,6 +110,24 @@ lemma fac : P.π ≫ P.U.ι = P.a := rfl
 lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] (x : X) :
     ∃ (U : Opens X) (hU : x ∈ U) (P : S.FinitelyPresentedOverAffineOpen),
       Nonempty (U.toScheme ≅ P.scheme) := by
+  obtain ⟨U, V, hx, hUV⟩ :
+      ∃ (U : X.affineOpens) (V : S.affineOpens), x ∈ U.val ∧ U ≤ f.base ⁻¹' V := by
+    obtain ⟨U, h₁, h₂, _⟩ := exists_isAffineOpen_mem_and_subset (x := f.base x) (U := ⊤) (by simp)
+    obtain ⟨V, h₃, h₄, h₅⟩ := exists_isAffineOpen_mem_and_subset (x := x)
+      (U := ⟨_, IsOpen.preimage f.continuous U.2⟩) (by simpa)
+    exact ⟨⟨V, h₃⟩, ⟨U, h₁⟩, h₄, h₅⟩
+  letI := (f.appLE V U hUV).hom.toAlgebra
+  obtain ⟨n, φ, h₁, h₂⟩ := (LocallyOfFinitePresentation.finitePresentation_appLE f V.prop U.prop hUV).out
+  obtain ⟨r, ρ, hρ⟩ : ∃ (r : ℕ) (γ : Fin r → MvPolynomial (Fin n) Γ(S, V)),
+      RingHom.ker φ.toRingHom = Ideal.span (Set.range γ) := by
+    obtain ⟨s, hs⟩ := h₂
+    exact ⟨s.card, Subtype.val ∘  s.equivFin.symm, by rw [← hs]; simp⟩
+  refine ⟨U, hx,
+    { U := V.1
+      hU := V.prop
+      g := n
+      r := r
+      rel := ρ }, ⟨?_⟩⟩
   sorry
 
 lemma exists_subring
