@@ -11,6 +11,14 @@ public import Mathlib.Topology.Sheaves.Sheaf
 /-!
 # The standard conservative families of points for the site attached to a topological space
 
+If `X` is a topological space, any `x : X` defined a point of the site
+attached to `X`.
+
+## TODO
+
+* Redefine the stalks functors in `Mathlib/Topology/Sheaves/Stalks.lean`
+using `GrothendieckTopology.Point.presheafFiber`.
+
 -/
 
 @[expose] public section
@@ -47,7 +55,8 @@ points on the site `(Opens X, Opens.grothendieckTopology X)`. -/
 def pointsGrothendieckTopology : ObjectProperty (Point.{u} (grothendieckTopology X)) :=
   ObjectProperty.ofObj pointGrothendieckTopology
 
-instance : (pointsGrothendieckTopology X).IsConservativeFamilyOfPoints :=
+lemma isConservative_pointsGrothendieckTopology :
+    (pointsGrothendieckTopology X).IsConservativeFamilyOfPoints :=
   .mk' (fun U S hS x hx ↦ by
     obtain ⟨V, f, hf, ⟨⟨hV⟩⟩, _⟩ := hS ⟨_, ⟨x⟩⟩ ⟨⟨hx⟩⟩
     exact ⟨V, f, hf, hV⟩)
