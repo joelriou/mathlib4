@@ -195,7 +195,7 @@ variable (X : T)
 
 noncomputable instance [P.ContainsIdentities] [P.RespectsIso] :
     CreatesLimitsOfShape (Discrete PEmpty.{1}) (Over.forget P ⊤ X) := by
-  apply (config := { allowSynthFailures := true }) forgetCreatesLimitsOfShapeOfClosed
+  apply +allowSynthFailures forgetCreatesLimitsOfShapeOfClosed
   · exact inferInstanceAs (HasLimitsOfShape _ (Over X))
   · apply Over.closedUnderLimitsOfShape_discrete_empty _
 

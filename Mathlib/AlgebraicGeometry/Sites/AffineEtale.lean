@@ -89,13 +89,13 @@ end
 /-- The small affine étale site: The category of affine schemes étale over `S`, whose objects are
 commutative rings `R` with an étale structure morphism `Spec R ⟶ S`. -/
 def AffineEtale (S : Scheme.{u}) : Type (u + 1) :=
-  MorphismProperty.CostructuredArrow @IsEtale.{u} ⊤ Scheme.Spec.{u} S
+  MorphismProperty.CostructuredArrow @Etale.{u} ⊤ Scheme.Spec.{u} S
 
 namespace AffineEtale
 
 /-- Construct an object of the small affine étale site. -/
 @[simps!]
-protected def mk {R : CommRingCat.{u}} (f : Spec R ⟶ S) [IsEtale f] : AffineEtale S :=
+protected def mk {R : CommRingCat.{u}} (f : Spec R ⟶ S) [Etale f] : AffineEtale S :=
   MorphismProperty.CostructuredArrow.mk ⊤ f ‹_›
 
 instance : Category S.AffineEtale :=
