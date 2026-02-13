@@ -107,11 +107,42 @@ noncomputable def a : P.scheme ⟶ S := P.π ≫ P.U.ι
 @[reassoc (attr := simp)]
 lemma fac : P.π ≫ P.U.ι = P.a := rfl
 
+lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] (x : X) :
+    ∃ (U : Opens X) (hU : x ∈ U) (P : S.FinitelyPresentedOverAffineOpen),
+      Nonempty (U.toScheme ≅ P.scheme) := by
+  sorry
+
 lemma exists_subring
     {A : CommRingCat.{u}} (f : Spec (.of A) ⟶ S) [LocallyOfFinitePresentation f] :
     ∃ (n : ℕ) (P : Fin n → S.FinitelyPresentedOverAffineOpen)
       (R₀ : Subring (∀ i, (P i).R)), Nonempty (A ≅ CommRingCat.of R₀) := by
-  sorry
+  choose U hU P e using exists_nhd f
+  let iso (x) := (e x).some
+  obtain ⟨n, α, hα⟩ : ∃ (n : ℕ) (α : Fin n → Spec (.of A)),
+    ⋃ (i : Fin n), (U (α i) : Set (Spec (.of A))) = Set.univ := by
+      obtain ⟨s, hs⟩ := CompactSpace.isCompact_univ.elim_finite_subcover _
+        (fun x ↦ (U x).isOpen) (fun x _ ↦ Set.mem_iUnion_of_mem x (hU x))
+      refine ⟨s.card, Subtype.val ∘ (Finset.equivFin s).symm,
+        subset_antisymm (by simp) (hs.trans ?_)⟩
+      simp only [Function.comp_apply, Set.iUnion_subset_iff]
+      exact fun i hi _ _ ↦ Set.mem_iUnion_of_mem ((Finset.equivFin s) ⟨i, hi⟩) (by simpa)
+  let β (i : Fin n) : A →+* ((P ∘ α) i).R := (Spec.preimage ((iso (α i)).inv ≫ (U (α i)).ι)).hom
+  let φ : A →+* ∀ i, ((P ∘ α) i).R :=
+    { toFun a i := β i a
+      map_zero' := by ext; simp
+      map_add' _ _ := by ext; simp
+      map_one' := by ext; simp
+      map_mul' _ _ := by ext; simp }
+  have hφ : Function.Injective φ := by
+    suffices ∀ a, φ a = 0 → a = 0 from
+      fun a b h ↦ by
+        rw [← sub_eq_zero] at h ⊢
+        exact this _ (by simpa)
+    sorry
+  exact ⟨n, P ∘ α, RingHom.range φ, ⟨RingEquiv.toCommRingCatIso
+    (RingEquiv.ofBijective φ.rangeRestrict
+      ⟨(Function.Injective.of_comp_iff Subtype.val_injective _).1 hφ,
+        RingHom.rangeRestrict_surjective φ⟩)⟩⟩
 
 end FinitelyPresentedOverAffineOpen
 
