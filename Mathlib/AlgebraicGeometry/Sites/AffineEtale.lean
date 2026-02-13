@@ -117,7 +117,7 @@ noncomputable def a : P.scheme ⟶ S := P.π ≫ P.U.ι
 lemma fac : P.π ≫ P.U.ι = P.a := rfl
 
 lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] (x : X) :
-    ∃ (U : Opens X) (hU : x ∈ U) (P : S.FinitelyPresentedOverAffineOpen),
+    ∃ (U : Opens X) (_ : x ∈ U) (P : S.FinitelyPresentedOverAffineOpen),
       Nonempty (U.toScheme ≅ P.scheme) := by
   obtain ⟨U, V, hx, hUV⟩ :
       ∃ (U : X.affineOpens) (V : S.affineOpens), x ∈ U.val ∧ U ≤ f.base ⁻¹' V := by
@@ -126,11 +126,12 @@ lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] 
       (U := ⟨_, IsOpen.preimage f.continuous U.2⟩) (by simpa)
     exact ⟨⟨V, h₃⟩, ⟨U, h₁⟩, h₄, h₅⟩
   letI := (f.appLE V U hUV).hom.toAlgebra
-  obtain ⟨n, φ, h₁, h₂⟩ := (LocallyOfFinitePresentation.finitePresentation_appLE f V.prop U.prop hUV).out
+  obtain ⟨n, φ, h₁, h₂⟩ :=
+    (LocallyOfFinitePresentation.finitePresentation_appLE f V.prop U.prop hUV).out
   obtain ⟨r, ρ, hρ⟩ : ∃ (r : ℕ) (γ : Fin r → MvPolynomial (Fin n) Γ(S, V)),
       Ideal.span (Set.range γ) = RingHom.ker φ.toRingHom := by
     obtain ⟨s, hs⟩ := h₂
-    exact ⟨s.card, Subtype.val ∘  s.equivFin.symm, by rw [← hs]; simp⟩
+    exact ⟨s.card, Subtype.val ∘ s.equivFin.symm, by rw [← hs]; simp⟩
   let P : S.FinitelyPresentedOverAffineOpen :=
     { U := V.1
       hU := V.prop
@@ -157,6 +158,7 @@ lemma exists_subring
         subset_antisymm (by simp) (hs.trans ?_)⟩
       simp only [Function.comp_apply, Set.iUnion_subset_iff]
       exact fun i hi _ _ ↦ Set.mem_iUnion_of_mem ((Finset.equivFin s) ⟨i, hi⟩) (by simpa)
+  have (i : Fin n) := (U (α i)).ι
   let β (i : Fin n) : A →+* ((P ∘ α) i).R := (Spec.preimage ((iso (α i)).inv ≫ (U (α i)).ι)).hom
   let φ : A →+* ∀ i, ((P ∘ α) i).R :=
     { toFun a i := β i a
@@ -169,6 +171,13 @@ lemma exists_subring
       fun a b h ↦ by
         rw [← sub_eq_zero] at h ⊢
         exact this _ (by simpa)
+    intro a ha
+    have (i : Fin n) : β i a = 0 := congr_fun ha i
+    obtain ⟨a, rfl⟩ := (ΓSpecIso A).commRingCatIsoToRingEquiv.surjective a
+    simp only [EmbeddingLike.map_eq_zero_iff]
+    apply (openCoverOfIsOpenCover _ (U ∘ α) (.mk (by aesop))).ext_elem
+    intro i
+    dsimp at i
     sorry
   exact ⟨n, P ∘ α, RingHom.range φ, ⟨RingEquiv.toCommRingCatIso
     (RingEquiv.ofBijective φ.rangeRestrict
