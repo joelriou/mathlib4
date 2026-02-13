@@ -113,7 +113,7 @@ namespace FinitelyPresentedOverAffineOpen
 variable (P : S.FinitelyPresentedOverAffineOpen)
 
 /-- The ring defined by the given presentation by generators and relations. -/
-abbrev Ring : Type u :=
+protected abbrev Ring : Type u :=
   MvPolynomial (Fin P.g) Γ(S, P.U) ⧸ Ideal.span (Set.range P.rel)
 
 lemma exists_nhd {X : Scheme.{u}} (f : X ⟶ S) [LocallyOfFinitePresentation f] (x : X) :
@@ -164,22 +164,16 @@ lemma exists_subring
   the restriction to the opens `U (α i)`, and show that it is injective by
   using the sheaf property of the structure sheaf. -/
   have (i : Fin n) := (U (α i)).ι
-  let β (i : Fin n) : A →+* ((P ∘ α) i).Ring := (Spec.preimage ((iso (α i)).inv ≫ (U (α i)).ι)).hom
-  let φ : A →+* ∀ i, ((P ∘ α) i).Ring :=
-    { toFun a i := β i a
-      map_zero' := by ext; simp
-      map_add' _ _ := by ext; simp
-      map_one' := by ext; simp
-      map_mul' _ _ := by ext; simp }
+  let β (i : Fin n) : A →+* ((P ∘ α) i).Ring :=
+    (Spec.preimage ((iso (α i)).inv ≫ (U (α i)).ι)).hom
+  let φ : A →+* ∀ i, ((P ∘ α) i).Ring := Pi.ringHom β
   have hφ : Function.Injective φ := by
-    suffices ∀ a, φ a = 0 → a = 0 from
-      fun a b h ↦ by
-        rw [← sub_eq_zero] at h ⊢
-        exact this _ (by simpa)
-    intro a ha
+    refine (AddMonoidHom.ker_eq_bot_iff φ.toAddMonoidHom).1 ?_
+    ext a
+    refine ⟨fun ha ↦ ?_, by rintro rfl; simp⟩
     replace ha (i : Fin n) : β i a = 0 := congr_fun ha i
     obtain ⟨a, rfl⟩ := (ΓSpecIso A).commRingCatIsoToRingEquiv.surjective a
-    simp only [EmbeddingLike.map_eq_zero_iff]
+    simp only [AddSubgroup.mem_bot, EmbeddingLike.map_eq_zero_iff]
     refine (openCoverOfIsOpenCover _ (U ∘ α) (.mk (by aesop))).ext_elem _ _ (fun i ↦ ?_)
     replace ha : (ΓSpecIso _).hom (((iso (α i)).inv ≫ (U (α i)).ι).appTop a) = 0 := by
       simpa [← ha] using ConcreteCategory.congr_hom (ΓSpecIso_naturality
@@ -198,8 +192,8 @@ end FinitelyPresentedOverAffineOpen
 lemma essentiallySmall_costructuredArrow_Spec
     (P : MorphismProperty Scheme.{u}) (hP : P ≤ @LocallyOfFinitePresentation) [P.RespectsIso] :
     EssentiallySmall.{u} (P.CostructuredArrow ⊤ Scheme.Spec S) := by
-  /- It suffices to show that there is a `u`-small type which parametrizes
-  up to isomorphism all the the possible rings `Z.left.unop` for
+  /- It suffices to show that there is a `u`-small type which, up to
+  isomorphisms, parametrizes all the the possible rings `Z.left.unop` for
   `Z : P.CostructuredArrow ⊤ Scheme.Spec S`. -/
   suffices ∃ (ι : Type u) (R : ι → CommRingCat.{u}),
       ∀ (Z : P.CostructuredArrow ⊤ Scheme.Spec S),
