@@ -5,7 +5,9 @@ Authors: Christian Merten, Joël Riou
 -/
 module
 
+public import Mathlib.Algebra.Category.Grp.Abelian
 public import Mathlib.AlgebraicGeometry.Sites.Etale
+public import Mathlib.CategoryTheory.Sites.Abelian
 public import Mathlib.CategoryTheory.Sites.DenseSubsite.OneHypercoverDense
 
 /-!
@@ -177,13 +179,13 @@ lemma exists_subring
     simp only [EmbeddingLike.map_eq_zero_iff]
     refine (openCoverOfIsOpenCover _ (U ∘ α) (.mk (by aesop))).ext_elem _ _ (fun i ↦ ?_)
     dsimp at i ⊢
-    replace ha := ha i
+    have : IsAffine (U (α i)) := IsAffine.of_isIso (iso (α i)).hom
     replace ha : (ΓSpecIso _).hom (((iso (α i)).inv ≫ (U (α i)).ι).appTop a) = 0 := by
       simpa [← ha] using (ConcreteCategory.congr_hom (ΓSpecIso_naturality
         (Spec.preimage ((iso (α i)).inv ≫ (U (α i)).ι))) a)
-    have : IsAffine (U (α i)) := IsAffine.of_isIso (iso (α i)).hom
-    simp only [map_zero]
-    sorry
+    apply (asIso (iso (α i)).inv.appTop ≪≫
+      ΓSpecIso (.of (P (α i)).R)).commRingCatIsoToRingEquiv.injective
+    simpa [-EmbeddingLike.map_eq_zero_iff] using ha
   exact ⟨n, P ∘ α, RingHom.range φ, ⟨RingEquiv.toCommRingCatIso
     (RingEquiv.ofBijective φ.rangeRestrict
       ⟨(Function.Injective.of_comp_iff Subtype.val_injective _).1 hφ,
@@ -295,9 +297,15 @@ variable {A : Type u'} [Category.{u} A]
   [∀ X Y, FunLike (FA X Y) (CD X) (CD Y)] [ConcreteCategory.{u} A FA]
   [PreservesLimits (CategoryTheory.forget A)] [HasColimits A] [HasLimits A]
   [(CategoryTheory.forget A).ReflectsIsomorphisms]
-  [PreservesColimitsOfSize.{u, u} (CategoryTheory.forget A)]
+  [PreservesFilteredColimitsOfSize.{u, u} (CategoryTheory.forget A)]
 
 instance : HasSheafify (topology S) A := hasSheafifyEssentiallySmallSite.{u} _ _
+
+example : HasSheafify (topology S) (Type u) := by
+  infer_instance
+
+example : Abelian (Sheaf (topology S) AddCommGrpCat.{u}) := by
+  infer_instance
 
 end
 
