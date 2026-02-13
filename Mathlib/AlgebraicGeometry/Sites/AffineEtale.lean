@@ -1,11 +1,12 @@
 /-
 Copyright (c) 2025 Christian Merten. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Christian Merten
+Authors: Christian Merten, Joël Riou
 -/
 module
 
 public import Mathlib.AlgebraicGeometry.Sites.Etale
+public import Mathlib.CategoryTheory.Sites.DenseSubsite.OneHypercoverDense
 
 /-!
 # Affine étale site
@@ -124,6 +125,35 @@ variable (S) in
 the small étale site. -/
 def topology : GrothendieckTopology S.AffineEtale :=
   (AffineEtale.Spec S).inducedTopology (smallEtaleTopology S)
+
+instance : Functor.IsDenseSubsite (topology S) (S.smallEtaleTopology) (AffineEtale.Spec S) := by
+  dsimp [topology]
+  infer_instance
+
+instance : Functor.IsOneHypercoverDense.{u} (AffineEtale.Spec S)
+    (topology S) (S.smallEtaleTopology) :=
+  Functor.IsOneHypercoverDense.of_hasPullbacks (fun X ↦ by
+    let 𝒰 := affineOpenCover X.left
+    refine ⟨𝒰.I₀, fun i ↦ .mk (𝒰.f i ≫ X.hom),
+      fun i ↦ MorphismProperty.CostructuredArrow.homMk (𝒰.f i) (by simp),
+         zariskiTopology_le_etaleTopology _ ?_⟩
+    rw [mem_grothendieckTopology_iff]
+    refine ⟨{
+      I₀ := 𝒰.I₀
+      X i := Spec (𝒰.X i)
+      f := 𝒰.f
+      mem₀ := by
+        refine ⟨?_, ?_⟩
+        · simp only [Comma.forget_obj, Precoverage.mem_comap_iff, forget_obj,
+            Presieve.map_ofArrows, forget_map, Types.ofArrows_mem_jointlySurjectivePrecoverage_iff]
+          exact fun _ ↦ ⟨_, 𝒰.covers _⟩
+        · simp only [Comma.forget_obj, ofArrows_mem_precoverage]
+          infer_instance
+        }, ?_⟩
+    rintro _ _ ⟨i⟩
+    exact ⟨Over.mk (𝒰.f i ≫ X.hom), Over.homMk (𝒰.f i), 𝟙 _,
+      ⟨Etale.mk (𝒰.f i ≫ X.hom), Over.homMk (𝒰.f i), 𝟙 _,
+      ⟨_, 𝟙 _, _, ⟨i⟩, by cat_disch⟩, by simp⟩, by simp⟩)
 
 /-- The category of sheafs on the small affine étale site is equivalent to the category of
 sheafs on the small étale site. -/
