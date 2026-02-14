@@ -172,6 +172,14 @@ variable {X} in
 lemma Etale.forget_mk {Y : Scheme.{u}} (f : Y ⟶ X) [Etale f] :
     (Etale.forget X).obj (.mk f) = Over.mk f := rfl
 
+@[simp]
+lemma Etale.forget_obj_left (Y : X.Etale) :
+    ((Etale.forget X).obj Y).left = Y.left := rfl
+
+@[simp]
+lemma Etale.forget_obj_hom (Y : X.Etale) :
+    ((Etale.forget X).obj Y).hom = Y.hom := rfl
+
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 def Etale.rec {motive : X.Etale → Sort*}
     (mk : ∀ (Y : Scheme.{u}) (f : Y ⟶ X) (_ : Etale f), motive (Etale.mk f))

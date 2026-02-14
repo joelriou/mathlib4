@@ -5,6 +5,7 @@ Authors: Christian Merten, Joël Riou
 -/
 module
 
+public import Mathlib.AlgebraicGeometry.Fiber
 public import Mathlib.AlgebraicGeometry.Sites.AffineEtale
 public import Mathlib.CategoryTheory.Functor.TypeValuedFlat
 public import Mathlib.CategoryTheory.Limits.Elements
@@ -33,9 +34,27 @@ variable {S : Scheme.{u}} {Ω : Type u} [Field Ω] [IsSepClosed Ω]
 instance : IsCofiltered (Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))).Elements :=
   Functor.isCofiltered_elements _
 
+lemma exists_fac_of_etale_of_isSepClosed {X S : Scheme.{u}} (f : X ⟶ S) [Etale f]
+    {Ω : Type u} [Field Ω] [IsSepClosed Ω] (s : Spec (.of Ω) ⟶ S)
+    (x : X) (hx : f x = s default) :
+    ∃ (l : Spec (.of Ω) ⟶ X), l ≫ f = s ∧ l default = x := by
+  obtain ⟨⟨s, a⟩, rfl⟩ := (SpecToEquivOfField Ω S).symm.surjective s
+  obtain rfl : f x = s := by simp [hx, SpecToEquivOfField]
+  let m := (f.residueFieldMap x).hom
+  dsimp at m
+  algebraize [m, a.hom]
+  let b : X.residueField x →ₐ[S.residueField (f x)] Ω :=
+    IsSepClosed.lift
+  have : f.residueFieldMap x ≫ CommRingCat.ofHom b.toRingHom = a := by
+    ext1; exact b.comp_algebraMap
+  refine ⟨Spec.map (CommRingCat.ofHom b.toRingHom) ≫ X.fromSpecResidueField x, ?_, ?_⟩
+  · simp [SpecToEquivOfField, ← this]
+  · dsimp
+    apply fromSpecResidueField_apply
+
 /-- A morphism `s : Spec (.of Ω) ⟶ S` where `Ω` is a separably closed field
 defines a point for the small étale site of `S`. -/
-@[simps -isSimp]
+@[simps]
 noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
   fiber := Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))
   initiallySmall :=
@@ -60,25 +79,11 @@ noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
     induction X with | _ X f
     obtain ⟨φ : Spec (.of Ω) ⟶ X, rfl : φ ≫ f = s, rfl⟩ := Over.homMk_surjective φ
     obtain ⟨𝒰, h, _, le⟩ := (mem_smallGrothendieckTopology _ _).1 hR
-    obtain ⟨⟨x, a⟩, rfl⟩ := (Scheme.SpecToEquivOfField Ω X).symm.surjective φ
-    obtain ⟨i, y, rfl⟩ := 𝒰.exists_eq x
-    have hf : 𝒰.f i ≫ f = 𝒰.X i ↘ S := (h.isOver_map i).comp_over
-    let m := ((𝒰.f i).residueFieldMap y).hom
-    dsimp at m
-    algebraize [m, a.hom]
-    let b : (𝒰.X i).residueField y →ₐ[X.residueField (𝒰.f i y)] Ω :=
-      IsSepClosed.lift
-    have fac : Spec.map (CommRingCat.ofHom b.toRingHom) ≫
-          (𝒰.X i).fromSpecResidueField y ≫ 𝒰.f i =
-        (SpecToEquivOfField Ω X).symm ⟨(𝒰.f i) y, a⟩ := by
-      have : (𝒰.f i).residueFieldMap y ≫ CommRingCat.ofHom b.toRingHom = a := by
-        ext1; exact b.comp_algebraMap
-      simp [SpecToEquivOfField, ← this]
-    dsimp at fac
+    obtain ⟨i, y, hy⟩ := 𝒰.exists_eq (φ default)
+    obtain ⟨l, hl₁, hl₂⟩ := exists_fac_of_etale_of_isSepClosed (𝒰.f i) φ _ hy
+    have : 𝒰.f i ≫ f = 𝒰.X i ↘ S := HomIsOver.comp_over (f := 𝒰.f i) (S := S)
     exact ⟨(𝒰.X i).asOverProp S inferInstance,
-      MorphismProperty.Over.homMk (𝒰.f i), le _ ⟨i⟩,
-      Over.homMk (Spec.map (CommRingCat.ofHom b.toRingHom) ≫
-        (𝒰.X i).fromSpecResidueField y) (by simp [Etale.forget, ← fac, hf]), by cat_disch⟩
+      MorphismProperty.Over.homMk (𝒰.f i), le _ ⟨i⟩, Over.homMk l, by cat_disch⟩
 
 variable {s₀ : S} (hs₀ : s default = s₀)
 
@@ -92,9 +97,23 @@ def pointSmallEtaleFiberObjToPreimage {X : S.Etale}
     rw [← this] at hs₀
     simpa⟩
 
+instance {Y X : Scheme.{u}} (f : Y ⟶ X) [Etale f] (x : X) :
+    Etale (f.fiberToSpecResidueField x) := by
+  dsimp [Hom.fiberToSpecResidueField]
+  infer_instance
+
 lemma pointSmallEtaleFiberObjToPreimage_surjective (X : S.Etale) :
-    Function.Surjective
-      (pointSmallEtaleFiberObjToPreimage s hs₀ (X := X)) := sorry
+    Function.Surjective (pointSmallEtaleFiberObjToPreimage s hs₀ (X := X)) := by
+  intro y
+  obtain ⟨y, rfl⟩ := (X.hom.fiberHomeo s₀).surjective y
+  obtain ⟨⟨t, a⟩, rfl⟩ := (Scheme.SpecToEquivOfField Ω _).symm.surjective s
+  obtain rfl : t = s₀ := by simp [SpecToEquivOfField, ← hs₀]
+  obtain ⟨l, hl, rfl⟩ := exists_fac_of_etale_of_isSepClosed
+    (X.hom.fiberToSpecResidueField _) (Spec.map a) y (by subsingleton)
+  refine ⟨Over.homMk (l ≫ X.hom.fiberι t) ?_, rfl⟩
+  dsimp
+  rw [Category.assoc, X.hom.fiber_fac, reassoc_of% hl]
+  cat_disch
 
 -- The following will have to wait for #35175
 variable {ι : Type*} {S : Scheme.{u}}
@@ -118,7 +137,7 @@ lemma isConservative_aux {X : S.Etale} {α : Type*} {Y : α → S.Etale} (f : �
     obtain ⟨i, y, hy⟩ := this
     obtain rfl := Subsingleton.elim y default
     exact ⟨i, hy⟩
-  obtain ⟨x', hx'⟩ :=pointSmallEtaleFiberObjToPreimage_surjective (s i) hi X ⟨x, by simp⟩
+  obtain ⟨x', hx'⟩ := pointSmallEtaleFiberObjToPreimage_surjective (s i) hi X ⟨x, by simp⟩
   rw [Subtype.ext_iff] at hx'
   dsimp at hx'
   obtain ⟨a, y, hy⟩ := hf i x'
