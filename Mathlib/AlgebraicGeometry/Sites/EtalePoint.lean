@@ -8,7 +8,7 @@ module
 public import Mathlib.AlgebraicGeometry.Sites.AffineEtale
 public import Mathlib.CategoryTheory.Functor.TypeValuedFlat
 public import Mathlib.CategoryTheory.Limits.Elements
-public import Mathlib.CategoryTheory.Sites.Point.Basic
+public import Mathlib.CategoryTheory.Sites.Point.Category
 
 /-!
 
@@ -35,6 +35,7 @@ instance : IsCofiltered (Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))).Eleme
 
 /-- A morphism `s : Spec (.of Ω) ⟶ S` where `Ω` is a separably closed field
 defines a point for the small étale site of `S`. -/
+@[simps -isSimp]
 noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
   fiber := Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))
   initiallySmall :=
@@ -78,5 +79,49 @@ noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
       MorphismProperty.Over.homMk (𝒰.f i), le _ ⟨i⟩,
       Over.homMk (Spec.map (CommRingCat.ofHom b.toRingHom) ≫
         (𝒰.X i).fromSpecResidueField y) (by simp [Etale.forget, ← fac, hf]), by cat_disch⟩
+
+variable {s₀ : S} (hs₀ : s default = s₀)
+
+@[simps]
+def pointSmallEtaleFiberObjToPreimage {X : S.Etale}
+    (t : (pointSmallEtale s).fiber.obj X) :
+    X.hom ⁻¹' {s₀} :=
+  ⟨t.left (default : Spec (.of Ω)), by
+    have := Over.w t
+    dsimp at this
+    rw [← this] at hs₀
+    simpa⟩
+
+lemma pointSmallEtaleFiberObjToPreimage_surjective (X : S.Etale) :
+    Function.Surjective
+      (pointSmallEtaleFiberObjToPreimage s hs₀ (X := X)) := sorry
+
+-- The following will have to wait for #35175
+variable {ι : Type*} {S : Scheme.{u}}
+  {Ω : ι → Type u} [∀ i, Field (Ω i)] [∀ i, IsSepClosed (Ω i)]
+  (s : ∀ i, Spec (.of (Ω i)) ⟶ S)
+  (hs : ⋃ i, Set.range (s i) = .univ)
+
+include hs in
+lemma isConservative_aux {X : S.Etale} {α : Type*} {Y : α → S.Etale} (f : ∀ a, Y a ⟶ X)
+    (hf : ∀ (i : ι) (x : (pointSmallEtale (s i)).fiber.obj X),
+      ∃ (a : α) (y : (pointSmallEtale (s i)).fiber.obj (Y a)),
+        (pointSmallEtale (s i)).fiber.map (f a) y = x) :
+    Sieve.ofArrows _ f ∈ smallEtaleTopology _ _ := by
+  rw [ofArrows_mem_smallEtaleTopology_iff]
+  ext x
+  simp only [Set.mem_iUnion, Set.mem_range, Set.mem_univ, iff_true]
+  obtain ⟨i, hi⟩ : ∃ i, s i default = X.hom x := by
+    have := Set.mem_univ (X.hom x)
+    simp only [← hs, Functor.const_obj_obj, Functor.id_obj, Set.mem_iUnion,
+      Set.mem_range] at this
+    obtain ⟨i, y, hy⟩ := this
+    obtain rfl := Subsingleton.elim y default
+    exact ⟨i, hy⟩
+  obtain ⟨x', hx'⟩ :=pointSmallEtaleFiberObjToPreimage_surjective (s i) hi X ⟨x, by simp⟩
+  rw [Subtype.ext_iff] at hx'
+  dsimp at hx'
+  obtain ⟨a, y, hy⟩ := hf i x'
+  exact ⟨a, (pointSmallEtaleFiberObjToPreimage (s i) hi y).1, by aesop⟩
 
 end AlgebraicGeometry.Scheme

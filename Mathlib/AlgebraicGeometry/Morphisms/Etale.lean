@@ -146,6 +146,10 @@ instance (Y : X.Etale) : Etale Y.hom := Y.prop
 instance : Category X.Etale :=
   inferInstanceAs <| Category (MorphismProperty.Over @Etale ⊤ X)
 
+instance {X : Scheme.{u}} {Z Y : X.Etale} (f : Z ⟶ Y) : Etale f.left := by
+  have : Etale (f.left ≫ Y.hom) := by rw [CategoryTheory.Over.w]; infer_instance
+  exact Etale.of_comp f.left Y.hom
+
 /-- The forgetful functor from schemes étale over `X` to schemes over `X`. -/
 def Etale.forget : X.Etale ⥤ Over X :=
   MorphismProperty.Over.forget @Etale ⊤ X
