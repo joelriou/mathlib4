@@ -14,25 +14,47 @@ public import Mathlib.CategoryTheory.Sites.Point.Basic
 
 # Points of the étale site
 
+In this file, we show that a morphism `Spec (.of Ω) ⟶ S` where `Ω` is
+a separably closed field defined a point on the small étale site of `S`.
 
 -/
 
+@[expose] public section
+
 universe u
 
-open CategoryTheory
+open CategoryTheory Opposite
 
 namespace AlgebraicGeometry.Scheme
 
 variable {S : Scheme.{u}} {Ω : Type u} [Field Ω] [IsSepClosed Ω]
   (s : Spec (.of Ω) ⟶ S)
 
+instance : IsCofiltered (Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))).Elements :=
+  Functor.isCofiltered_elements _
+
 /-- A morphism `s : Spec (.of Ω) ⟶ S` where `Ω` is a separably closed field
 defines a point for the small étale site of `S`. -/
 noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
   fiber := Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))
-  isCofiltered := Functor.isCofiltered_elements _
-  initiallySmall := by
-    sorry
+  initiallySmall :=
+    initiallySmall_of_essentiallySmall_weakly_initial_objectProperty
+      (Functor.Elements.precomp (AffineEtale.Spec S)
+        (Etale.forget S ⋙ coyoneda.obj (op (Over.mk s)))).essImage (by
+      rintro ⟨X, x⟩
+      induction X with | _ Y f
+      obtain ⟨g, hg, rfl⟩ := Over.homMk_surjective x
+      dsimp at g hg
+      obtain ⟨R, j, _, g', rfl⟩ : ∃ (R : CommRingCat) (j : Spec (.of R) ⟶ Y)
+          (_ : IsOpenImmersion j) (g' : _ ⟶ _), g' ≫ j = g := by
+        obtain ⟨R, j, _, hj, _⟩ := exists_affine_mem_range_and_range_subset
+          (x := g.base default) (U := ⊤) (by simp)
+        refine ⟨R, j, inferInstance, _, IsOpenImmersion.lift_fac j g ?_⟩
+        rintro _ ⟨a, rfl⟩
+        rwa [Subsingleton.elim a default]
+      exact ⟨_,
+        ⟨Functor.elementsMk _ (AffineEtale.mk (j ≫ f)) (Over.homMk g'), ⟨Iso.refl _⟩⟩,
+        ⟨⟨MorphismProperty.Over.homMk j rfl (by simp), by cat_disch⟩⟩⟩)
   jointly_surjective {X} R hR φ := by
     induction X with | _ X f
     obtain ⟨φ : Spec (.of Ω) ⟶ X, rfl : φ ≫ f = s, rfl⟩ := Over.homMk_surjective φ

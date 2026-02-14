@@ -218,6 +218,11 @@ instance (P : ObjectProperty C) [ObjectProperty.EssentiallySmall.{w} P]
   obtain ⟨Q, _, h₁, h₂⟩ := EssentiallySmall.exists_small_le P
   exact ⟨Q.strictMap F, inferInstance, (map_monotone h₂ F).trans (by simp)⟩
 
+instance [EssentiallySmall.{w} C] (F : C ⥤ D) :
+    ObjectProperty.EssentiallySmall.{w} F.essImage := by
+  rw [← ObjectProperty.map_top]
+  infer_instance
+
 instance (P : ObjectProperty C) [LocallySmall.{w} C]
     [ObjectProperty.EssentiallySmall.{w} P] : EssentiallySmall.{w} P.FullSubcategory := by
   obtain ⟨Q, _, h₁, h₂⟩ := EssentiallySmall.exists_small_le P
@@ -252,6 +257,5 @@ lemma essentiallySmall_iff_objectPropertyEssentiallySmall_top
   rw [← exists_equivalence_iff_of_locallySmall]
   exact ⟨fun _ ↦ ⟨_, _, ⟨equivSmallModel.{w} C⟩⟩,
     fun ⟨C₀, _, ⟨e⟩⟩ ↦ ⟨C₀, inferInstance, ⟨e⟩⟩⟩
-
 
 end CategoryTheory
