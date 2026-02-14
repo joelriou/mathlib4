@@ -43,17 +43,17 @@ noncomputable def pointSmallEtale : (smallEtaleTopology S).Point where
         (Etale.forget S ⋙ coyoneda.obj (op (Over.mk s)))).essImage (by
       rintro ⟨X, x⟩
       induction X with | _ Y f
-      obtain ⟨g, hg, rfl⟩ := Over.homMk_surjective x
-      dsimp at g hg
-      obtain ⟨R, j, _, g', rfl⟩ : ∃ (R : CommRingCat) (j : Spec (.of R) ⟶ Y)
-          (_ : IsOpenImmersion j) (g' : _ ⟶ _), g' ≫ j = g := by
+      obtain ⟨y, hy, rfl⟩ := Over.homMk_surjective x
+      dsimp at y hy
+      obtain ⟨R, j, _, y', rfl⟩ : ∃ (R : CommRingCat) (j : Spec (.of R) ⟶ Y)
+          (_ : IsOpenImmersion j) (y' : _ ⟶ _), y' ≫ j = y := by
         obtain ⟨R, j, _, hj, _⟩ := exists_affine_mem_range_and_range_subset
-          (x := g.base default) (U := ⊤) (by simp)
-        refine ⟨R, j, inferInstance, _, IsOpenImmersion.lift_fac j g ?_⟩
+          (x := y.base default) (U := ⊤) (by simp)
+        refine ⟨R, j, inferInstance, _, IsOpenImmersion.lift_fac j y ?_⟩
         rintro _ ⟨a, rfl⟩
         rwa [Subsingleton.elim a default]
       exact ⟨_,
-        ⟨Functor.elementsMk _ (AffineEtale.mk (j ≫ f)) (Over.homMk g'), ⟨Iso.refl _⟩⟩,
+        ⟨Functor.elementsMk _ (AffineEtale.mk (j ≫ f)) (Over.homMk y'), ⟨Iso.refl _⟩⟩,
         ⟨⟨MorphismProperty.Over.homMk j rfl (by simp), by cat_disch⟩⟩⟩)
   jointly_surjective {X} R hR φ := by
     induction X with | _ X f
