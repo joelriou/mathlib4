@@ -9,6 +9,7 @@ public import Mathlib.Algebra.Category.Grp.Abelian
 public import Mathlib.AlgebraicGeometry.Sites.Etale
 public import Mathlib.CategoryTheory.Abelian.GrothendieckAxioms.Sheaf
 public import Mathlib.CategoryTheory.Sites.Abelian
+public import Mathlib.CategoryTheory.Sites.Equivalence
 public import Mathlib.CategoryTheory.Sites.DenseSubsite.OneHypercoverDense
 
 /-!
@@ -261,14 +262,14 @@ variable (S) in
 /-- The topology on the small affine étale site is the topology induced by `Spec` from
 the small étale site. -/
 def topology : GrothendieckTopology S.AffineEtale :=
-  (AffineEtale.Spec S).inducedTopology (smallEtaleTopology S)
+  (AffineEtale.Spec S).inducedTopology S.smallEtaleTopology
 
-instance : Functor.IsDenseSubsite (topology S) (S.smallEtaleTopology) (AffineEtale.Spec S) := by
+instance : Functor.IsDenseSubsite (topology S) S.smallEtaleTopology (AffineEtale.Spec S) := by
   dsimp [topology]
   infer_instance
 
 instance : Functor.IsOneHypercoverDense.{u} (AffineEtale.Spec S)
-    (topology S) (S.smallEtaleTopology) :=
+    (topology S) S.smallEtaleTopology :=
   isOneHypercoverDense_toOver_Spec _
 
 instance : EssentiallySmall.{u} S.AffineEtale :=
@@ -288,26 +289,34 @@ variable {A : Type u'} [Category.{u} A]
 instance : HasSheafify (AffineEtale.topology S) A :=
     hasSheafifyEssentiallySmallSite.{u} _ _
 
-instance : HasSheafify (smallEtaleTopology S) A :=
+instance : HasSheafify S.smallEtaleTopology A :=
   (AffineEtale.Spec S).hasSheafify_of_isOneHypercoverDense
-    (AffineEtale.topology S) (S.smallEtaleTopology) A
+    (AffineEtale.topology S) S.smallEtaleTopology A
 
 example : HasSheafify (AffineEtale.topology S) (Type u) := by
   infer_instance
 
-example : HasSheafify (smallEtaleTopology S) (Type u) := by
+example : HasSheafify S.smallEtaleTopology (Type u) := by
   infer_instance
 
 example : Abelian (Sheaf (AffineEtale.topology S) AddCommGrpCat.{u}) := by
   infer_instance
 
-example : Abelian (Sheaf (smallEtaleTopology S) AddCommGrpCat.{u}) := by
+example : Abelian (Sheaf S.smallEtaleTopology AddCommGrpCat.{u}) := by
   infer_instance
 
 instance :
     Functor.IsEquivalence ((AffineEtale.Spec S).sheafPushforwardContinuous A
-      (AffineEtale.topology S) (S.smallEtaleTopology)) :=
+      (AffineEtale.topology S) S.smallEtaleTopology) :=
   Functor.isEquivalence_of_isOneHypercoverDense _ _ _ _
+
+instance : (AffineEtale.topology S).WEqualsLocallyBijective A :=
+  .ofEssentiallySmall (AffineEtale.topology S)
+
+instance : S.smallEtaleTopology.WEqualsLocallyBijective A :=
+  .transport  _ _ _
+    (Functor.IsDenseSubsite.coverPreserving (AffineEtale.topology S) _
+      (AffineEtale.Spec S))
 
 variable (S A)
 
@@ -315,9 +324,9 @@ variable (S A)
 sheafs on the small étale site. -/
 @[simps! inverse]
 noncomputable def AffineEtale.sheafEquiv :
-    Sheaf (AffineEtale.topology S) A ≌ Sheaf (smallEtaleTopology S) A :=
+    Sheaf (AffineEtale.topology S) A ≌ Sheaf S.smallEtaleTopology A :=
   ((AffineEtale.Spec S).sheafPushforwardContinuous A
-      (topology S) (S.smallEtaleTopology)).asEquivalence.symm
+      (topology S) S.smallEtaleTopology).asEquivalence.symm
 
 lemma isGrothendieckAbelian_sheaf_affineEtaleTopology
     [Abelian A] [IsGrothendieckAbelian.{u} A] :
@@ -326,7 +335,7 @@ lemma isGrothendieckAbelian_sheaf_affineEtaleTopology
 
 lemma isGrothendieckAbelian_sheaf_smallEtaleTopology
     [Abelian A] [IsGrothendieckAbelian.{u} A] :
-    IsGrothendieckAbelian.{u} (Sheaf (smallEtaleTopology S) A) :=
+    IsGrothendieckAbelian.{u} (Sheaf S.smallEtaleTopology A) :=
   have := isGrothendieckAbelian_sheaf_affineEtaleTopology S A
   IsGrothendieckAbelian.of_equivalence (AffineEtale.sheafEquiv S A)
 
