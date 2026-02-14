@@ -18,7 +18,7 @@ category is the category of commutative rings `R` equipped with an étale struct
 morphism `Spec R ⟶ S`. We show that this category is essentially small,
 that it is a dense subsite of the small étale site, and that it is `1`-hypercover
 dense, which allows to show that if `S : Scheme.{u}`, then we can sheafify
-étale presheaves with values in `Type u`, `AddCommGrpCat.{u}`, etc (TODO).
+étale presheaves with values in `Type u`, `AddCommGrpCat.{u}`, etc.
 
 ## Main results
 - `AlgebraicGeometry.Scheme.AffineEtale.sheafEquiv`: The category of sheaves on the
@@ -284,19 +284,35 @@ variable {A : Type u'} [Category.{u} A]
 
 instance : HasSheafify (topology S) A := hasSheafifyEssentiallySmallSite.{u} _ _
 
+instance : HasSheafify (smallEtaleTopology S) A :=
+  (AffineEtale.Spec S).hasSheafify_of_isOneHypercoverDense
+    (topology S) (S.smallEtaleTopology) A
+
 example : HasSheafify (topology S) (Type u) := by
+  infer_instance
+
+example : HasSheafify (smallEtaleTopology S) (Type u) := by
   infer_instance
 
 example : Abelian (Sheaf (topology S) AddCommGrpCat.{u}) := by
   infer_instance
 
-end
+example : Abelian (Sheaf (smallEtaleTopology S) AddCommGrpCat.{u}) := by
+  infer_instance
+
+instance :
+    Functor.IsEquivalence ((AffineEtale.Spec S).sheafPushforwardContinuous A
+      (topology S) (S.smallEtaleTopology)) :=
+  Functor.isEquivalence_of_isOneHypercoverDense _ _ _ _
 
 /-- The category of sheafs on the small affine étale site is equivalent to the category of
 sheafs on the small étale site. -/
-noncomputable def sheafEquiv (A : Type*) [Category A]
-    [∀ (X : S.Etaleᵒᵖ), Limits.HasLimitsOfShape (StructuredArrow X (AffineEtale.Spec S).op) A] :
+@[simps! inverse]
+noncomputable def sheafEquiv :
     Sheaf (AffineEtale.topology S) A ≌ Sheaf (smallEtaleTopology S) A :=
-  (AffineEtale.Spec S).sheafInducedTopologyEquivOfIsCoverDense _ _
+  ((AffineEtale.Spec S).sheafPushforwardContinuous A
+      (topology S) (S.smallEtaleTopology)).asEquivalence.symm
+
+end
 
 end AlgebraicGeometry.Scheme.AffineEtale
