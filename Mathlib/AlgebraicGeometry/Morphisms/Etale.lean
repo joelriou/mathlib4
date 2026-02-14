@@ -141,6 +141,8 @@ protected def Etale (X : Scheme.{u}) : Type _ := MorphismProperty.Over @Etale ‚ä
 
 variable (X : Scheme.{u})
 
+instance (Y : X.Etale) : Etale Y.hom := Y.prop
+
 instance : Category X.Etale :=
   inferInstanceAs <| Category (MorphismProperty.Over @Etale ‚ä§ X)
 
