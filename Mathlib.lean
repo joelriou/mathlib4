@@ -1362,6 +1362,7 @@ public import Mathlib.AlgebraicGeometry.Scheme
 public import Mathlib.AlgebraicGeometry.Sites.AffineEtale
 public import Mathlib.AlgebraicGeometry.Sites.BigZariski
 public import Mathlib.AlgebraicGeometry.Sites.Etale
+public import Mathlib.AlgebraicGeometry.Sites.EtalePoint
 public import Mathlib.AlgebraicGeometry.Sites.MorphismProperty
 public import Mathlib.AlgebraicGeometry.Sites.Pretopology
 public import Mathlib.AlgebraicGeometry.Sites.QuasiCompact
