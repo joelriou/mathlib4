@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Algebra.Homology.SpectralObject.Basic
 public import Mathlib.Algebra.Homology.SpectralSequence.ComplexShape
+public import Mathlib.Order.Fin.Clamp
 public import Mathlib.Order.WithBotTop
 
 /-!
@@ -193,18 +194,6 @@ def mkDataE₂CohomologicalNat :
   i₃_next r r' pq pq' hpq hrr' hr := by
     simp only [ComplexShape.spectralSequenceNat_rel_iff] at hpq
     lia
-
-
--- to be moved
-lemma _root_.Fin.clamp_mono {m : ℕ} : Monotone (fun n ↦ Fin.clamp n m) := by
-  intro a b h
-  rw [Fin.le_iff_val_le_val]
-  exact min_le_min_right m h
-
-lemma _root_.Fin.clamp_eq_last (n m : ℕ) (hnm : m ≤ n) :
-    Fin.clamp n m = Fin.last _ := by
-  ext
-  simpa
 
 /-- The data which allows to construct an `E₂`-cohomological spectral sequence
 indexed by `ℤ × Fin l` from a spectral object indexed by `Fin (l + 1)`. -/
