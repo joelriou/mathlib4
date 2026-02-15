@@ -403,7 +403,7 @@ lemma exists_distinguished_triangle_of_isLE_zero_of_isGE_neg_one
     simp only [Category.assoc, ← Functor.map_comp,
       e₁.inv_hom_id, Functor.id_obj, Functor.map_id, Category.comp_id]
 
-lemma admissibleMorphism_heart {X₁ X₂ : t.Heart} (f : X₁ ⟶ X₂) :
+lemma admissibleMorphism_ιHeart {X₁ X₂ : t.Heart} (f : X₁ ⟶ X₂) :
     AbelianSubcategory.admissibleMorphism t.ιHeart f := by
   intro X₃ f₂ f₃ hT
   have := t.cocone_heart_isLE_zero hT
@@ -414,7 +414,9 @@ noncomputable instance : Abelian t.Heart := by
   apply AbelianSubcategory.abelian t.ιHeart
   · intro X Y n f hn
     exact t.zero f 0 (-n) (by linarith)
-  · apply admissibleMorphism_heart
+  · ext
+    simp only [MorphismProperty.top_apply, iff_true]
+    apply admissibleMorphism_ιHeart
 
 end
 
