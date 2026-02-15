@@ -150,6 +150,24 @@ lemma jointly_reflect_ofArrows_mem
     rw [this, ← Sigma.ι_desc (fun i ↦ shrinkYoneda.{w}.map (f i)) i, Functor.map_comp]
     rfl
 
+lemma jointly_reflect_ofArrows_mem_of_small
+    [HasSheafify J (Type w)] [J.WEqualsLocallyBijective (Type w)]
+    (hP : P.IsConservativeFamilyOfPoints) [ObjectProperty.Small.{w} P]
+    {X : C} {ι : Type*} {U : ι → C} (f : ∀ i, U i ⟶ X) :
+    Sieve.ofArrows _ f ∈ J X ↔
+      ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
+        ∃ (i : ι) (y : Φ.obj.fiber.obj (U i)), Φ.obj.fiber.map (f i) y = x := by
+  refine ⟨fun hf Φ x ↦ ?_, fun hf ↦ ?_⟩
+  · obtain ⟨Z, _, ⟨_, p, _, ⟨i⟩, rfl⟩, z, rfl⟩ := Φ.obj.jointly_surjective _ hf x
+    exact ⟨i, Φ.obj.fiber.map p z, by simp⟩
+  · let ι' : Type _ := Σ (Φ : P.FullSubcategory), Φ.obj.fiber.obj X
+    choose i y hy using fun (j : ι') ↦ hf j.1 j.2
+    refine J.superset_covering (S := Sieve.ofArrows _ (fun i' ↦ f (i i'))) ?_ ?_
+    · rw [Sieve.generate_le_iff, Presieve.ofArrows_le_iff]
+      exact fun _ ↦ Sieve.ofArrows_mk _ _ _
+    · rw [hP.jointly_reflect_ofArrows_mem]
+      exact fun Φ x ↦ ⟨_, _, hy ⟨Φ, x⟩⟩
+
 private lemma mk'.isLocallySurjective
     (hP : ∀ ⦃X : C⦄ (S : Sieve X) (_ : ∀ (Φ : P.FullSubcategory) (x : Φ.obj.fiber.obj X),
       ∃ (Y : C) (g : Y ⟶ X) (_ : S g) (y : Φ.obj.fiber.obj Y), Φ.obj.fiber.map g y = x),
