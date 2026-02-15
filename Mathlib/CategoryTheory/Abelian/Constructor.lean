@@ -20,16 +20,17 @@ open Category Limits
 
 namespace Abelian
 
-variable (C : Type*) [Category C] [Preadditive C] [HasFiniteProducts C]
-  (h : ∀ ⦃X Y : C⦄ (f : X ⟶ Y), ∃ (K : C) (i : K ⟶ X) (wi : i ≫ f = 0)
-    (_hi : IsLimit (KernelFork.ofι _ wi))
-    (Q : C) (p : Y ⟶ Q) (wp : f ≫ p = 0) (_hp : IsColimit (CokernelCofork.ofπ _ wp))
-    (I : C) (π : X ⟶ I) (wπ : i ≫ π = 0) (_hπ : IsColimit (CokernelCofork.ofπ _ wπ))
-    (ι : I ⟶ Y) (wι : ι ≫ p = 0) (_hι : IsLimit (KernelFork.ofι _ wι)), f = π ≫ ι)
-
-/-- Constructor for abelian categories. -/
-noncomputable def mk' : Abelian C where
-  toPreadditive := inferInstance
+/-- Constructor for abelian categories. We assume that the category `C` is
+preadditive, has finite products, and that any morphism `f : X ⟶ Y` has
+a kernel `i : K ⟶ X`, a cokernel `p : Y ⟶ Q` such that `f` factors as `f = π ≫ ι`
+where `π : X ⟶ I` is a cokernel of `i` and `ι : I ⟶ Y` is a kernel of `p`. -/
+noncomputable def mk' {C : Type*} [Category C] [Preadditive C] [HasFiniteProducts C]
+    (h : ∀ ⦃X Y : C⦄ (f : X ⟶ Y),
+      ∃ (K : C) (i : K ⟶ X) (wi : i ≫ f = 0) (_hi : IsLimit (KernelFork.ofι _ wi))
+        (Q : C) (p : Y ⟶ Q) (wp : f ≫ p = 0) (_hp : IsColimit (CokernelCofork.ofπ _ wp))
+        (I : C) (π : X ⟶ I) (wπ : i ≫ π = 0) (_hπ : IsColimit (CokernelCofork.ofπ _ wπ))
+        (ι : I ⟶ Y) (wι : ι ≫ p = 0) (_hι : IsLimit (KernelFork.ofι _ wι)), f = π ≫ ι) :
+    Abelian C where
   has_kernels := ⟨fun {X Y} f => by
     obtain ⟨K, i, wi, hi, _⟩ := h f
     exact ⟨_, hi⟩⟩
