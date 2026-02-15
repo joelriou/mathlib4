@@ -8,7 +8,6 @@ module
 public import Mathlib.Algebra.Homology.SpectralObject.Basic
 public import Mathlib.Algebra.Homology.ExactSequenceFour
 public import Mathlib.CategoryTheory.Abelian.Exact
-public import Batteries.Tactic.Lint
 
 /-!
 # Kernel and cokernel of the differentiel of a spectral object
