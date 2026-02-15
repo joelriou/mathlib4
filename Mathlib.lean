@@ -3234,6 +3234,7 @@ public import Mathlib.CategoryTheory.Triangulated.Pretriangulated
 public import Mathlib.CategoryTheory.Triangulated.Rotate
 public import Mathlib.CategoryTheory.Triangulated.SpectralObject
 public import Mathlib.CategoryTheory.Triangulated.Subcategory
+public import Mathlib.CategoryTheory.Triangulated.TStructure.AbelianSubcategory
 public import Mathlib.CategoryTheory.Triangulated.TStructure.Basic
 public import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLTGE
 public import Mathlib.CategoryTheory.Triangulated.TriangleShift
