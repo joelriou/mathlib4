@@ -106,8 +106,8 @@ namespace GrothendieckTopology
 if it has a `w`-small conservative family of points. -/
 class HasEnoughPoints (J : GrothendieckTopology C) : Prop where
   exists_objectProperty (J) :
-      ∃ (P : ObjectProperty (Point.{w} J)),
-        ObjectProperty.Small.{w} P ∧ P.IsConservativeFamilyOfPoints
+    ∃ (P : ObjectProperty (Point.{w} J)),
+      ObjectProperty.Small.{w} P ∧ P.IsConservativeFamilyOfPoints
 
 end GrothendieckTopology
 
