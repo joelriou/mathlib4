@@ -1296,6 +1296,7 @@ public import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
 public import Mathlib.AlgebraicGeometry.Fiber
 public import Mathlib.AlgebraicGeometry.FunctionField
 public import Mathlib.AlgebraicGeometry.GammaSpecAdjunction
+public import Mathlib.AlgebraicGeometry.Geometrically.Basic
 public import Mathlib.AlgebraicGeometry.Gluing
 public import Mathlib.AlgebraicGeometry.GluingOneHypercover
 public import Mathlib.AlgebraicGeometry.Group.Smooth
@@ -2538,6 +2539,7 @@ public import Mathlib.CategoryTheory.Functor.KanExtension.Preserves
 public import Mathlib.CategoryTheory.Functor.OfSequence
 public import Mathlib.CategoryTheory.Functor.ReflectsIso.Balanced
 public import Mathlib.CategoryTheory.Functor.ReflectsIso.Basic
+public import Mathlib.CategoryTheory.Functor.ReflectsIso.Jointly
 public import Mathlib.CategoryTheory.Functor.RegularEpi
 public import Mathlib.CategoryTheory.Functor.Trifunctor
 public import Mathlib.CategoryTheory.Functor.TwoSquare
@@ -3147,6 +3149,8 @@ public import Mathlib.CategoryTheory.Sites.Over
 public import Mathlib.CategoryTheory.Sites.Plus
 public import Mathlib.CategoryTheory.Sites.Point.Basic
 public import Mathlib.CategoryTheory.Sites.Point.Category
+public import Mathlib.CategoryTheory.Sites.Point.Conservative
+public import Mathlib.CategoryTheory.Sites.Point.Over
 public import Mathlib.CategoryTheory.Sites.Precoverage
 public import Mathlib.CategoryTheory.Sites.PrecoverageToGrothendieck
 public import Mathlib.CategoryTheory.Sites.Preserves
@@ -3234,6 +3238,7 @@ public import Mathlib.CategoryTheory.Triangulated.TriangleShift
 public import Mathlib.CategoryTheory.Triangulated.Triangulated
 public import Mathlib.CategoryTheory.Triangulated.Yoneda
 public import Mathlib.CategoryTheory.Types.Basic
+public import Mathlib.CategoryTheory.Types.Epimorphisms
 public import Mathlib.CategoryTheory.Types.Monomorphisms
 public import Mathlib.CategoryTheory.Types.Set
 public import Mathlib.CategoryTheory.UnivLE
@@ -6079,6 +6084,7 @@ public import Mathlib.RingTheory.Finiteness.Bilinear
 public import Mathlib.RingTheory.Finiteness.Cardinality
 public import Mathlib.RingTheory.Finiteness.Cofinite
 public import Mathlib.RingTheory.Finiteness.Defs
+public import Mathlib.RingTheory.Finiteness.Descent
 public import Mathlib.RingTheory.Finiteness.Finsupp
 public import Mathlib.RingTheory.Finiteness.Ideal
 public import Mathlib.RingTheory.Finiteness.Lattice
@@ -6160,6 +6166,7 @@ public import Mathlib.RingTheory.Ideal.Lattice
 public import Mathlib.RingTheory.Ideal.Maps
 public import Mathlib.RingTheory.Ideal.Maximal
 public import Mathlib.RingTheory.Ideal.MinimalPrime.Basic
+public import Mathlib.RingTheory.Ideal.MinimalPrime.Colon
 public import Mathlib.RingTheory.Ideal.MinimalPrime.Localization
 public import Mathlib.RingTheory.Ideal.MinimalPrime.Noetherian
 public import Mathlib.RingTheory.Ideal.NatInt
@@ -7538,6 +7545,7 @@ public import Mathlib.Topology.Sheaves.LocallySurjective
 public import Mathlib.Topology.Sheaves.MayerVietoris
 public import Mathlib.Topology.Sheaves.Over
 public import Mathlib.Topology.Sheaves.PUnit
+public import Mathlib.Topology.Sheaves.Points
 public import Mathlib.Topology.Sheaves.Presheaf
 public import Mathlib.Topology.Sheaves.PresheafOfFunctions
 public import Mathlib.Topology.Sheaves.Sheaf
