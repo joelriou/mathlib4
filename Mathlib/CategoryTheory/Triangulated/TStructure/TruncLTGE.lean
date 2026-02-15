@@ -6,6 +6,7 @@ Authors: Joël Riou
 module
 
 public import Mathlib.CategoryTheory.Triangulated.TStructure.Basic
+public import Mathlib.CategoryTheory.Triangulated.Subcategory
 
 /-!
 # Truncations for a t-structure
