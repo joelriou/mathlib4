@@ -659,6 +659,7 @@ public import Mathlib.Algebra.Homology.Single
 public import Mathlib.Algebra.Homology.SingleHomology
 public import Mathlib.Algebra.Homology.SpectralObject.Basic
 public import Mathlib.Algebra.Homology.SpectralObject.Cycles
+public import Mathlib.Algebra.Homology.SpectralObject.Page
 public import Mathlib.Algebra.Homology.Square
 public import Mathlib.Algebra.Homology.TotalComplex
 public import Mathlib.Algebra.Homology.TotalComplexShift
