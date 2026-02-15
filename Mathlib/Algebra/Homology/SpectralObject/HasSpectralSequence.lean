@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Algebra.Homology.SpectralObject.Basic
 public import Mathlib.Algebra.Homology.SpectralSequence.ComplexShape
+public import Mathlib.Order.Fin.Clamp
 public import Mathlib.Order.WithBotTop
 
 /-!
@@ -229,8 +230,7 @@ def mkDataE₂CohomologicalFin (l : ℕ) :
     rintro r r' ⟨a, ⟨a', _⟩⟩ hr hrr'
     dsimp
     rw [Fin.mk_le_mk]
-    apply Fin.clamp_le_clamp
-    lia
+    exact Fin.clamp_mono (by lia)
   i₀_prev := by
     rintro r r' ⟨a, ⟨a', _⟩⟩ ⟨b, ⟨b', _⟩⟩ ⟨h₁, h₂⟩ hrr' hr
     ext
@@ -333,11 +333,6 @@ instance (E : SpectralObject C EInt) : E.HasSpectralSequence mkDataE₂Cohomolog
   isZero_H_obj_mk₁_i₃_le r r' pq hpq n hn hrr' hr := by
     exfalso
     exact hpq (pq - (r, 1-r)) (by simp)
-
-lemma _root_.Fin.clamp_eq_last (n m : ℕ) (hnm : m ≤ n) :
-    Fin.clamp n m = Fin.last _ := by
-  ext
-  simpa
 
 instance {l : ℕ} (E : SpectralObject C (Fin (l + 1))) :
     E.HasSpectralSequence (mkDataE₂CohomologicalFin l) where
