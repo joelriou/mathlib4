@@ -194,11 +194,17 @@ def mkDataE₂CohomologicalNat :
     simp only [ComplexShape.spectralSequenceNat_rel_iff] at hpq
     lia
 
+
 -- to be moved
-lemma _root_.Fin.clamp_le_clamp {a b : ℕ} (h : a ≤ b) (m : ℕ) :
-    Fin.clamp a m ≤ Fin.clamp b m := by
+lemma _root_.Fin.clamp_mono {m : ℕ} : Monotone (fun n ↦ Fin.clamp n m) := by
+  intro a b h
   rw [Fin.le_iff_val_le_val]
   exact min_le_min_right m h
+
+lemma _root_.Fin.clamp_eq_last (n m : ℕ) (hnm : m ≤ n) :
+    Fin.clamp n m = Fin.last _ := by
+  ext
+  simpa
 
 /-- The data which allows to construct an `E₂`-cohomological spectral sequence
 indexed by `ℤ × Fin l` from a spectral object indexed by `Fin (l + 1)`. -/
@@ -235,8 +241,7 @@ def mkDataE₂CohomologicalFin (l : ℕ) :
     rintro r r' ⟨a, ⟨a', _⟩⟩ hr hrr'
     dsimp
     rw [Fin.mk_le_mk]
-    apply Fin.clamp_le_clamp
-    lia
+    exact Fin.clamp_mono (by lia)
   i₀_prev := by
     rintro r r' ⟨a, ⟨a', _⟩⟩ ⟨b, ⟨b', _⟩⟩ ⟨h₁, h₂⟩ hrr' hr
     ext
@@ -339,11 +344,6 @@ instance (E : SpectralObject C EInt) : E.HasSpectralSequence mkDataE₂Cohomolog
   isZero_H_obj_mk₁_i₃_le r r' pq hpq n hn hrr' hr := by
     exfalso
     exact hpq (pq - (r, 1-r)) (by simp)
-
-lemma _root_.Fin.clamp_eq_last (n m : ℕ) (hnm : m ≤ n) :
-    Fin.clamp n m = Fin.last _ := by
-  ext
-  simpa
 
 instance {l : ℕ} (E : SpectralObject C (Fin (l + 1))) :
     E.HasSpectralSequence (mkDataE₂CohomologicalFin l) where
