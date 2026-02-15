@@ -82,4 +82,12 @@ lemma IsConservativeFamilyOfPoints.over
 
 end ObjectProperty
 
+namespace GrothendieckTopology
+
+example [HasEnoughPoints.{w} J] (X : C) :
+    HasEnoughPoints.{w} (J.over X) := by
+  sorry
+
+end GrothendieckTopology
+
 end CategoryTheory
