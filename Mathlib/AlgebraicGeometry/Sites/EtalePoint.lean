@@ -153,4 +153,8 @@ lemma isConservative_pointSmallEtale' (S : Scheme.{u}) :
     simp only [Equiv.invFun_as_coe, Set.mem_iUnion, Set.mem_range, Set.mem_univ, iff_true]
     exact ⟨s, default, by simp [SpecToEquivOfField]⟩)
 
+instance : GrothendieckTopology.HasEnoughPoints.{u} (smallEtaleTopology S) where
+  exists_objectProperty :=
+    ⟨_, inferInstance, isConservative_pointSmallEtale' S⟩
+
 end AlgebraicGeometry.Scheme
