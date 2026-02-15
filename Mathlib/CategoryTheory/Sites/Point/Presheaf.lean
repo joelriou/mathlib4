@@ -99,6 +99,11 @@ noncomputable def pointsBot :
     ObjectProperty (Point.{w} (⊥ : GrothendieckTopology C)) :=
   .ofObj pointBot
 
+instance [Small.{w} C] : ObjectProperty.Small.{w} (pointsBot C) := by
+  dsimp [pointsBot]
+  infer_instance
+
+variable (C) in
 lemma isConservative_pointsBot :
     (pointsBot.{w} C).IsConservativeFamilyOfPoints :=
   .mk' (fun X S hS ↦ by
@@ -110,6 +115,10 @@ lemma isConservative_pointsBot :
         rw [← hb, shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm])
     simpa only [bot_covering, ← Sieve.id_mem_iff_eq_top, this]
       using S.downward_closed ha b)
+
+instance {C : Type w} [SmallCategory C] :
+    HasEnoughPoints.{w} (⊥ : GrothendieckTopology C) :=
+  ⟨_, inferInstance, isConservative_pointsBot C⟩
 
 end GrothendieckTopology
 
