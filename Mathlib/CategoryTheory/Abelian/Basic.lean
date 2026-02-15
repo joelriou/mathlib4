@@ -803,3 +803,46 @@ def abelian : Abelian C where
   normalEpiOfEpi := fun f _ ↦ ⟨normalEpiOfEpi f⟩
 
 end CategoryTheory.NonPreadditiveAbelian
+
+namespace CategoryTheory.Abelian
+
+/-- Constructor for abelian categories. We assume that the category `C` is
+preadditive, has finite products, and that any morphism `f : X ⟶ Y` has
+a kernel `i : K ⟶ X`, a cokernel `p : Y ⟶ Q` such that `f` factors as `f = π ≫ ι`
+where `π : X ⟶ I` is a cokernel of `i` and `ι : I ⟶ Y` is a kernel of `p`. -/
+noncomputable def mk' {C : Type*} [Category C] [Preadditive C] [HasFiniteProducts C]
+    (h : ∀ ⦃X Y : C⦄ (f : X ⟶ Y),
+      ∃ (K : C) (i : K ⟶ X) (wi : i ≫ f = 0) (_hi : IsLimit (KernelFork.ofι _ wi))
+        (Q : C) (p : Y ⟶ Q) (wp : f ≫ p = 0) (_hp : IsColimit (CokernelCofork.ofπ _ wp))
+        (I : C) (π : X ⟶ I) (wπ : i ≫ π = 0) (_hπ : IsColimit (CokernelCofork.ofπ _ wπ))
+        (ι : I ⟶ Y) (wι : ι ≫ p = 0) (_hι : IsLimit (KernelFork.ofι _ wι)), f = π ≫ ι) :
+    Abelian C where
+  has_kernels := ⟨fun {X Y} f => by
+    obtain ⟨K, i, wi, hi, _⟩ := h f
+    exact ⟨_, hi⟩⟩
+  has_cokernels := ⟨fun {X Y} f => by
+    obtain ⟨_, _, _, _, Q, p, wp, hp, _⟩ := h f
+    exact ⟨_, hp⟩⟩
+  normalMonoOfMono {X Y} f _ := by
+    obtain ⟨K, i, wi, _, Q, p, wp, _, I, π, wπ, hπ, ι, wι, hι, fac⟩ := h f
+    exact
+     ⟨{ Z := Q
+        g := p
+        w := by rw [fac, Category.assoc, wι, comp_zero]
+        isLimit := by
+          have : IsIso π := CokernelCofork.IsColimit.isIso_π _ hπ (by
+            rw [← cancel_mono f, zero_comp, wi])
+          exact IsLimit.ofIsoLimit hι (Fork.ext (by exact asIso π)
+            (by exact fac.symm)).symm }⟩
+  normalEpiOfEpi {X Y} f _ := by
+    obtain ⟨K, i, wi, _, Q, p, wp, _, I, π, wπ, hπ, ι, wι, hι, fac⟩ := h f
+    exact
+     ⟨{ W := K
+        g := i
+        w := by rw [fac, reassoc_of% wπ, zero_comp]
+        isColimit := by
+          have : IsIso ι := KernelFork.IsLimit.isIso_ι _ hι (by
+            rw [← cancel_epi f, comp_zero, wp])
+          exact IsColimit.ofIsoColimit hπ (Cofork.ext (asIso ι) fac.symm) }⟩
+
+end CategoryTheory.Abelian
