@@ -11,6 +11,19 @@ public import Mathlib.CategoryTheory.Triangulated.TStructure.ETrunc
 /-!
 # Abelian subcategories of triangulated categories
 
+Let `ι : A ⥤ C` be a fully faithful additive functor where `A` is
+an additive category and `C` s a triangulated category. We show that `A`
+is an abelian category if the following conditions are satisfied:
+* For any object `X` and `Y` in `A`, there is no nonzero morphism
+  `ι.obj X ⟶ (ι.obj Y)⟦n⟧` when `n < 0`.
+* Any morphism `f₁ : X₁ ⟶ X₂` in `A` is admissible, i.e. when
+  we complete `ι.obj f₁` in a distinguished triangle
+  `ι.obj X₁ ⟶ ι.obj X₂ ⟶ X₃ ⟶ (ι.obj X₁)⟦1⟧`, there exists objects `K`
+  and `Q`, and a distinguished triangle `(ι.obj K)⟦1⟧ ⟶ X₃ ⟶ (ι.obj Q) ⟶`.
+
+## References
+* [Beilinson, Bernstein, Deligne, Gabber, *Faisceaux pervers*][bbd-1982]
+
 -/
 
 @[expose] public section
@@ -174,7 +187,7 @@ variable (ι)
 def admissibleMorphism : MorphismProperty A := fun X₁ X₂ f₁ =>
   ∀ ⦃X₃ : C⦄ (f₂ : ι.obj X₂ ⟶ X₃) (f₃ : X₃ ⟶ (ι.obj X₁)⟦(1 : ℤ)⟧)
     (_ : Triangle.mk (ι.map f₁) f₂ f₃ ∈ distTriang C),
-  ∃ (K Q : A) (α : (ι.obj K)⟦(1 : ℤ)⟧ ⟶ X₃) (β : X₃ ⟶ (ι.obj Q))
+  ∃ (K Q : A) (α : (ι.obj K)⟦(1 : ℤ)⟧ ⟶ X₃) (β : X₃ ⟶ ι.obj Q)
     (γ : ι.obj Q ⟶ (ι.obj K)⟦(1 : ℤ)⟧⟦(1 : ℤ)⟧), Triangle.mk α β γ ∈ distTriang C
 
 variable {ι} [Preadditive A] [ι.Full] [ι.Faithful]
@@ -198,7 +211,7 @@ lemma hasCokernel_of_admissibleMorphism {X₁ X₂ : A} (f₁ : X₁ ⟶ X₂)
 section
 
 -- should be moved somewhere
-instance hasZeroObject [HasTerminal A] : HasZeroObject A :=
+instance (priority := low) hasZeroObject [HasTerminal A] : HasZeroObject A :=
   ⟨⊤_ A, by
     rw [IsZero.iff_id_eq_zero]
     apply Subsingleton.elim⟩
@@ -247,9 +260,8 @@ noncomputable def isColimitCokernelCoforkOfDistTriang {X₁ X₂ X₃ : A}
     hT hT') ?_
   exact Cofork.ext (Iso.refl _) (ι.map_injective (by simp))
 
-variable (hA : ∀ ⦃X₁ X₂ : A⦄ (f₁ : X₁ ⟶ X₂), admissibleMorphism ι f₁) [IsTriangulated C]
+variable (hA : ∀ ⦃X₁ X₂ : A⦄ (f₁ : X₁ ⟶ X₂), admissibleMorphism ι f₁)
 
-omit [IsTriangulated C] in
 include hι hA in
 lemma exists_distinguished_triangle_of_epi {X₂ X₃ : A} (π : X₂ ⟶ X₃) [Epi π] :
     ∃ (X₁ : A) (i : X₁ ⟶ X₂) (δ : ι.obj X₃ ⟶ (ι.obj X₁)⟦(1 : ℤ)⟧),
@@ -270,36 +282,29 @@ lemma exists_distinguished_triangle_of_epi {X₂ X₃ : A} (π : X₂ ⟶ X₃) 
 
 variable (ι)
 
-noncomputable def abelian : Abelian A := by
-  apply Abelian.mk'
-  intro X₁ X₂ f₁
-  obtain ⟨X₃, f₂, f₃, hT⟩ := distinguished_cocone_triangle (ι.map f₁)
-  obtain ⟨K, Q, α, β, γ, hT'⟩ := hA f₁ f₂ f₃ hT
-  have comm : f₂ ≫ β = ι.map (πQ f₂ β) := by simp
-  have := epi_πQ hι hT hT'
-  obtain ⟨I, i, δ, hI⟩ := exists_distinguished_triangle_of_epi hι hA (πQ f₂ β)
-  have H := someOctahedron comm (rot_of_distTriang _ hT) (rot_of_distTriang _ hT')
-    (rot_of_distTriang _ hI)
-  obtain ⟨m₁, hm₁⟩ : ∃ (m₁ : X₁ ⟶ I), (shiftFunctor C (1 : ℤ)).map (ι.map m₁) = H.m₁ :=
-    ⟨(ι ⋙ shiftFunctor C (1 : ℤ)).preimage H.m₁, Functor.map_preimage (ι ⋙ _) _⟩
-  obtain ⟨m₃ : ι.obj I ⟶ (ι.obj K)⟦(1 : ℤ)⟧, hm₃⟩ :
-      ∃ m₃, (shiftFunctor C (1 : ℤ)).map m₃ = H.m₃ :=
-    ⟨(shiftFunctor C (1 : ℤ)).preimage H.m₃, Functor.map_preimage _ _⟩
-  have Hmem' : Triangle.mk (ι.map (ιK f₃ α)) (ι.map m₁) (-m₃) ∈ distTriang C := by
-    rw [rotate_distinguished_triangle, ← Triangle.shift_distinguished_iff _ 1]
-    refine isomorphic_distinguished _ H.mem _ ?_
-    refine Triangle.isoMk _ _ (-(Iso.refl _)) (Iso.refl _) (Iso.refl _) ?_ ?_ ?_
-    · dsimp
-      simp [hm₁]
-    · dsimp
-      simp [hm₃]
-    · dsimp
-      simp
-  exact ⟨K, _, _, isLimitKernelFork hι hT hT',
-    Q, _, _, isColimitCokernelCofork hι hT hT',
-    I, _, _, isColimitCokernelCoforkOfDistTriang hι _ _ _ Hmem',
-    i, _, isLimitKernelForkOfDistTriang hι _ _ _ hI,
-    (ι ⋙ shiftFunctor C (1 : ℤ)).map_injective (by simpa [hm₁] using H.comm₂.symm)⟩
+noncomputable def abelian [IsTriangulated C] : Abelian A :=
+  Abelian.mk' (fun X₁ X₂ f₁ ↦ by
+    obtain ⟨X₃, f₂, f₃, hT⟩ := distinguished_cocone_triangle (ι.map f₁)
+    obtain ⟨K, Q, α, β, γ, hT'⟩ := hA f₁ f₂ f₃ hT
+    have comm : f₂ ≫ β = ι.map (πQ f₂ β) := by simp
+    have := epi_πQ hι hT hT'
+    obtain ⟨I, i, δ, hI⟩ := exists_distinguished_triangle_of_epi hι hA (πQ f₂ β)
+    have H := someOctahedron comm (rot_of_distTriang _ hT) (rot_of_distTriang _ hT')
+      (rot_of_distTriang _ hI)
+    obtain ⟨m₁, hm₁⟩ : ∃ (m₁ : X₁ ⟶ I), (shiftFunctor C (1 : ℤ)).map (ι.map m₁) = H.m₁ :=
+      ⟨(ι ⋙ shiftFunctor C (1 : ℤ)).preimage H.m₁, Functor.map_preimage (ι ⋙ _) _⟩
+    obtain ⟨m₃ : ι.obj I ⟶ (ι.obj K)⟦(1 : ℤ)⟧, hm₃⟩ :
+        ∃ m₃, (shiftFunctor C (1 : ℤ)).map m₃ = H.m₃ :=
+      ⟨(shiftFunctor C (1 : ℤ)).preimage H.m₃, Functor.map_preimage _ _⟩
+    have Hmem' : Triangle.mk (ι.map (ιK f₃ α)) (ι.map m₁) (-m₃) ∈ distTriang C := by
+      rw [rotate_distinguished_triangle, ← Triangle.shift_distinguished_iff _ 1]
+      refine isomorphic_distinguished _ H.mem _ ?_
+      exact Triangle.isoMk _ _ (-(Iso.refl _)) (Iso.refl _) (Iso.refl _)
+    exact ⟨K, _, _, isLimitKernelFork hι hT hT',
+      Q, _, _, isColimitCokernelCofork hι hT hT',
+      I, _, _, isColimitCokernelCoforkOfDistTriang hι _ _ _ Hmem',
+      i, _, isLimitKernelForkOfDistTriang hι _ _ _ hI,
+      (ι ⋙ shiftFunctor C (1 : ℤ)).map_injective (by simpa [hm₁] using H.comm₂.symm)⟩)
 
 end
 
