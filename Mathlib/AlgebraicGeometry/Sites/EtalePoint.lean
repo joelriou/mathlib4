@@ -9,7 +9,9 @@ public import Mathlib.AlgebraicGeometry.Fiber
 public import Mathlib.AlgebraicGeometry.Sites.AffineEtale
 public import Mathlib.CategoryTheory.Functor.TypeValuedFlat
 public import Mathlib.CategoryTheory.Limits.Elements
-public import Mathlib.CategoryTheory.Sites.Point.Category
+public import Mathlib.CategoryTheory.Sites.Point.Conservative
+
+public import Mathlib.FieldTheory.SeparableClosure
 
 /-!
 
@@ -17,6 +19,7 @@ public import Mathlib.CategoryTheory.Sites.Point.Category
 
 In this file, we show that a morphism `Spec (.of Ω) ⟶ S` where `Ω` is
 a separably closed field defined a point on the small étale site of `S`.
+We show that these points form a conservative family.
 
 -/
 
@@ -30,9 +33,6 @@ namespace AlgebraicGeometry.Scheme
 
 variable {S : Scheme.{u}} {Ω : Type u} [Field Ω] [IsSepClosed Ω]
   (s : Spec (.of Ω) ⟶ S)
-
-instance : IsCofiltered (Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))).Elements :=
-  Functor.isCofiltered_elements _
 
 lemma exists_fac_of_etale_of_isSepClosed {X S : Scheme.{u}} (f : X ⟶ S) [Etale f]
     {Ω : Type u} [Field Ω] [IsSepClosed Ω] (s : Spec (.of Ω) ⟶ S)
@@ -51,6 +51,9 @@ lemma exists_fac_of_etale_of_isSepClosed {X S : Scheme.{u}} (f : X ⟶ S) [Etale
   · simp [SpecToEquivOfField, ← this]
   · dsimp
     apply fromSpecResidueField_apply
+
+instance : IsCofiltered (Etale.forget S ⋙ coyoneda.obj (op (Over.mk s))).Elements :=
+  Functor.isCofiltered_elements _
 
 /-- A morphism `s : Spec (.of Ω) ⟶ S` where `Ω` is a separably closed field
 defines a point for the small étale site of `S`. -/
@@ -115,32 +118,39 @@ lemma pointSmallEtaleFiberObjToPreimage_surjective (X : S.Etale) :
   rw [Category.assoc, X.hom.fiber_fac, reassoc_of% hl]
   cat_disch
 
--- The following will have to wait for #35175
-variable {ι : Type*} {S : Scheme.{u}}
-  {Ω : ι → Type u} [∀ i, Field (Ω i)] [∀ i, IsSepClosed (Ω i)]
-  (s : ∀ i, Spec (.of (Ω i)) ⟶ S)
-  (hs : ⋃ i, Set.range (s i) = .univ)
+lemma isConservative_pointSmallEtale
+    {ι : Type*} {S : Scheme.{u}}
+    {Ω : ι → Type u} [∀ i, Field (Ω i)] [∀ i, IsSepClosed (Ω i)]
+    (s : ∀ i, Spec (.of (Ω i)) ⟶ S)
+    (hs : ⋃ i, Set.range (s i) = .univ) :
+    (ObjectProperty.ofObj (fun i ↦ pointSmallEtale (s i))).IsConservativeFamilyOfPoints :=
+  .mk' (fun X R hR ↦ by
+    obtain ⟨α, T, f, rfl⟩ := R.exists_eq_ofArrows
+    rw [ofArrows_mem_smallEtaleTopology_iff]
+    ext x
+    simp only [Set.mem_iUnion, Set.mem_range, Set.mem_univ, iff_true]
+    obtain ⟨i, hi⟩ : ∃ i, s i default = X.hom x := by
+      have := Set.mem_univ (X.hom x)
+      simp only [← hs, Functor.const_obj_obj, Functor.id_obj, Set.mem_iUnion,
+        Set.mem_range] at this
+      obtain ⟨i, y, hy⟩ := this
+      obtain rfl := Subsingleton.elim y default
+      exact ⟨i, hy⟩
+    obtain ⟨x', hx'⟩ := pointSmallEtaleFiberObjToPreimage_surjective (s i) hi X ⟨x, by simp⟩
+    rw [Subtype.ext_iff] at hx'
+    dsimp at hx'
+    subst hx'
+    obtain ⟨W, g, ⟨Z, p, _, ⟨a⟩, rfl⟩, y, rfl⟩ := hR ⟨_, ⟨i⟩⟩ x'
+    exact ⟨a, (pointSmallEtaleFiberObjToPreimage (s i) hi (y ≫ p.hom)).1, rfl⟩)
 
-include hs in
-lemma isConservative_aux {X : S.Etale} {α : Type*} {Y : α → S.Etale} (f : ∀ a, Y a ⟶ X)
-    (hf : ∀ (i : ι) (x : (pointSmallEtale (s i)).fiber.obj X),
-      ∃ (a : α) (y : (pointSmallEtale (s i)).fiber.obj (Y a)),
-        (pointSmallEtale (s i)).fiber.map (f a) y = x) :
-    Sieve.ofArrows _ f ∈ smallEtaleTopology _ _ := by
-  rw [ofArrows_mem_smallEtaleTopology_iff]
-  ext x
-  simp only [Set.mem_iUnion, Set.mem_range, Set.mem_univ, iff_true]
-  obtain ⟨i, hi⟩ : ∃ i, s i default = X.hom x := by
-    have := Set.mem_univ (X.hom x)
-    simp only [← hs, Functor.const_obj_obj, Functor.id_obj, Set.mem_iUnion,
-      Set.mem_range] at this
-    obtain ⟨i, y, hy⟩ := this
-    obtain rfl := Subsingleton.elim y default
-    exact ⟨i, hy⟩
-  obtain ⟨x', hx'⟩ := pointSmallEtaleFiberObjToPreimage_surjective (s i) hi X ⟨x, by simp⟩
-  rw [Subtype.ext_iff] at hx'
-  dsimp at hx'
-  obtain ⟨a, y, hy⟩ := hf i x'
-  exact ⟨a, (pointSmallEtaleFiberObjToPreimage (s i) hi y).1, by aesop⟩
+lemma isConservative_pointSmallEtale' (S : Scheme.{u}) :
+    (ObjectProperty.ofObj (fun (s : S) ↦ pointSmallEtale
+      ((SpecToEquivOfField (SeparableClosure (S.residueField s)) _).2
+        ⟨s, CommRingCat.ofHom
+          (algebraMap (S.residueField s) _)⟩))).IsConservativeFamilyOfPoints :=
+  isConservative_pointSmallEtale _ (by
+    ext s
+    simp only [Equiv.invFun_as_coe, Set.mem_iUnion, Set.mem_range, Set.mem_univ, iff_true]
+    exact ⟨s, default, by simp [SpecToEquivOfField]⟩)
 
 end AlgebraicGeometry.Scheme
