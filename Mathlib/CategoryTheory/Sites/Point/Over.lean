@@ -84,9 +84,12 @@ end ObjectProperty
 
 namespace GrothendieckTopology
 
-example [HasEnoughPoints.{w} J] (X : C) :
+instance [HasEnoughPoints.{w} J] [J.WEqualsLocallyBijective (Type w)]
+    [HasSheafify J (Type w)] (X : C)
+    [HasSheafify (J.over X) (Type w)] :
     HasEnoughPoints.{w} (J.over X) := by
-  sorry
+  obtain ⟨P, _, hP⟩ := HasEnoughPoints.exists_objectProperty J
+  exact ⟨_, inferInstance, hP.over X⟩
 
 end GrothendieckTopology
 
