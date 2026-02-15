@@ -306,7 +306,6 @@ lemma isZero_H_obj_mk₁_i₀_le (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ ≤
     IsZero ((X.H n).obj (mk₁ (homOfLE (data.i₀_le r r' pq)))) :=
   HasSpectralSequence.isZero_H_obj_mk₁_i₀_le r r' pq hpq n hn
 
-/-- isZero_H_obj_mk₁_i₀_le' -/
 lemma isZero_H_obj_mk₁_i₀_le' (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ ≤ r)
     (pq : κ) (hpq : ∀ (pq' : κ), ¬ ((c r).Rel pq pq'))
     (n : ℤ) (hn : n = data.deg pq + 1) (i₀' i₀ : ι)
@@ -323,7 +322,6 @@ lemma isZero_H_obj_mk₁_i₃_le (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ ≤
     IsZero ((X.H n).obj (mk₁ (homOfLE (data.i₃_le r r' pq)))) :=
   HasSpectralSequence.isZero_H_obj_mk₁_i₃_le r r' pq hpq n hn
 
-/-- isZero_H_obj_mk₁_i₃_le' -/
 lemma isZero_H_obj_mk₁_i₃_le' (r r' : ℤ) (hrr' : r + 1 = r') (hr : r₀ ≤ r)
     (pq : κ) (hpq : ∀ (pq' : κ), ¬ ((c r).Rel pq' pq))
     (n : ℤ) (hn : n = data.deg pq - 1) (i₃ i₃' : ι)
