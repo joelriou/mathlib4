@@ -12,7 +12,7 @@ public import Mathlib.CategoryTheory.Triangulated.TStructure.TruncLEGT
 /-!
 # Induced t-structures
 
-Let `t` be a t-structure on a pretriangulated cateogry `C`.
+Let `t` be a t-structure on a pretriangulated category `C`.
 If `P` is a triangulated subcategory of `C`, we introduce a typeclass
 `P.HasInducedTStructure t` which essentially says that up to isomorphisms
 `P` is stable by the application of the truncation functors.
