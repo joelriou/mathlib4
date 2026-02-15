@@ -16,13 +16,13 @@ public import Mathlib.Order.MinMax
 
 namespace Fin
 
-lemma Fin.clamp_mono {m : ℕ} : Monotone (fun n ↦ Fin.clamp n m) := by
+lemma clamp_mono {m : ℕ} : Monotone (fun n ↦ clamp n m) := by
   intro a b h
-  rw [Fin.le_iff_val_le_val]
+  rw [le_iff_val_le_val]
   exact min_le_min_right m h
 
-lemma Fin.clamp_eq_last (n m : ℕ) (hnm : m ≤ n) :
-    Fin.clamp n m = Fin.last _ := by
+lemma clamp_eq_last (n m : ℕ) (hnm : m ≤ n) :
+    clamp n m = last _ := by
   ext
   simpa
 
