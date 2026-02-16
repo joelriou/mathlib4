@@ -289,8 +289,7 @@ def ofDescentData (D : F.DescentData f) : F.DescentData' sq sq₃ where
       pullHom'_eq_pullHom _ _ _ _ _ _ (sq₃ i₁ i₂ i₃).p₂₃,
       pullHom'_eq_pullHom _ _ _ _ _ _ (sq₃ i₁ i₂ i₃).p₁₃,
       D.pullHom_hom _ _ (sq₃ i₁ i₂ i₃).p, D.pullHom_hom _ _ (sq₃ i₁ i₂ i₃).p,
-      D.pullHom_hom _ _ (sq₃ i₁ i₂ i₃).p,
-      D.hom_comp]
+      D.pullHom_hom _ _ (sq₃ i₁ i₂ i₃).p, D.hom_comp]
     all_goals cat_disch
 
 variable (sq sq₃) in
@@ -299,8 +298,8 @@ lemma pullHom'_ofDescentData_hom (D : F.DescentData f)
     ⦃Y : C⦄ (q : Y ⟶ S) ⦃i₁ i₂ : ι⦄ (f₁ : Y ⟶ X i₁)
     (f₂ : Y ⟶ X i₂) (hf₁ : f₁ ≫ f i₁ = q) (hf₂ : f₂ ≫ f i₂ = q) :
     pullHom' (ofDescentData sq sq₃ D).hom q f₁ f₂ hf₁ hf₂ = D.hom q f₁ f₂ hf₁ hf₂ := by
-  obtain ⟨p, h₁, h₂⟩ := (sq i₁ i₂).isPullback.exists_lift f₁ f₂ (by aesop)
-  rw [pullHom'_eq_pullHom _ _ _ _ _ _ p (by aesop) (by aesop)]
+  obtain ⟨p, h₁, h₂⟩ := (sq i₁ i₂).isPullback.exists_lift f₁ f₂ (by cat_disch)
+  rw [pullHom'_eq_pullHom _ _ _ _ _ _ p (by cat_disch) (by cat_disch)]
   dsimp
   rw [D.pullHom_hom _ _ _ (by rw [← (sq i₁ i₂).hp₁, reassoc_of% h₁, hf₁]) _ _
     (by simp) (by simp) _ _ h₁ h₂]
