@@ -218,6 +218,7 @@ instance : (cofibrations (Plus C)).HasFactorization (trivialFibrations (Plus C))
 
 scoped instance : ModelCategory (CochainComplex.Plus C) where
 
+omit [EnoughInjectives C] in
 lemma isFibrant_iff (X : Plus C) :
     IsFibrant X ↔ ∀ (n : ℤ), Injective (X.obj.X n) := by
   rw [HomotopicalAlgebra.isFibrant_iff, fibration_iff,
