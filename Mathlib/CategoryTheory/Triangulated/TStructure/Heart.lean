@@ -9,8 +9,19 @@ public import Mathlib.CategoryTheory.Abelian.Basic
 public import Mathlib.CategoryTheory.Triangulated.TStructure.Basic
 
 /-!
-# The heart of a t-structures
+# The heart of a t-structure
 
+Let `t` be a t-structure on a triangulated category `C`. We define
+the heart of `t` as a property `t.heart : ObjectProperty C`. As the
+the heart is usually identified to a particular category in the applications
+(e.g. the heart of the canonical t-structure on the derived category of
+an abelian category `A` identifies to `A`), instead of working
+with the full subcategory defined by `t.heart`, we introduce a typeclass
+`t.HasHeart` which contains the data of a preadditive category that
+is equivalent to it: this heart can be accessed as `t.Heart`.
+
+## TODO (@joelriou)
+* Show that `t.Heart` is an abelian category.
 
 ## References
 * [Beilinson, Bernstein, Deligne, Gabber, *Faisceaux pervers*][bbd-1982]
@@ -19,11 +30,13 @@ public import Mathlib.CategoryTheory.Triangulated.TStructure.Basic
 
 @[expose] public section
 
+universe v' u' v u
+
 namespace CategoryTheory.Triangulated.TStructure
 
 open Pretriangulated Limits
 
-variable {C : Type*} [Category* C] [Preadditive C] [HasZeroObject C] [HasShift C ℤ]
+variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C] [HasShift C ℤ]
   [∀ (n : ℤ), (shiftFunctor C n).Additive] [Pretriangulated C]
   (t : TStructure C)
 
@@ -44,9 +57,9 @@ category can be accessed as `t.Heart`. -/
 class HasHeart where
   /-- A preadditive category which is equivalent to the fullsubcategory defined by
   the property `t.heart`. -/
-  H : Type*
+  H : Type u'
   /-- The category structure on the heart. -/
-  [category : Category H]
+  [category : Category.{v'} H]
   /-- The heart is a preadditive category. -/
   [preadditive : Preadditive H]
   /-- The inclusion functor. -/
