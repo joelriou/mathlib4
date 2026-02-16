@@ -211,9 +211,9 @@ lemma p₁₃_eq_lift : h.p₁₃ = h₁₃.isPullback.lift h.p₁ h.p₃ (by si
 lemma exists_lift {Y : C} (g₁ : Y ⟶ X₁) (g₂ : Y ⟶ X₂) (g₃ : Y ⟶ X₃) (b : Y ⟶ S)
     (hg₁ : g₁ ≫ f₁ = b) (hg₂ : g₂ ≫ f₂ = b) (hg₃ : g₃ ≫ f₃ = b) :
     ∃ (φ : Y ⟶ h.pullback), φ ≫ h.p₁ = g₁ ∧ φ ≫ h.p₂ = g₂ ∧ φ ≫ h.p₃ = g₃ := by
-  obtain ⟨φ₁₂, w₁, w₂⟩ := h₁₂.isPullback.exists_lift g₁ g₂ (by aesop)
-  obtain ⟨φ₂₃, w₂', w₃⟩ := h₂₃.isPullback.exists_lift g₂ g₃ (by aesop)
-  obtain ⟨φ, w₁₂, w₂₃⟩ := h.chosenPullback.isPullback.exists_lift φ₁₂ φ₂₃ (by aesop)
+  obtain ⟨φ₁₂, w₁, w₂⟩ := h₁₂.isPullback.exists_lift g₁ g₂ (by cat_disch)
+  obtain ⟨φ₂₃, w₂', w₃⟩ := h₂₃.isPullback.exists_lift g₂ g₃ (by cat_disch)
+  obtain ⟨φ, w₁₂, w₂₃⟩ := h.chosenPullback.isPullback.exists_lift φ₁₂ φ₂₃ (by cat_disch)
   refine ⟨φ, ?_, ?_, ?_⟩
   · rw [← w₁, ← w₁₂, Category.assoc, ← p₁₂, p₁₂_p₁]
   · rw [← w₂, ← w₁₂, Category.assoc, ← p₁₂, p₁₂_p₂]
@@ -237,7 +237,7 @@ lemma isPullback₁ : IsPullback h.p₁₂ h.p₁₃ h₁₂.p₁ h₁₃.p₁ :
           (by simp) (by simpa using w.symm =≫ f₁)
       refine ⟨φ, ?_, ?_⟩
       · apply h₁₂.isPullback.hom_ext <;> simpa
-      · apply h₁₃.isPullback.hom_ext <;> aesop)
+      · apply h₁₃.isPullback.hom_ext <;> cat_disch)
 
 lemma isPullback₃ : IsPullback h.p₁₃ h.p₂₃ h₁₃.p₂ h₂₃.p₂ :=
   .mk' (by simp) (fun _ _ _ h₁ h₂ ↦ h.hom_ext (by simpa using h₁ =≫ h₁₃.p₁)
