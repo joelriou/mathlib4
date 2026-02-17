@@ -59,7 +59,7 @@ lemma isPullback : IsPullback h.p₁ h.p₂ f₁ f₂ where
 
 attribute [reassoc (attr := simp)] hp₁
 
-@[reassoc (attr := simp)]
+@[reassoc (attr := simp, grind =)]
 lemma hp₂ : h.p₂ ≫ f₂ = h.p := by rw [← h.condition, hp₁]
 
 /-- Given `f₁ : X₁ ⟶ S`, `f₂ : X₂ ⟶ S`, `h : ChosenPullback f₁ f₂` and morphisms
