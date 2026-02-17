@@ -129,15 +129,12 @@ def isoMk {D₁ D₂ : F.DescentDataAsCoalgebra f} (e : ∀ (i : ι), D₁.obj i
 
 end
 
-section
-
-variable (ι : Type*) [Unique ι] {X S : C} (f : X ⟶ S)
-
+variable (F) in
 /-- When the index type `ι` contains a unique element, the category
 `DescentDataAsCoalgebra` identifies to the category of coalgebras
 over the comonoad corresponding to the adjunction
 `(F.map f.op.toLoc).adj`. -/
-def coalgebraEquivalence :
+def coalgebraEquivalence (ι : Type*) [Unique ι] {X S : C} (f : X ⟶ S) :
     F.DescentDataAsCoalgebra (fun (_ : ι) ↦ f) ≌
     (Adjunction.ofCat (F.map f.op.toLoc).adj).toComonad.Coalgebra where
   functor.obj D :=
@@ -164,8 +161,6 @@ def coalgebraEquivalence :
       simp)
   counitIso := Iso.refl _
 
-end
-
 end DescentDataAsCoalgebra
 
 variable (F) in
@@ -186,6 +181,34 @@ def toDescentDataAsCoalgebra
   map g :=
     { hom i := (F.map (f i).op.toLoc).l.toFunctor.map g
       comm i₁ i₂ := by simp [← Functor.map_comp] }
+
+section
+
+variable (ι : Type*) [Unique ι] {X S : C} (f : X ⟶ S)
+
+/-- When `ι` contains a unique element and `f : X ⟶ S` is a morphim,
+the composition of `F.toDescentDataAsCoalgebra (fun (_ : ι) ↦ f)`
+and the functor of the equivalence
+`DescentDataAsCoalgebra.coalgebraEquivalence F ι f` identifies to
+`Comonad.comparison` applied to the adjunction corresponding to
+`F.map f.op.toLoc`. -/
+def toDescentDataAsCoalgebraCompCoalgebraEquivalenceFunctorIso
+    (ι : Type*) [Unique ι] {X S : C} (f : X ⟶ S) :
+    F.toDescentDataAsCoalgebra (fun (_ : ι) ↦ f) ⋙
+      (DescentDataAsCoalgebra.coalgebraEquivalence F ι f).functor ≅
+    Comonad.comparison (Adjunction.ofCat (F.map f.op.toLoc).adj) :=
+  Iso.refl _
+
+lemma isEquivalence_toDescentDataAsCoalgebra_iff_isEquivalence_comonadComparison :
+    (F.toDescentDataAsCoalgebra (fun (_ : ι) ↦ f)).IsEquivalence ↔
+    (Comonad.comparison (Adjunction.ofCat (F.map f.op.toLoc).adj)).IsEquivalence := by
+  rw [← Functor.isEquivalence_iff_of_iso
+    (F.toDescentDataAsCoalgebraCompCoalgebraEquivalenceFunctorIso ι f)]
+  exact ⟨fun _ ↦ inferInstance, fun _ ↦
+    Functor.isEquivalence_of_comp_right _
+    ((DescentDataAsCoalgebra.coalgebraEquivalence F ι f).functor)⟩
+
+end
 
 end Pseudofunctor
 
