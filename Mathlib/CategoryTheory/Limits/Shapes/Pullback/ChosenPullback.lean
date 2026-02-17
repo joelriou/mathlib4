@@ -75,7 +75,7 @@ structure LiftStruct {Y : C} (g₁ : Y ⟶ X₁) (g₂ : Y ⟶ X₂) (b : Y ⟶ 
 
 namespace LiftStruct
 
-attribute [reassoc (attr := simp)] f_p₁ f_p₂ f_p
+attribute [reassoc (attr := simp, grind =)] f_p₁ f_p₂ f_p
 
 variable {h} {Y : C} {g₁ : Y ⟶ X₁} {g₂ : Y ⟶ X₂} {b : Y ⟶ S} (l : h.LiftStruct g₁ g₂ b)
 
