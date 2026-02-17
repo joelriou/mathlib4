@@ -689,6 +689,23 @@ lemma of_isColimit_binaryCofan_of_isInitial
       · rw [h₁, hc.fac (BinaryCofan.mk s.inr s.inl) ⟨.right⟩]
         rfl)⟩
 
+lemma mk' {Z X Y P : C} {f : Z ⟶ X} {g : Z ⟶ Y} {inl : X ⟶ P} {inr : Y ⟶ P}
+    (hom_ext : ∀ ⦃T : C⦄ ⦃φ φ' : P ⟶ T⦄ (_ : inl ≫ φ = inl ≫ φ')
+      (_ : inr ≫ φ = inr ≫ φ'), φ = φ')
+    (exists_desc : ∀ ⦃T : C⦄ (a : X ⟶ T) (b : Y ⟶ T)
+      (_ : f ≫ a = g ≫ b), ∃ (l : P ⟶ T), inl ≫ l = a ∧ inr ≫ l = b)
+    (w : f ≫ inl = g ≫ inr) :
+    IsPushout f g inl inr where
+  w := w
+  isColimit' := by
+    let l (s : PushoutCocone f g) := exists_desc _ _ s.condition
+    exact ⟨PushoutCocone.IsColimit.mk _
+      (fun s ↦ (l s).choose)
+      (fun s ↦ (l s).choose_spec.1)
+      (fun s ↦ (l s).choose_spec.2)
+      (fun s m h₁ h₂ ↦ hom_ext
+        (h₁.trans (l s).choose_spec.1.symm)
+        (h₂.trans (l s).choose_spec.2.symm))⟩
 
 end IsPushout
 
