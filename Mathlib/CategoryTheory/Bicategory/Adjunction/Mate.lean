@@ -160,6 +160,12 @@ lemma mateEquiv_apply' (α : g ≫ l₂ ⟶ l₁ ≫ h) :
   rw [mateEquiv_apply, Adjunction.homEquiv₂_apply, Adjunction.homEquiv₁_apply]
   bicategory
 
+lemma mateEquiv_apply'' (α : g ≫ l₂ ⟶ l₁ ≫ h) :
+    mateEquiv adj₁ adj₂ α =
+      adj₂.homEquiv₂ ((α_ _ _ _).hom ≫ adj₁.homEquiv₁ α) := by
+  rw [mateEquiv_apply', Adjunction.homEquiv₁_apply, Adjunction.homEquiv₂_apply]
+  bicategory
+
 lemma mateEquiv_symm_apply' (β : r₁ ≫ g ⟶ h ≫ r₂) :
     (mateEquiv adj₁ adj₂).symm β =
       𝟙 _ ⊗≫ adj₁.unit ▷ g ▷ l₂ ⊗≫ l₁ ◁ β ▷ l₂ ⊗≫ l₁ ◁ h ◁ adj₂.counit ⊗≫ 𝟙 _ := by
