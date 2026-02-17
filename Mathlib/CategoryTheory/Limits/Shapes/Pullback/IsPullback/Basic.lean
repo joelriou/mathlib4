@@ -690,11 +690,11 @@ lemma of_isColimit_binaryCofan_of_isInitial
         rfl)⟩
 
 lemma mk' {Z X Y P : C} {f : Z ⟶ X} {g : Z ⟶ Y} {inl : X ⟶ P} {inr : Y ⟶ P}
+    (w : f ≫ inl = g ≫ inr)
     (hom_ext : ∀ ⦃T : C⦄ ⦃φ φ' : P ⟶ T⦄ (_ : inl ≫ φ = inl ≫ φ')
       (_ : inr ≫ φ = inr ≫ φ'), φ = φ')
     (exists_desc : ∀ ⦃T : C⦄ (a : X ⟶ T) (b : Y ⟶ T)
-      (_ : f ≫ a = g ≫ b), ∃ (l : P ⟶ T), inl ≫ l = a ∧ inr ≫ l = b)
-    (w : f ≫ inl = g ≫ inr) :
+      (_ : f ≫ a = g ≫ b), ∃ (l : P ⟶ T), inl ≫ l = a ∧ inr ≫ l = b) :
     IsPushout f g inl inr where
   w := w
   isColimit' := by
