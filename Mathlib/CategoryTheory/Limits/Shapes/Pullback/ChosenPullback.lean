@@ -69,9 +69,9 @@ lemma hp₂ : h.p₂ ≫ f₂ = h.p := by rw [← h.condition, hp₁]
 structure LiftStruct {Y : C} (g₁ : Y ⟶ X₁) (g₂ : Y ⟶ X₂) (b : Y ⟶ S) where
   /-- a lifting to the pullback -/
   f : Y ⟶ h.pullback
-  f_p₁ : f ≫ h.p₁ = g₁
-  f_p₂ : f ≫ h.p₂ = g₂
-  f_p : f ≫ h.p = b
+  f_p₁ : f ≫ h.p₁ = g₁ := by cat_disch
+  f_p₂ : f ≫ h.p₂ = g₂ := by cat_disch
+  f_p : f ≫ h.p = b := by cat_disch
 
 namespace LiftStruct
 
