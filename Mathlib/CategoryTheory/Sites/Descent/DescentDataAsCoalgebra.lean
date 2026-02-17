@@ -175,10 +175,8 @@ def toDescentDataAsCoalgebra
       hom i₁ i₂ :=
         (F.map (f i₁).op.toLoc).l.toFunctor.map
           ((F.map (f i₂).op.toLoc).adj.unit.toNatTrans.app _)
-      counit i := by cat_disch
       coassoc i₁ i₂ i₃ := by
-        rw [← Functor.map_comp, ← Functor.map_comp,
-          Adj.unit_naturality] }
+        rw [← Functor.map_comp, ← Functor.map_comp, Adj.unit_naturality] }
   map g :=
     { hom i := (F.map (f i).op.toLoc).l.toFunctor.map g
       comm i₁ i₂ := by simp [← Functor.map_comp] }
