@@ -100,8 +100,7 @@ lemma nonempty (w : g₁ ≫ f₁ = g₂ ≫ f₂) (hf₁ : g₁ ≫ f₁ = b) :
     f := l
     f_p₁ := h₁
     f_p₂ := h₂
-    f_p := by rw [← h.hp₁, ← hf₁, reassoc_of% h₁]
-  }⟩
+    f_p := by rw [← h.hp₁, ← hf₁, reassoc_of% h₁] }⟩
 
 end LiftStruct
 
