@@ -87,10 +87,7 @@ lemma w : g₁ ≫ f₁ = g₂ ≫ f₂ := by
 instance : Subsingleton (h.LiftStruct g₁ g₂ b) where
   allEq := by
     rintro ⟨f, f_p₁, f_p₂, _⟩ ⟨f', f'_p₁, f'_p₂, _⟩
-    obtain rfl : f = f' := by
-      apply h.isPullback.hom_ext
-      · rw [f_p₁, f'_p₁]
-      · rw [f_p₂, f'_p₂]
+    obtain rfl : f = f' := by apply h.isPullback.hom_ext <;> grind
     rfl
 
 lemma nonempty (w : g₁ ≫ f₁ = g₂ ≫ f₂) (hf₁ : g₁ ≫ f₁ = b) :
