@@ -7,11 +7,11 @@ module
 
 public import Mathlib.CategoryTheory.Bicategory.Adjunction.Adj
 public import Mathlib.CategoryTheory.Bicategory.Adjunction.Cat
+public import Mathlib.CategoryTheory.Bicategory.LocallyDiscrete
 public import Mathlib.CategoryTheory.Monad.Adjunction
-public import Mathlib.CategoryTheory.Sites.Descent.IsPrestack
 
 /-!
-# Descent data as coalgebra
+# Descent data as coalgebras
 
 Let `F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Adj Cat` be a pseudofunctor
 to the bicategory of adjunctions in `Cat`. In particular,
@@ -21,18 +21,18 @@ functor `(g^*, g_*)`.
 In this file, given a family of morphisms `f i : X i ⟶ S` indexed
 by a type `ι` in `C`, we introduce a category `F.DescentDataAsCoalgebra f`
 of descent data relative to the morphisms `f i`, where the objects are
-described as a family of objects `obj i` over `X i`, where the
+described as a family of objects `obj i` over `X i`, and the
 morphisms relating them are described as morphisms
 `obj i₁ ⟶ (f i₁)^* (f i₂)_* (obj i₂)`, similarly as
 Eilenberg-Moore coalgebras. Indeed, when the index type `ι`
 contains a unique element, we show that
 `F.DescentDataAsCoalgebra (fun (i : ι) ↦ f`
-identifies to the category of coalgebras of the comonad attached
+identifies to the category of coalgebras for the comonad attached
 to the adjunction `(F.map f.op.toLoc).adj`.
 
 ## TODO (@joelriou, @chrisflav)
 * Compare `DescentDataAsCoalgebra` with `DescentData` when suitable
-pullbacks exists and certain base change morphisms are isomorphims
+pullbacks exist and certain base change morphisms are isomorphims
 
 -/
 
@@ -44,47 +44,24 @@ namespace CategoryTheory
 
 open Bicategory Opposite
 
-namespace Bicategory
-
--- to be moved
-namespace Adj
-
-variable {C₁ C₂ : Adj Cat.{v', u'}} (α : C₁ ⟶ C₂)
-
-@[reassoc (attr := simp)]
-lemma left_triangle_components (X : C₁.obj) :
-    α.l.toFunctor.map (α.adj.unit.toNatTrans.app X) ≫
-      α.adj.counit.toNatTrans.app (α.l.toFunctor.obj X) =
-    𝟙 (α.l.toFunctor.obj X) :=
-  (Adjunction.ofCat α.adj).left_triangle_components _
-
-@[reassoc (attr := simp)]
-lemma right_triangle_components (X : C₂.obj) :
-    α.adj.unit.toNatTrans.app (α.r.toFunctor.obj X) ≫
-       α.r.toFunctor.map (α.adj.counit.toNatTrans.app X) =
-    𝟙 (α.r.toFunctor.obj X) :=
-  (Adjunction.ofCat α.adj).right_triangle_components _
-
-@[reassoc (attr := simp)]
-lemma unit_naturality {X Y : C₁.obj} (f : X ⟶ Y) :
-    α.adj.unit.toNatTrans.app X ≫ α.r.toFunctor.map (α.l.toFunctor.map f) =
-    f ≫ α.adj.unit.toNatTrans.app Y :=
-  (Adjunction.ofCat α.adj).unit_naturality f
-
-end Adj
-
-end Bicategory
-
 namespace Pseudofunctor
 
 variable {C : Type u} [Category.{v} C]
   {F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Adj Cat.{v', u'}}
 
 variable (F) in
+/-- Given a pseudofunctor `F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Adj Cat` and a family
+of morphisms `f i : X i ⟶ S` in `C`, this is the category of descent data for `F`
+relative to the morphisms `f i` where the objects are defined as coalgebras:
+the morphisms relating the various objects `obj i` over `X i` are of the
+form `obj i₁ ⟶ (f i₁)^* (f i₂)_* (obj i₂)`. This category can be compared
+to the corresponding category `DescentData` when suitable pullbacks exist
+and certain base change morphisms are isomorphisms (TODO). -/
 structure DescentDataAsCoalgebra
     {ι : Type t} {S : C} {X : ι → C} (f : ∀ i, X i ⟶ S) where
   /-- The objects over `X i` for all `i` -/
   obj (i : ι) : (F.obj (.mk (op (X i)))).obj
+  /-- The compatibility morphisms. -/
   hom (i₁ i₂ : ι) : obj i₁ ⟶
     (F.map (f i₁).op.toLoc).l.toFunctor.obj
       ((F.map (f i₂).op.toLoc).r.toFunctor.obj (obj i₂))
@@ -105,8 +82,10 @@ section
 
 variable {ι : Type t} {S : C} {X : ι → C} {f : ∀ i, X i ⟶ S}
 
+/-- The type of morphisms in `DescentDataAsCoalgebra`. -/
 @[ext]
 structure Hom (D₁ D₂ : F.DescentDataAsCoalgebra f) where
+  /-- The morphisms between the `obj` fields of descent data. -/
   hom (i : ι) : D₁.obj i ⟶ D₂.obj i
   comm (i₁ i₂ : ι) :
     D₁.hom i₁ i₂ ≫
@@ -134,6 +113,7 @@ lemma id_hom (D : F.DescentDataAsCoalgebra f) (i : ι) :
 lemma comp_hom {D₁ D₂ D₃ : F.DescentDataAsCoalgebra f} (φ : D₁ ⟶ D₂) (φ' : D₂ ⟶ D₃) (i : ι) :
     (φ ≫ φ').hom i = φ.hom i ≫ φ'.hom i := rfl
 
+/-- Constructor for isomorphisms in `DescentDataAsCoalgebra`. -/
 @[simps]
 def isoMk {D₁ D₂ : F.DescentDataAsCoalgebra f} (e : ∀ (i : ι), D₁.obj i ≅ D₂.obj i)
     (comm : ∀ (i₁ i₂ : ι), D₁.hom i₁ i₂ ≫
@@ -153,8 +133,12 @@ section
 
 variable (ι : Type*) [Unique ι] {X S : C} (f : X ⟶ S)
 
+/-- When the index type `ι` contains a unique element, the category
+`DescentDataAsCoalgebra` identifies to the category of coalgebras
+over the comonoad corresponding to the adjunction
+`(F.map f.op.toLoc).adj`. -/
 def coalgebraEquivalence :
-    F.DescentDataAsCoalgebra (fun (i : ι) ↦ f) ≌
+    F.DescentDataAsCoalgebra (fun (_ : ι) ↦ f) ≌
     (Adjunction.ofCat (F.map f.op.toLoc).adj).toComonad.Coalgebra where
   functor.obj D :=
     { A := D.obj default
@@ -185,6 +169,8 @@ end
 end DescentDataAsCoalgebra
 
 variable (F) in
+/-- The functor `(F.obj (.mk (op S))).obj ⥤ F.DescentDataAsCoalgebra f`
+when `f i : X i ⟶ S` is a family of morphisms. -/
 def toDescentDataAsCoalgebra
     {ι : Type t} {S : C} {X : ι → C} (f : ∀ i, X i ⟶ S) :
     (F.obj (.mk (op S))).obj ⥤ F.DescentDataAsCoalgebra f where
@@ -195,8 +181,9 @@ def toDescentDataAsCoalgebra
           ((F.map (f i₂).op.toLoc).adj.unit.toNatTrans.app _)
       counit i := by cat_disch
       coassoc i₁ i₂ i₃ := by
-        sorry }
-  map {M N} g :=
+        rw [← Functor.map_comp, ← Functor.map_comp,
+          Adj.unit_naturality] }
+  map g :=
     { hom i := (F.map (f i).op.toLoc).l.toFunctor.map g
       comm i₁ i₂ := by simp [← Functor.map_comp] }
 

@@ -7,7 +7,7 @@ module
 
 public import Mathlib.CategoryTheory.Adjunction.Mates
 public import Mathlib.CategoryTheory.Bicategory.Adjunction.Mate
-public import Mathlib.CategoryTheory.Category.Cat
+public import Mathlib.CategoryTheory.Bicategory.Adjunction.Adj
 
 /-!
 # Adjunctions in `Cat`
@@ -102,6 +102,38 @@ lemma toNatTrans_conjugateEquiv {C D : Cat}
   rw [toNatTrans_mateEquiv]
   ext X
   simp [CategoryTheory.conjugateEquiv]
+
+namespace Adj
+
+variable {C₁ C₂ : Adj Cat.{v, u}} (α : C₁ ⟶ C₂)
+
+@[reassoc (attr := simp)]
+lemma left_triangle_components (X : C₁.obj) :
+    α.l.toFunctor.map (α.adj.unit.toNatTrans.app X) ≫
+      α.adj.counit.toNatTrans.app (α.l.toFunctor.obj X) =
+    𝟙 (α.l.toFunctor.obj X) :=
+  (Adjunction.ofCat α.adj).left_triangle_components _
+
+@[reassoc (attr := simp)]
+lemma right_triangle_components (X : C₂.obj) :
+    α.adj.unit.toNatTrans.app (α.r.toFunctor.obj X) ≫
+       α.r.toFunctor.map (α.adj.counit.toNatTrans.app X) =
+    𝟙 (α.r.toFunctor.obj X) :=
+  (Adjunction.ofCat α.adj).right_triangle_components _
+
+@[reassoc (attr := simp)]
+lemma unit_naturality {X Y : C₁.obj} (f : X ⟶ Y) :
+    α.adj.unit.toNatTrans.app X ≫ α.r.toFunctor.map (α.l.toFunctor.map f) =
+    f ≫ α.adj.unit.toNatTrans.app Y :=
+  (Adjunction.ofCat α.adj).unit_naturality f
+
+@[reassoc (attr := simp)]
+lemma counit_naturality {X Y : C₂.obj} (f : X ⟶ Y) :
+    α.l.toFunctor.map (α.r.toFunctor.map f) ≫ α.adj.counit.toNatTrans.app Y =
+      α.adj.counit.toNatTrans.app X ≫ f :=
+  (Adjunction.ofCat α.adj).counit_naturality f
+
+end Adj
 
 end Bicategory
 
