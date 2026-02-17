@@ -71,7 +71,6 @@ noncomputable def isLimitPowerFan : IsLimit (U.powerFan α) :=
       · rfl
       · dsimp
         ext a
-        dsimp
         specialize hm a
         rw [hom_ext_iff] at hm
         obtain ⟨_, hm⟩ := hm
