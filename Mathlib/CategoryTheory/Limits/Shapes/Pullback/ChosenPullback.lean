@@ -83,11 +83,10 @@ namespace LiftStruct
 
 attribute [reassoc (attr := simp, grind =)] f_p₁ f_p₂ f_p
 
-variable {h} {Y : C} {g₁ : Y ⟶ X₁} {g₂ : Y ⟶ X₂} {b : Y ⟶ S} (l : h.LiftStruct g₁ g₂ b)
+variable {h} {Y : C} {g₁ : Y ⟶ X₁} {g₂ : Y ⟶ X₂} {b : Y ⟶ S}
 
-include l in
 @[reassoc]
-lemma w : g₁ ≫ f₁ = g₂ ≫ f₂ := by
+lemma w (l : h.LiftStruct g₁ g₂ b) : g₁ ≫ f₁ = g₂ ≫ f₂ := by
   simp only [← l.f_p₁, ← l.f_p₂, Category.assoc, h.condition]
 
 instance : Subsingleton (h.LiftStruct g₁ g₂ b) where
@@ -250,3 +249,4 @@ lemma isPullback₃ : IsPullback h.p₁₃ h.p₂₃ h₁₃.p₂ h₂₃.p₂ :
 end ChosenPullback₃
 
 end CategoryTheory.Limits
+#lint
