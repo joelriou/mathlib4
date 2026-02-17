@@ -217,6 +217,7 @@ lemma exists_lift {Y : C} (g₁ : Y ⟶ X₁) (g₂ : Y ⟶ X₂) (g₃ : Y ⟶ 
 
 lemma isPullback₂ : IsPullback h.p₁₂ h.p₂₃ h₁₂.p₂ h₂₃.p₁ := h.chosenPullback.isPullback
 
+@[ext]
 lemma hom_ext {Y : C} {φ φ' : Y ⟶ h.pullback}
     (h₁ : φ ≫ h.p₁ = φ' ≫ h.p₁) (h₂ : φ ≫ h.p₂ = φ' ≫ h.p₂)
     (h₃ : φ ≫ h.p₃ = φ' ≫ h.p₃) : φ = φ' := by
