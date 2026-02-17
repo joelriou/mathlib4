@@ -57,7 +57,7 @@ lemma isPullback : IsPullback h.p₁ h.p₂ f₁ f₂ where
   w := h.condition
   isLimit' := ⟨h.isLimit⟩
 
-attribute [reassoc (attr := simp)] hp₁
+attribute [reassoc (attr := simp, grind =)] hp₁
 
 @[reassoc (attr := simp, grind =)]
 lemma hp₂ : h.p₂ ≫ f₂ = h.p := by rw [← h.condition, hp₁]
