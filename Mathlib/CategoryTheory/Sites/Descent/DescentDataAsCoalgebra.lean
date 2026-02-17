@@ -15,8 +15,9 @@ public import Mathlib.CategoryTheory.Monad.Adjunction
 
 Let `F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Adj Cat` be a pseudofunctor
 to the bicategory of adjunctions in `Cat`. In particular,
-for any morphism `g : X ⟶ Y` in `C`, we have a pullback
-functor `(g^*, g_*)`.
+for any morphism `g : X ⟶ Y` in `C`, we have an
+adjunction `(g^*, g_*)` between a pullback functor and a
+pushforward functor.
 
 In this file, given a family of morphisms `f i : X i ⟶ S` indexed
 by a type `ι` in `C`, we introduce a category `F.DescentDataAsCoalgebra f`
