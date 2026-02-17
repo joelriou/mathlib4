@@ -207,7 +207,7 @@ lemma isEquivalence_toDescentDataAsCoalgebra_iff_isEquivalence_comonadComparison
     (F.toDescentDataAsCoalgebraCompCoalgebraEquivalenceFunctorIso ι f)]
   exact ⟨fun _ ↦ inferInstance, fun _ ↦
     Functor.isEquivalence_of_comp_right _
-    ((DescentDataAsCoalgebra.coalgebraEquivalence F ι f).functor)⟩
+      ((DescentDataAsCoalgebra.coalgebraEquivalence F ι f).functor)⟩
 
 end
 
