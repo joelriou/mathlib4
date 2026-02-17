@@ -2653,6 +2653,7 @@ public import Mathlib.CategoryTheory.Limits.FintypeCat
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.Basic
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.Cech
+public import Mathlib.CategoryTheory.Limits.FormalCoproducts.EvalOpAddCommGrpCat
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.ExtraDegeneracy
 public import Mathlib.CategoryTheory.Limits.FormalCoproducts.Misc
 public import Mathlib.CategoryTheory.Limits.Fubini

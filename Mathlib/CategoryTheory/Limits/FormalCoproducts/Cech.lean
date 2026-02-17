@@ -27,38 +27,37 @@ namespace CategoryTheory.Limits.FormalCoproduct
 
 variable {C : Type u} [Category.{v} C]
 
-/-- Given `U : FormalCoproduct C` and a type `α`, this is the formal coproduct
-indexed by all `i : α → U.I` of the products of the objects `U.obj (i a)`
-for all `a : α`. -/
 @[simps]
-noncomputable def power (U : FormalCoproduct.{w} C) (α : Type t)
-    [HasProductsOfShape α C] : FormalCoproduct.{max w t} C where
+def power' (U : FormalCoproduct.{w} C) {α : Type t}
+    (fan : ∀ (i : α → U.I), Fan (U.obj ∘ i)) :
+    FormalCoproduct.{max w t} C where
   I := α → U.I
-  obj i := ∏ᶜ (U.obj ∘ i)
+  obj i := (fan i).pt
 
 section
 
-variable (U : FormalCoproduct.{w} C) (α : Type) [HasProductsOfShape α C]
+variable (U : FormalCoproduct.{w} C) {α : Type}
+  (fan : ∀ (i : α → U.I), Fan (U.obj ∘ i))
 
-variable {α} in
-/-- The projection `U.power α ⟶ U` for each `a : α`. -/
+/-- The projection `U.power' fan ⟶ U` for each `a : α`. -/
 @[simps]
-noncomputable def powerπ (a : α) : U.power α ⟶ U where
+def power'π (a : α) : U.power' fan ⟶ U where
   f i := i a
-  φ _ := Pi.π _ a
+  φ _ := (fan _).proj _
 
-/-- The (limit) fan expressing that `U.power α` is a product of copies of
-`U` indexed by `α`. -/
-noncomputable abbrev powerFan :
+/-- The fan expressing that `U.power' fan` is a product of copies of
+`U` indexed by `α` when each `fan i` is limit. -/
+abbrev power'Fan :
     Fan (fun (_ : α) ↦ U) :=
-  Fan.mk (U.power α) U.powerπ
+  Fan.mk (U.power' fan) (U.power'π fan)
 
-/-- `U.power α` identifies to the product of copies of `U` indexed by `α`. -/
-noncomputable def isLimitPowerFan : IsLimit (U.powerFan α) :=
+/-- `U.power' fan` identifies to the product of copies of `U` indexed by `α`. -/
+def isLimitPower'Fan (hfan : ∀ i, IsLimit (fan i)) :
+    IsLimit (U.power'Fan fan) :=
   mkFanLimit _
     (fun s ↦
       { f i a := (s.proj a).f i
-        φ i := Pi.lift (fun a ↦ (s.proj a).φ i) })
+        φ i := Fan.IsLimit.lift (hfan _) (fun a ↦ (s.proj a).φ i) })
     (fun _ _ ↦ by ext <;> simp)
     (fun s m hm ↦ by
       obtain ⟨f, φ⟩ := m
@@ -69,14 +68,51 @@ noncomputable def isLimitPowerFan : IsLimit (U.powerFan α) :=
         exact congr_fun (congr_arg FormalCoproduct.Hom.f (hm a)) i
       ext i
       · rfl
-      · dsimp
-        ext a
+      · refine Fan.IsLimit.hom_ext (hfan _) _ _ (fun a ↦ ?_)
         specialize hm a
         rw [hom_ext_iff] at hm
         obtain ⟨_, hm⟩ := hm
         simpa using hm i)
 
 end
+
+/-- Given `U : FormalCoproduct C` and a type `α`, this is the formal coproduct
+indexed by all `i : α → U.I` of the products of the objects `U.obj (i a)`
+for all `a : α`. -/
+@[simps!]
+noncomputable def power (U : FormalCoproduct.{w} C) (α : Type t)
+    [HasProductsOfShape α C] : FormalCoproduct.{max w t} C :=
+  U.power' (α := α) (fun _ ↦ (Fan.mk _ (Pi.π _)))
+
+section
+
+variable (U : FormalCoproduct.{w} C) (α : Type) [HasProductsOfShape α C]
+
+variable {α} in
+/-- The projection `U.power α ⟶ U` for each `a : α`. -/
+@[simps!]
+noncomputable def powerπ (a : α) : U.power α ⟶ U :=
+  power'π _ _ a
+
+/-- The (limit) fan expressing that `U.power α` is a product of copies of
+`U` indexed by `α`. -/
+noncomputable abbrev powerFan :
+    Fan (fun (_ : α) ↦ U) :=
+  Fan.mk (U.power α) U.powerπ
+
+/-- `U.power α` identifies to the product of copies of `U` indexed by `α`. -/
+noncomputable def isLimitPowerFan : IsLimit (U.powerFan α) :=
+  isLimitPower'Fan _ _ (fun _ ↦ productIsProduct _)
+
+end
+
+@[simps!]
+noncomputable def power'Iso (U : FormalCoproduct.{w} C)
+    {α : Type t} [HasProductsOfShape α C]
+    (fan : ∀ (i : α → U.I), Fan (U.obj ∘ i)) (hfan : ∀ i, IsLimit (fan i)) :
+    U.power' fan ≅ U.power α :=
+  FormalCoproduct.isoOfComponents (.refl _)
+    (fun i ↦ IsLimit.conePointUniqueUpToIso (hfan i) (productIsProduct _))
 
 /-- For any morphism `f : U ⟶ V` in `FormalCoproduct C` and a type `α`,
 this is the induced map `U.power α ⟶ V.power α`. -/
