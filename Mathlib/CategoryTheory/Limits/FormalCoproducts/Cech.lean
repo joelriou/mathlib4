@@ -53,6 +53,7 @@ noncomputable abbrev powerFan :
     Fan (fun (_ : α) ↦ U) :=
   Fan.mk (U.power α) U.powerπ
 
+set_option backward.isDefEq.respectTransparency false in
 /-- `U.power α` identifies to the product of copies of `U` indexed by `α`. -/
 noncomputable def isLimitPowerFan : IsLimit (U.powerFan α) :=
   mkFanLimit _
@@ -158,6 +159,7 @@ lemma mapPower_powerMap {U V : FormalCoproduct.{w} C} (f : U ⟶ V)
       Category.assoc, limit.lift_π, Fan.mk_π_app, Pi.map_π]
     apply limit.lift_π
 
+set_option backward.isDefEq.respectTransparency false in
 @[reassoc (attr := simp)]
 lemma mapPower_π (U : FormalCoproduct.{w} C) {α β : Type}
     [HasProductsOfShape α C] [HasProductsOfShape β C] (f : α → β) (a : α) :

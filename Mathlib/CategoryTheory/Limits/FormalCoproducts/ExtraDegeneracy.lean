@@ -60,6 +60,7 @@ lemma cechIsoCechNerveApp_π (n : SimplexCategoryᵒᵖ) (i : ToType n.unop) :
       WidePullback.π (fun _ ↦ (isTerminalIncl T hT).from U) i = U.powerπ i :=
   IsLimit.conePointUniqueUpToIso_hom_comp _ _ _
 
+set_option backward.isDefEq.respectTransparency false in
 /-- The Cech construction for `FormalCoproduct` is isomorphic
 to the general `Arrow.cechNerve` construction applied to the morphism
 to the terminal object. -/
