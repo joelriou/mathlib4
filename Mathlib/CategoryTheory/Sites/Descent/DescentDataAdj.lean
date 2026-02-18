@@ -40,6 +40,10 @@ variable {X₁₂ X₁ X₂ : C}
   (hom : obj₁ ⟶ (F.map p₁.op.toLoc).r.toFunctor.obj
     ((F.map p₂.op.toLoc).l.toFunctor.obj obj₂))
 
+/-- Given morphims `p₁ : X₁₂ ⟶ X₁`, `p₂ : X₁₂ ⟶ X₂`, `p₁₂ : Y₁₂ ⟶ X₁₂`,,
+`q₁ : Y₁₂ ⟶ X₁`, `q₂ : Y₁₂ ⟶ X₂` such that `p₁₂ ≫ p₁ = q₁` and `p₁₂ ≫ p₂ = q₂`,
+this is the morphism `obj₁ ⟶ q₁_*q₂^* obj₂` that is deduced from a morphism
+`obj₁ ⟶ p₁_*p₂^* obj₂`. -/
 def pullHom ⦃Y₁₂ : C⦄ (p₁₂ : Y₁₂ ⟶ X₁₂) (q₁ : Y₁₂ ⟶ X₁) (q₂ : Y₁₂ ⟶ X₂)
     (hq₁ : p₁₂ ≫ p₁ = q₁ := by cat_disch) (hq₂ : p₁₂ ≫ p₂ = q₂ := by cat_disch) :
     obj₁ ⟶ (F.map q₁.op.toLoc).r.toFunctor.obj ((F.map q₂.op.toLoc).l.toFunctor.obj obj₂) :=
@@ -47,7 +51,6 @@ def pullHom ⦃Y₁₂ : C⦄ (p₁₂ : Y₁₂ ⟶ X₁₂) (q₁ : Y₁₂ �
     (Adj.rIso (F.mapComp' p₁.op.toLoc p₁₂.op.toLoc q₁.op.toLoc)).inv.toNatTrans.app _ ≫
       (F.map q₁.op.toLoc).r.toFunctor.map
     ((Adj.lIso (F.mapComp' p₂.op.toLoc p₁₂.op.toLoc q₂.op.toLoc)).inv.toNatTrans.app _)
-
 
 end
 
