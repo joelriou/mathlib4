@@ -10,6 +10,7 @@ public import Mathlib.CategoryTheory.Bicategory.Adjunction.Cat
 public import Mathlib.CategoryTheory.Bicategory.Adjunction.BaseChange
 public import Mathlib.CategoryTheory.Bicategory.LocallyDiscrete
 public import Mathlib.CategoryTheory.Limits.Shapes.Pullback.ChosenPullback
+public import Mathlib.CategoryTheory.Sites.Descent.DescentDataPrime
 
 /-!
 # Descent data we have both pullbacks and pushforwards
@@ -155,6 +156,98 @@ def isoMk {D₁ D₂ : F.DescentDataAdj sq sq₃} (e : ∀ (i : ι), D₁.obj i 
       comm i₁ i₂ := by
         rw [← cancel_epi (e i₁).hom, ← reassoc_of% comm i₁ i₂]
         simp [← Functor.map_comp] }
+
+namespace equivalenceDescentData'
+
+variable {obj : ∀ i, (F.obj (.mk (op (X i)))).obj}
+
+@[simps! -isSimp apply symm_apply]
+def homEquiv :
+    (∀ i₁ i₂, obj i₁ ⟶ (F.map (sq i₁ i₂).p₁.op.toLoc).r.toFunctor.obj
+      ((F.map (sq i₁ i₂).p₂.op.toLoc).l.toFunctor.obj (obj i₂))) ≃
+    (∀ i₁ i₂, (F.map (sq i₁ i₂).p₁.op.toLoc).l.toFunctor.obj (obj i₁) ⟶
+      (F.map (sq i₁ i₂).p₂.op.toLoc).l.toFunctor.obj (obj i₂)) :=
+  Equiv.piCongrRight (fun i₁ ↦ Equiv.piCongrRight (fun i₂ ↦
+    ((Adjunction.ofCat (F.map (sq i₁ i₂).p₁.op.toLoc).adj).homEquiv _ _).symm))
+
+variable (hom : ∀ i₁ i₂, obj i₁ ⟶ (F.map (sq i₁ i₂).p₁.op.toLoc).r.toFunctor.obj
+      ((F.map (sq i₁ i₂).p₂.op.toLoc).l.toFunctor.obj (obj i₂)))
+
+lemma homEquiv_self_iff (i : ι) :
+    DescentData'.pullHom' (F := (F.comp Adj.forget₁)) (homEquiv hom)
+        (f i) (𝟙 (X i)) (𝟙 (X i)) = 𝟙 _ ↔
+    ∀ (δ : (sq i i).Diagonal),
+      pullHom (hom i i) δ.f (𝟙 _) (𝟙 _) =
+      (F.map (𝟙 (.mk (op (X i))))).adj.unit.toNatTrans.app _ := by
+  sorry
+
+lemma homEquiv_comp_iff (i₁ i₂ i₃ : ι) :
+    DescentData'.pullHom' (F := F.comp Adj.forget₁) (homEquiv hom)
+      (sq₃ i₁ i₂ i₃).p (sq₃ i₁ i₂ i₃).p₁ (sq₃ i₁ i₂ i₃).p₂ ≫
+    DescentData'.pullHom' (homEquiv hom)
+      (sq₃ i₁ i₂ i₃).p (sq₃ i₁ i₂ i₃).p₂ (sq₃ i₁ i₂ i₃).p₃ =
+    DescentData'.pullHom' (homEquiv hom)
+      (sq₃ i₁ i₂ i₃).p (sq₃ i₁ i₂ i₃).p₁ (sq₃ i₁ i₂ i₃).p₃ ↔
+    homComp sq sq₃ (hom i₁ i₂) (hom i₂ i₃) =
+      pullHom (hom i₁ i₃) (sq₃ i₁ i₂ i₃).p₁₃ _ _ := by
+  sorry
+
+end equivalenceDescentData'
+
+variable (F sq sq₃)
+
+set_option backward.isDefEq.respectTransparency false in
+open equivalenceDescentData' in
+@[simps!]
+def toDescentData' : F.DescentDataAdj sq sq₃ ⥤ (F.comp Adj.forget₁).DescentData' sq sq₃ where
+  obj D :=
+    { obj := D.obj
+      hom := homEquiv D.hom
+      pullHom'_hom_self i := by simpa only [homEquiv_self_iff] using D.hom_self i
+      pullHom'_hom_comp i₁ i₂ i₃ := by
+        simpa only [homEquiv_comp_iff] using D.hom_comp i₁ i₂ i₃ }
+  map {D₁ D₂} φ :=
+    { hom := φ.hom
+      comm i₁ i₂ := by
+        dsimp
+        rw [homEquiv_apply, homEquiv_apply,
+          ← Adjunction.homEquiv_naturality_right_symm, φ.comm,
+          Adjunction.homEquiv_naturality_left_symm] }
+
+set_option backward.isDefEq.respectTransparency false in
+open equivalenceDescentData' in
+@[simps!]
+def fromDescentData' : (F.comp Adj.forget₁).DescentData' sq sq₃ ⥤ F.DescentDataAdj sq sq₃ where
+  obj D :=
+    { obj := D.obj
+      hom := homEquiv.symm D.hom
+      hom_self i := by
+        obtain ⟨φ, hφ⟩ := homEquiv.surjective D.hom
+        simpa only [← homEquiv_self_iff, Equiv.apply_symm_apply] using D.pullHom'_hom_self i
+      hom_comp i₁ i₂ i₃ := by
+        obtain ⟨φ, hφ⟩ := homEquiv.surjective D.hom
+        simpa only [← homEquiv_comp_iff, Equiv.apply_symm_apply]
+          using D.pullHom'_hom_comp i₁ i₂ i₃ }
+  map φ :=
+    { hom := φ.hom
+      comm i₁ i₂ := by
+        have := φ.comm i₁ i₂
+        dsimp at this ⊢
+        rw [homEquiv_symm_apply, homEquiv_symm_apply,
+          ← Adjunction.homEquiv_naturality_left, this,
+          ← Adjunction.homEquiv_naturality_right] }
+
+set_option backward.isDefEq.respectTransparency false in
+def equivalenceDescentData' :
+    F.DescentDataAdj sq sq₃ ≌ (F.comp Adj.forget₁).DescentData' sq sq₃ where
+  functor := toDescentData' F sq sq₃
+  inverse := fromDescentData' F sq sq₃
+  unitIso :=
+    NatIso.ofComponents (fun D ↦ isoMk (fun _ ↦ Iso.refl _)
+      (by simp [toDescentData']))
+  counitIso :=
+    NatIso.ofComponents (fun D ↦ DescentData'.isoMk (fun _ ↦ Iso.refl _)
+      (by simp [fromDescentData']))
 
 end DescentDataAdj
 
