@@ -249,4 +249,3 @@ lemma isPullback₃ : IsPullback h.p₁₃ h.p₂₃ h₁₃.p₂ h₂₃.p₂ :
 end ChosenPullback₃
 
 end CategoryTheory.Limits
-#lint
