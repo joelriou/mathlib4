@@ -337,12 +337,11 @@ lemma natTransTruncLTOfLE_ι_app (a b : ℤ) (h : a ≤ b) (X : C) :
     (t.natTransTruncLTOfLE a b h).app X ≫ (t.truncLTι b).app X = (t.truncLTι a).app X := by
   simpa using ((TruncAux.triangleFunctorNatTransOfLE t a b h).app X).comm₁.symm
 
+set_option backward.isDefEq.respectTransparency false in
 @[reassoc (attr := simp)]
 lemma natTransTruncLTOfLE_ι (a b : ℤ) (h : a ≤ b) :
     t.natTransTruncLTOfLE a b h ≫ t.truncLTι b = t.truncLTι a := by
-  -- cat_disch should work
-  ext
-  apply natTransTruncLTOfLE_ι_app
+  cat_disch
 
 @[reassoc (attr := simp)]
 lemma π_natTransTruncGEOfLE_app (a b : ℤ) (h : a ≤ b) (X : C) :
