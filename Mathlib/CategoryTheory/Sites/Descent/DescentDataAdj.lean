@@ -14,6 +14,10 @@ public import Mathlib.CategoryTheory.Limits.Shapes.Pullback.ChosenPullback
 /-!
 # Descent data we have both pullbacks and pushforwards
 
+depends on
+#35401
+#35396
+#35393
 -/
 
 @[expose] public section
