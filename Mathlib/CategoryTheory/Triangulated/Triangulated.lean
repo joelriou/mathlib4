@@ -176,33 +176,21 @@ class IsTriangulated : Prop where
       {v₁₃ : X₃ ⟶ Z₁₃} {w₁₃ : Z₁₃ ⟶ X₁⟦(1 : ℤ)⟧} (h₁₃ : Triangle.mk u₁₃ v₁₃ w₁₃ ∈ distTriang C),
       Nonempty (Octahedron comm h₁₂ h₂₃ h₁₃)
 
+variable {C}
+
 namespace Triangulated
 
-variable {C}
-variable {X₁ X₂ X₃ Z₁₂ Z₂₃ Z₁₃ : C}
-  {u₁₂ : X₁ ⟶ X₂} {u₂₃ : X₂ ⟶ X₃} {u₁₃ : X₁ ⟶ X₃} (comm : u₁₂ ≫ u₂₃ = u₁₃)
-  {v₁₂ : X₂ ⟶ Z₁₂} {w₁₂ : Z₁₂ ⟶ X₁⟦(1 : ℤ)⟧} {h₁₂ : Triangle.mk u₁₂ v₁₂ w₁₂ ∈ distTriang C}
-  {v₂₃ : X₃ ⟶ Z₂₃} {w₂₃ : Z₂₃ ⟶ X₂⟦(1 : ℤ)⟧} {h₂₃ : Triangle.mk u₂₃ v₂₃ w₂₃ ∈ distTriang C}
-  {v₁₃ : X₃ ⟶ Z₁₃} {w₁₃ : Z₁₃ ⟶ X₁⟦(1 : ℤ)⟧} {h₁₃ : Triangle.mk u₁₃ v₁₃ w₁₃ ∈ distTriang C}
-  (h : Octahedron comm h₁₂ h₂₃ h₁₃)
-
 /-- A choice of octahedron given by the octahedron axiom. -/
-def someOctahedron' [IsTriangulated C] : Octahedron comm h₁₂ h₂₃ h₁₃ :=
-  (IsTriangulated.octahedron_axiom comm h₁₂ h₂₃ h₁₃).some
-
-/-- A choice of octahedron given by the octahedron axiom. -/
-def someOctahedron [IsTriangulated C]
+irreducible_def someOctahedron [IsTriangulated C]
     {X₁ X₂ X₃ Z₁₂ Z₂₃ Z₁₃ : C}
     {u₁₂ : X₁ ⟶ X₂} {u₂₃ : X₂ ⟶ X₃} {u₁₃ : X₁ ⟶ X₃} (comm : u₁₂ ≫ u₂₃ = u₁₃)
     {v₁₂ : X₂ ⟶ Z₁₂} {w₁₂ : Z₁₂ ⟶ X₁⟦(1 : ℤ)⟧} (h₁₂ : Triangle.mk u₁₂ v₁₂ w₁₂ ∈ distTriang C)
     {v₂₃ : X₃ ⟶ Z₂₃} {w₂₃ : Z₂₃ ⟶ X₂⟦(1 : ℤ)⟧} (h₂₃ : Triangle.mk u₂₃ v₂₃ w₂₃ ∈ distTriang C)
     {v₁₃ : X₃ ⟶ Z₁₃} {w₁₃ : Z₁₃ ⟶ X₁⟦(1 : ℤ)⟧} (h₁₃ : Triangle.mk u₁₃ v₁₃ w₁₃ ∈ distTriang C) :
     Octahedron comm h₁₂ h₂₃ h₁₃ :=
-  someOctahedron' _
+  (IsTriangulated.octahedron_axiom comm h₁₂ h₂₃ h₁₃).some
 
 end Triangulated
-
-variable {C}
 
 /-- Constructor for `IsTriangulated C` which shows that it suffices to obtain an octahedron
 for a suitable isomorphic diagram instead of the given diagram. -/
