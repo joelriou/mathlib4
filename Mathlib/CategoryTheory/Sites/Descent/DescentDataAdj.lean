@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Joël Riou. All rights reserved.
+Copyright (c) 2026 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Joël Riou, Christian Merten
 -/
@@ -7,11 +7,12 @@ module
 
 public import Mathlib.CategoryTheory.Bicategory.Adjunction.Adj
 public import Mathlib.CategoryTheory.Bicategory.Adjunction.Cat
+public import Mathlib.CategoryTheory.Bicategory.Adjunction.BaseChange
 public import Mathlib.CategoryTheory.Bicategory.LocallyDiscrete
-public import Mathlib.CategoryTheory.Monad.Adjunction
+public import Mathlib.CategoryTheory.Limits.Shapes.Pullback.ChosenPullback
 
 /-!
-# Descent data we have both pullbacks and pushforward
+# Descent data we have both pullbacks and pushforwards
 
 -/
 
@@ -21,12 +22,134 @@ universe t v' v u' u
 
 namespace CategoryTheory
 
-open Bicategory Opposite
+open Bicategory Opposite Limits
 
 namespace Pseudofunctor
 
 variable {C : Type u} [Category.{v} C]
   {F : LocallyDiscrete Cᵒᵖ ⥤ᵖ Adj Cat.{v', u'}}
+
+
+namespace DescentDataAdj
+
+section
+
+variable {X₁₂ X₁ X₂ : C}
+  {obj₁ : (F.obj (.mk (op X₁))).obj} {obj₂ : (F.obj (.mk (op X₂))).obj}
+  {p₁ : X₁₂ ⟶ X₁} {p₂ : X₁₂ ⟶ X₂}
+  (hom : obj₁ ⟶ (F.map p₁.op.toLoc).r.toFunctor.obj
+    ((F.map p₂.op.toLoc).l.toFunctor.obj obj₂))
+
+def pullHom ⦃Y₁₂ : C⦄ (p₁₂ : Y₁₂ ⟶ X₁₂) (q₁ : Y₁₂ ⟶ X₁) (q₂ : Y₁₂ ⟶ X₂)
+    (hq₁ : p₁₂ ≫ p₁ = q₁ := by cat_disch) (hq₂ : p₁₂ ≫ p₂ = q₂ := by cat_disch) :
+    obj₁ ⟶ (F.map q₁.op.toLoc).r.toFunctor.obj ((F.map q₂.op.toLoc).l.toFunctor.obj obj₂) :=
+  hom ≫ (F.map p₁.op.toLoc).r.toFunctor.map ((F.map p₁₂.op.toLoc).adj.unit.toNatTrans.app _) ≫
+    (Adj.rIso (F.mapComp' p₁.op.toLoc p₁₂.op.toLoc q₁.op.toLoc)).inv.toNatTrans.app _ ≫
+      (F.map q₁.op.toLoc).r.toFunctor.map
+    ((Adj.lIso (F.mapComp' p₂.op.toLoc p₁₂.op.toLoc q₂.op.toLoc)).inv.toNatTrans.app _)
+
+
+end
+
+section
+
+variable
+  {ι : Type*} {S : C} {X : ι → C} {f : ∀ i, X i ⟶ S}
+  (sq : ∀ i j, ChosenPullback (f i) (f j))
+  (sq₃ : ∀ (i₁ i₂ i₃ : ι), ChosenPullback₃ (sq i₁ i₂) (sq i₂ i₃) (sq i₁ i₃))
+  {i₁ i₂ i₃ : ι} {obj₁ : (F.obj (.mk (op (X i₁)))).obj}
+  {obj₂ : (F.obj (.mk (op (X i₂)))).obj}
+  {obj₃ : (F.obj (.mk (op (X i₃)))).obj}
+  (hom₁₂ : obj₁ ⟶ (F.map (sq i₁ i₂).p₁.op.toLoc).r.toFunctor.obj
+    ((F.map (sq i₁ i₂).p₂.op.toLoc).l.toFunctor.obj obj₂))
+  (hom₂₃ : obj₂ ⟶ (F.map (sq i₂ i₃).p₁.op.toLoc).r.toFunctor.obj
+    ((F.map (sq i₂ i₃).p₂.op.toLoc).l.toFunctor.obj obj₃))
+
+def homComp : obj₁ ⟶ (F.map (sq₃ i₁ i₂ i₃).p₁.op.toLoc).r.toFunctor.obj
+      ((F.map (sq₃ i₁ i₂ i₃).p₃.op.toLoc).l.toFunctor.obj obj₃) :=
+  hom₁₂ ≫ (F.map (sq i₁ i₂).p₁.op.toLoc).r.toFunctor.map
+      ((F.map (sq i₁ i₂).p₂.op.toLoc).l.toFunctor.map hom₂₃) ≫
+        (F.map (sq i₁ i₂).p₁.op.toLoc).r.toFunctor.map
+          ((F.baseChange (sq₃ i₁ i₂ i₃).isPullback₂.toCommSq.flip.op.toLoc).toNatTrans.app _) ≫
+    (Adj.rIso (F.mapComp' (sq i₁ i₂).p₁.op.toLoc (sq₃ i₁ i₂ i₃).p₁₂.op.toLoc
+          (sq₃ i₁ i₂ i₃).p₁.op.toLoc
+            (by simp [← Quiver.Hom.comp_toLoc, ← op_comp]))).inv.toNatTrans.app _ ≫
+    (F.map (sq₃ i₁ i₂ i₃).p₁.op.toLoc).r.toFunctor.map
+      ((Adj.lIso (F.mapComp' (sq i₂ i₃).p₂.op.toLoc (sq₃ i₁ i₂ i₃).p₂₃.op.toLoc
+          (sq₃ i₁ i₂ i₃).p₃.op.toLoc
+            (by simp [← Quiver.Hom.comp_toLoc, ← op_comp]))).inv.toNatTrans.app _)
+
+end
+
+end DescentDataAdj
+
+variable
+  {ι : Type*} {S : C} {X : ι → C} {f : ∀ i, X i ⟶ S}
+  {sq : ∀ i j, ChosenPullback (f i) (f j)}
+  {sq₃ : ∀ (i₁ i₂ i₃ : ι), ChosenPullback₃ (sq i₁ i₂) (sq i₂ i₃) (sq i₁ i₃)}
+
+open DescentDataAdj in
+variable (F sq sq₃) in
+structure DescentDataAdj where
+  obj (i : ι) : (F.obj (.mk (op (X i)))).obj
+  hom (i₁ i₂ : ι) : obj i₁ ⟶
+    (F.map (sq i₁ i₂).p₁.op.toLoc).r.toFunctor.obj
+      ((F.map (sq i₁ i₂).p₂.op.toLoc).l.toFunctor.obj (obj i₂))
+  hom_self (i : ι) (δ : (sq i i).Diagonal) :
+    pullHom (hom i i) δ.f (𝟙 _) (𝟙 _) =
+      (F.map (𝟙 (.mk (op (X i))))).adj.unit.toNatTrans.app _
+  hom_comp (i₁ i₂ i₃ : ι) :
+    homComp sq sq₃ (hom i₁ i₂) (hom i₂ i₃) =
+      pullHom (hom i₁ i₃) (sq₃ i₁ i₂ i₃).p₁₃ _ _
+
+namespace DescentDataAdj
+
+@[ext]
+structure Hom (D₁ D₂ : F.DescentDataAdj sq sq₃) where
+  hom (i : ι) : D₁.obj i ⟶ D₂.obj i
+  comm (i₁ i₂ : ι) :
+    D₁.hom i₁ i₂ ≫ (F.map (sq i₁ i₂).p₁.op.toLoc).r.toFunctor.map
+      ((F.map (sq i₁ i₂).p₂.op.toLoc).l.toFunctor.map (hom i₂)) =
+    hom i₁ ≫ D₂.hom i₁ i₂ := by cat_disch
+
+attribute [reassoc (attr := simp)] Hom.comm
+
+instance : Category (F.DescentDataAdj sq sq₃) where
+  Hom := Hom
+  id _ := { hom _ := 𝟙 _ }
+  comp f g := { hom i := f.hom i ≫ g.hom i }
+
+@[ext]
+lemma hom_ext {D₁ D₂ : F.DescentDataAdj sq sq₃} {f g : D₁ ⟶ D₂}
+    (h : ∀ i, f.hom i = g.hom i) : f = g :=
+  Hom.ext (funext h)
+
+@[simp]
+lemma id_hom (D : F.DescentDataAdj sq sq₃) (i : ι) :
+    Hom.hom (𝟙 D) i = 𝟙 _ :=
+  rfl
+
+@[reassoc, simp]
+lemma comp_hom {D₁ D₂ D₃ : F.DescentDataAdj sq sq₃} (f : D₁ ⟶ D₂) (g : D₂ ⟶ D₃) (i : ι) :
+    (f ≫ g).hom i = f.hom i ≫ g.hom i :=
+  rfl
+
+@[simps]
+def isoMk {D₁ D₂ : F.DescentDataAdj sq sq₃} (e : ∀ (i : ι), D₁.obj i ≅ D₂.obj i)
+    (comm : ∀ (i₁ i₂ : ι), D₁.hom i₁ i₂ ≫ (F.map (sq i₁ i₂).p₁.op.toLoc).r.toFunctor.map
+      ((F.map (sq i₁ i₂).p₂.op.toLoc).l.toFunctor.map (e i₂).hom) =
+        (e i₁).hom ≫ D₂.hom i₁ i₂ := by cat_disch) :
+    D₁ ≅ D₂ where
+  hom :=
+    { hom i := (e i).hom
+      comm := comm }
+  inv :=
+    { hom i := (e i).inv
+      comm i₁ i₂ := by
+        rw [← cancel_epi (e i₁).hom, ← reassoc_of% comm i₁ i₂]
+        simp [← Functor.map_comp] }
+
+end DescentDataAdj
 
 end Pseudofunctor
 
