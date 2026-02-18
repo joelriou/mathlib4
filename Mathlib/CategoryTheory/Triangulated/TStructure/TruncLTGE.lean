@@ -305,18 +305,22 @@ lemma truncGEδLT_comp_truncLTι_app (n : ℤ) (X : C) :
     (t.truncGEδLT n).app X ≫ ((t.truncLTι n).app X)⟦(1 : ℤ)⟧' = 0 :=
   comp_distTriang_mor_zero₃₁ _ (t.triangleLTGE_distinguished n X)
 
+set_option backward.isDefEq.respectTransparency false in
 @[reassoc (attr := simp)]
 lemma truncLTι_comp_truncGEπ (n : ℤ) :
-    t.truncLTι n ≫ t.truncGEπ n = 0 := by sorry --cat_disch
+    t.truncLTι n ≫ t.truncGEπ n = 0 := by
+  cat_disch
 
+set_option backward.isDefEq.respectTransparency false in
 @[reassoc (attr := simp)]
 lemma truncGEπ_comp_truncGEδLT (n : ℤ) :
-    t.truncGEπ n ≫ t.truncGEδLT n = 0 := by sorry --cat_disch
+    t.truncGEπ n ≫ t.truncGEδLT n = 0 := by cat_disch
 
+set_option backward.isDefEq.respectTransparency false in
 @[reassoc (attr := simp)]
 lemma truncGEδLT_comp_truncLTι (n : ℤ) :
     t.truncGEδLT n ≫ Functor.whiskerRight (t.truncLTι n) (shiftFunctor C (1 : ℤ)) = 0 := by
-  sorry --cat_disch
+  cat_disch
 
 /-- The natural transformation `t.truncLT a ⟶ t.truncLT b` when `a ≤ b`. -/
 noncomputable def natTransTruncLTOfLE (a b : ℤ) (h : a ≤ b) :
@@ -360,10 +364,11 @@ lemma truncGEδLT_comp_whiskerRight_natTransTruncLTOfLE (a b : ℤ) (h : a ≤ b
   ext X
   exact t.truncGEδLT_comp_natTransTruncLTOfLE_app a b h X
 
+set_option backward.isDefEq.respectTransparency false in
 @[reassoc (attr := simp)]
 lemma π_natTransTruncGEOfLE (a b : ℤ) (h : a ≤ b) :
     t.truncGEπ a ≫ t.natTransTruncGEOfLE a b h = t.truncGEπ b := by
-  sorry --cat_disch
+  cat_disch
 
 /-- The natural transformation `t.triangleLTGE a ⟶ t.triangleLTGE b`
 when `a ≤ b`. -/
@@ -437,6 +442,7 @@ instance (n : ℤ) : t.IsLE (0 : C) n := t.isLE_of_isZero (isZero_zero C) n
 
 instance (n : ℤ) : t.IsGE (0 : C) n := t.isGE_of_isZero (isZero_zero C) n
 
+set_option backward.isDefEq.respectTransparency false in
 lemma isLE_iff_isIso_truncLTι_app (n₀ n₁ : ℤ) (h : n₀ + 1 = n₁) (X : C) :
     t.IsLE X n₀ ↔ IsIso (((t.truncLTι n₁)).app X) := by
   subst h
@@ -453,8 +459,9 @@ lemma isLE_iff_isIso_truncLTι_app (n₀ n₁ : ℤ) (h : n₀ + 1 = n₁) (X : 
   have : (t.truncLTι (n₀ + 1)).app X = e.inv.hom₁ := by
     simpa [he'] using e.inv.comm₁
   rw [this]
-  sorry --infer_instance
+  infer_instance
 
+set_option backward.isDefEq.respectTransparency false in
 lemma isGE_iff_isIso_truncGEπ_app (n : ℤ) (X : C) :
     t.IsGE X n ↔ IsIso ((t.truncGEπ n).app X) := by
   constructor
@@ -468,9 +475,9 @@ lemma isGE_iff_isIso_truncGEπ_app (n : ℤ) (X : C) :
     have : (truncGEπ t n).app X = e.hom.hom₃ := by
       have := e.hom.comm₂
       dsimp at this
-      sorry --rw [← cancel_epi e.hom.hom₂, ← this, he]
+      rw [← cancel_epi e.hom.hom₂, ← this, he]
     rw [this]
-    sorry --infer_instance
+    infer_instance
   · intro
     exact t.isGE_of_iso (asIso ((truncGEπ t n).app X)).symm n
 
@@ -527,15 +534,17 @@ lemma to_truncLT_obj_ext {n : ℤ} {Y : C} {X : C}
   rw [hg, hg', zero_comp]
   rfl
 
+set_option backward.isDefEq.respectTransparency false in
 @[reassoc]
 lemma truncLT_map_truncLTι_app (n : ℤ) (X : C) :
     (t.truncLT n).map ((t.truncLTι n).app X) = (t.truncLTι n).app ((t.truncLT n).obj X) :=
-  t.to_truncLT_obj_ext (by sorry) --simp)
+  t.to_truncLT_obj_ext (by simp)
 
+set_option backward.isDefEq.respectTransparency false in
 @[reassoc]
 lemma truncGE_map_truncGEπ_app (n : ℤ) (X : C) :
     (t.truncGE n).map ((t.truncGEπ n).app X) = (t.truncGEπ n).app ((t.truncGE n).obj X) :=
-  t.from_truncGE_obj_ext (by sorry) --simp)
+  t.from_truncGE_obj_ext (by simp)
 
 section
 
