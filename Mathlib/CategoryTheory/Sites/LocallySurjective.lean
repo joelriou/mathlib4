@@ -423,7 +423,7 @@ lemma ofArrows_mem_iff_isLocallySurjective
     refine ⟨(Sigma.ι (fun i ↦ shrinkYoneda.{w}.obj (X i)) i).app _
       (shrinkYonedaObjObjEquiv.symm v),
       (congr_fun (NatTrans.congr_app
-      (Sigma.ι_desc (fun i ↦ shrinkYoneda.{w}.map (f i)) i) _) _).trans ?_⟩
+        (Sigma.ι_desc (fun i ↦ shrinkYoneda.{w}.map (f i)) i) _) _).trans ?_⟩
     rw [shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm, fac,
       shrinkYonedaObjObjEquiv_symm_comp]
     rfl
@@ -433,7 +433,7 @@ lemma ofArrows_mem_iff_isLocallySurjective
     rintro Z g ⟨a, ha⟩
     obtain ⟨⟨i⟩, a, rfl⟩ := Types.jointly_surjective_of_isColimit
       (isColimitOfPreserves ((evaluation _ _).obj (op Z))
-      (coproductIsCoproduct (fun i ↦ shrinkYoneda.{w}.obj (X i)))) a
+        (coproductIsCoproduct (fun i ↦ shrinkYoneda.{w}.obj (X i)))) a
     obtain ⟨a, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective a
     refine ⟨_, a, _, ⟨i⟩, shrinkYonedaObjObjEquiv.symm.injective ?_⟩
     convert ha
