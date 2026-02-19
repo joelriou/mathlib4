@@ -775,7 +775,6 @@ lemma hasSheafify_of_isEquivalence [HasSheafify J A] [HasFiniteLimits A] :
     apply comp_preservesFiniteLimits
   have : PreservesFiniteLimits (sheafifyOfIsEquivalence J K G A) := by
     apply comp_preservesFiniteLimits
-  let adj := sheafifyAdjunctionOfIsEquivalence J K G A
   exact HasSheafify.mk' _ _ (sheafifyAdjunctionOfIsEquivalence J K G A)
 
 end
