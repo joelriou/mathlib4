@@ -115,8 +115,7 @@ noncomputable def internalHom : PresheafOfModules.{max u u₁ v₁} (R ⋙ forge
         erw [over_smul_app_apply, over_smul_app_apply]
         dsimp
         rw [Functor.map_comp]
-        rfl
-        ) }
+        rfl ) }
   map_id _ := by
     ext
     dsimp [internalHomMap]
