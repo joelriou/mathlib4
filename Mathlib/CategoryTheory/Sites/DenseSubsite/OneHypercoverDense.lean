@@ -753,7 +753,7 @@ lemma isSheaf : Presheaf.IsSheaf J (presheaf data G₀) := by
     · simp [Multifork.ι, PreOneHypercover.multifork]
 
 /-- Let `F : C₀ ⥤ C` be a dense subsite and `data : ∀ X, F.OneHypercoverDenseData J₀ J X`
-be a family of structures. Let `G₀` be a sheaf on `C₀`. This is a shead on `C` which
+be a family of structures. Let `G₀` be a sheaf on `C₀`. This is a sheaf on `C` which
 extends `G₀` (see `OneHypercoverDenseData.essSurj.isSheafIso`). -/
 noncomputable def sheaf : Sheaf J A := ⟨presheaf data G₀, isSheaf data G₀⟩
 
