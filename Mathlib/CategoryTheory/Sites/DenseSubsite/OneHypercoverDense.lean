@@ -706,9 +706,7 @@ lemma presheafMap_presheafObjObjIso_hom (X : C) (i : (data X).I₀) :
     comp_id]
   apply presheafObj_hom_ext
   intro j
-  rw [assoc, presheafMap_π]
-  dsimp [presheafObjObjIso]
-  rw [presheafObjObjIso.inv_π data G₀]
+  rw [assoc, presheafMap_π, presheafObjObjIso, presheafObjObjIso.inv_π data G₀]
   apply restriction_eq_of_fac
   simp
 
