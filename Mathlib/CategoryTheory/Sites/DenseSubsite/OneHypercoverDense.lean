@@ -698,10 +698,7 @@ noncomputable def presheafObjObjIso (X₀ : C₀) :
       ⟨_, cover_lift F J₀ _ (data (F.obj X₀)).mem₀⟩ _ _ ?_
     rintro ⟨Y₀, a, X, b, c, ⟨i⟩, fac⟩
     dsimp at i b fac ⊢
-    rw [assoc, presheafObjObjIso.hom_map data G₀ _ b fac,
-      presheafObjObjIso.inv_π_assoc, id_comp,
-      ← IsDenseSubsite.mapPreimage_comp, fac,
-      IsDenseSubsite.mapPreimage_map]
+    simp [presheafObjObjIso.hom_map data G₀ _ b fac, ← IsDenseSubsite.mapPreimage_comp, fac]
 
 @[reassoc (attr := simp)]
 lemma presheafMap_presheafObjObjIso_hom (X : C) (i : (data X).I₀) :
