@@ -27,10 +27,6 @@ We provide a constructor `ObjectProperty.IsConservativeFamilyOfPoints.mk'`
 which allows to verify that a family of points is conservative
 using a condition involving covering sieves (SGA 4 IV 6.5 (a)).
 
-## TODO
-* Formalize SGA 4 IV 6.5 (a) which characterizes conservative families
-of points.
-
 -/
 
 @[expose] public section
@@ -247,8 +243,8 @@ namespace GrothendieckTopology
 if it has a `w`-small conservative family of points. -/
 class HasEnoughPoints (J : GrothendieckTopology C) : Prop where
   exists_objectProperty (J) :
-      ∃ (P : ObjectProperty (Point.{w} J)),
-        ObjectProperty.Small.{w} P ∧ P.IsConservativeFamilyOfPoints
+    ∃ (P : ObjectProperty (Point.{w} J)),
+      ObjectProperty.Small.{w} P ∧ P.IsConservativeFamilyOfPoints
 
 end GrothendieckTopology
 
