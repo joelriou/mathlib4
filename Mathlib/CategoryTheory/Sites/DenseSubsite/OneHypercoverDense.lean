@@ -689,10 +689,10 @@ noncomputable def presheafObjObjIso (X₀ : C₀) :
     (presheaf data G₀).obj (op (F.obj X₀)) ≅ G₀.val.obj (op X₀) where
   hom := presheafObjObjIso.hom data G₀ X₀
   inv := presheafObjObjIso.inv data G₀ X₀
-  hom_inv_id := presheafObj_hom_ext (fun i ↦ by
+  hom_inv_id := presheafObj_hom_ext fun i ↦ by
     rw [assoc, presheafObjObjIso.inv_π, id_comp,
       presheafObjObjIso.hom_mapPreimage data G₀ _ (𝟙 _) (fac := by simp),
-      IsDenseSubsite.mapPreimage_id, comp_id])
+      IsDenseSubsite.mapPreimage_id, comp_id]
   inv_hom_id := by
     refine Presheaf.IsSheaf.hom_ext G₀.cond
       ⟨_, cover_lift F J₀ _ (data (F.obj X₀)).mem₀⟩ _ _ ?_
