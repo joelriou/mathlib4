@@ -687,8 +687,8 @@ noncomputable def sheafifyOfIsEquivalence
 variable (A) in
 /-- Assuming that `(C, J)` is a dense subsite of `(D, K)` (via a functor `G : C ⥤ D`)
 and `sheafPushforwardContinuous G A J₀ J` is an equivalence of categories, this is
-the isomorphism `sheafifyOfIsEquivalence J K G A ⋙ G.sheafPushforwardContinuous A J K`
-and functor which sends a presheaf to the sheafification of its precomposition by `G.op`. -/
+the isomorphism between `sheafifyOfIsEquivalence J K G A ⋙ G.sheafPushforwardContinuous A J K`
+and the functor which sends a presheaf to the sheafification of its precomposition by `G.op`. -/
 noncomputable def sheafifyOfIsEquivalenceCompIso
     [IsEquivalence (sheafPushforwardContinuous G A J K)] :
     sheafifyOfIsEquivalence J K G A ⋙ G.sheafPushforwardContinuous A J K ≅
