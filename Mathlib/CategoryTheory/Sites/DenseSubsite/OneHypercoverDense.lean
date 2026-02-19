@@ -831,8 +831,8 @@ variable {A}
 noncomputable def sheafifyHomEquivOfIsEquivalence
     {P : Cᵒᵖ ⥤ A} {Q : Sheaf J A} :
     ((sheafifyOfIsEquivalence F J₀ J A).obj P ⟶ Q) ≃ (P ⟶ Q.val) :=
-  have := IsDenseSubsite.isLocallyFull J₀ J F
-  have := IsDenseSubsite.isCoverDense J₀ J F
+  haveI := IsDenseSubsite.isLocallyFull J₀ J F
+  haveI := IsDenseSubsite.isCoverDense J₀ J F
   ((F.sheafPushforwardContinuous A J₀ J).asEquivalence.symm.toAdjunction.homEquiv _ _).trans
     (((sheafificationAdjunction J₀ A).homEquiv _ _).trans IsCoverDense.restrictHomEquivHom)
 
