@@ -20,8 +20,9 @@ show that the restriction functor
 `sheafPushforwardContinuous F A J₀ J : Sheaf J A ⥤ Sheaf J₀ A` is an equivalence
 of categories (see `Functor.isEquivalence_of_isOneHypercoverDense`), which allows
 to transport `HasWeakSheafify` and `HasSheafify` assumptions for the site `(C₀, J₀)`
-to the site `(C, J)`, see `Functor.hasWeakSheafify_of_isEquivalence`
-and `Functor.hasSheafify_of_isEquivalence`.
+to the site `(C, J)`, see `Functor.IsDenseSubsite.hasWeakSheafify_of_isEquivalence`
+and `Functor.IsDenseSubsite.hasSheafify_of_isEquivalence` in the file
+`Mathlib/CategoryTheory/Sites/DenseSubsite/Basic.lean`.
 
 -/
 
@@ -808,103 +809,6 @@ lemma isEquivalence_of_isOneHypercoverDense
     [HasLimitsOfSize.{w, w} A] [IsOneHypercoverDense.{w} F J₀ J] :
     IsEquivalence (sheafPushforwardContinuous F A J₀ J) :=
   OneHypercoverDenseData.isEquivalence.{w} A (oneHypercoverDenseData F J₀ J)
-
-variable [IsEquivalence (sheafPushforwardContinuous F A J₀ J)]
-
-section
-
-variable [HasWeakSheafify J₀ A]
-
-/-- Assuming that `(C₀, J₀)` is a dense subsite of `(C, J)` and
-`sheafPushforwardContinuous F A J₀ J` is an equivalence of categories
-this is a sheafification functor `(Cᵒᵖ ⥤ A) ⥤ Sheaf J A`
-when `HasWeakSheafify J₀ A` holds. -/
-noncomputable def sheafifyOfIsEquivalence
-    [IsEquivalence (sheafPushforwardContinuous F A J₀ J)] :
-    (Cᵒᵖ ⥤ A) ⥤ Sheaf J A :=
-  (whiskeringLeft _ _ _).obj F.op ⋙ presheafToSheaf J₀ A ⋙
-    inv (F.sheafPushforwardContinuous A J₀ J)
-
-variable {A}
-
-/-- Auxiliary definition for `sheafifyAdjunctionOfIsEquivalence`. -/
-noncomputable def sheafifyHomEquivOfIsEquivalence
-    {P : Cᵒᵖ ⥤ A} {Q : Sheaf J A} :
-    ((sheafifyOfIsEquivalence F J₀ J A).obj P ⟶ Q) ≃ (P ⟶ Q.val) :=
-  haveI := IsDenseSubsite.isLocallyFull J₀ J F
-  haveI := IsDenseSubsite.isCoverDense J₀ J F
-  ((F.sheafPushforwardContinuous A J₀ J).asEquivalence.symm.toAdjunction.homEquiv _ _).trans
-    (((sheafificationAdjunction J₀ A).homEquiv _ _).trans IsCoverDense.restrictHomEquivHom)
-
-@[reassoc]
-lemma sheafifyHomEquivOfIsEquivalence_naturality_left
-    {P₁ P₂ : Cᵒᵖ ⥤ A} (f : P₁ ⟶ P₂) {Q : Sheaf J A}
-    (g : (F.sheafifyOfIsEquivalence J₀ J A).obj P₂ ⟶ Q) :
-      sheafifyHomEquivOfIsEquivalence F J₀ J
-        ((F.sheafifyOfIsEquivalence J₀ J A).map f ≫ g) =
-        f ≫ sheafifyHomEquivOfIsEquivalence F J₀ J g := by
-  have := IsDenseSubsite.isLocallyFull J₀ J F
-  have := IsDenseSubsite.isCoverDense J₀ J F
-  let adj₁ := (F.sheafPushforwardContinuous A J₀ J).asEquivalence.symm.toAdjunction
-  let adj₂ := sheafificationAdjunction J₀ A
-  change IsCoverDense.restrictHomEquivHom (adj₂.homEquiv _ _ (adj₁.homEquiv _ _
-    ((F.sheafifyOfIsEquivalence J₀ J A).map f ≫ g))) =
-      f ≫ IsCoverDense.restrictHomEquivHom (adj₂.homEquiv _ _ (adj₁.homEquiv _ _ g))
-  rw [← IsCoverDense.restrictHomEquivHom_naturality_left]
-  congr 2
-  trans adj₂.homEquiv _ _ ((presheafToSheaf J₀ A).map (F.op.whiskerLeft f) ≫
-    (adj₁.homEquiv _ _) g)
-  · congr 1
-    apply adj₁.homEquiv_naturality_left
-  · apply adj₂.homEquiv_naturality_left
-
-@[reassoc]
-lemma sheafifyHomEquivOfIsEquivalence_naturality_right
-    {P : Cᵒᵖ ⥤ A} {Q₁ Q₂ : Sheaf J A}
-    (f : (F.sheafifyOfIsEquivalence J₀ J A).obj P ⟶ Q₁) (g : Q₁ ⟶ Q₂) :
-      sheafifyHomEquivOfIsEquivalence F J₀ J (f ≫ g) =
-        sheafifyHomEquivOfIsEquivalence F J₀ J f ≫ g.val := by
-  have := IsDenseSubsite.isLocallyFull J₀ J F
-  have := IsDenseSubsite.isCoverDense J₀ J F
-  let adj₁ := (F.sheafPushforwardContinuous A J₀ J).asEquivalence.symm.toAdjunction
-  let adj₂ := sheafificationAdjunction J₀ A
-  change IsCoverDense.restrictHomEquivHom (adj₂.homEquiv _ _ (adj₁.homEquiv _ _ (f ≫ g))) =
-    IsCoverDense.restrictHomEquivHom (adj₂.homEquiv _ _ (adj₁.homEquiv _ _ f)) ≫ g.val
-  rw [adj₁.homEquiv_naturality_right, adj₂.homEquiv_naturality_right]
-  apply IsCoverDense.restrictHomEquivHom_naturality_right
-
-variable (A)
-
-/-- Assuming that `(C₀, J₀)` is a dense subsite of `(C, J)` and
-`sheafPushforwardContinuous F A J₀ J` is an equivalence of categories, and
-that `HasWeakSheafify J₀ A` holds, then this adjunction shows the existence
-of a left adjoint to `sheafToPresheaf J A`. -/
-noncomputable def sheafifyAdjunctionOfIsEquivalence :
-    sheafifyOfIsEquivalence F J₀ J A ⊣ sheafToPresheaf J A :=
-  Adjunction.mkOfHomEquiv
-    { homEquiv := fun P Q ↦ sheafifyHomEquivOfIsEquivalence F J₀ J
-      homEquiv_naturality_left_symm := fun {P₁ P₂ Q} f g ↦
-        (F.sheafifyHomEquivOfIsEquivalence J₀ J).injective (by
-          simp only [sheafToPresheaf_obj, Equiv.apply_symm_apply,
-            sheafifyHomEquivOfIsEquivalence_naturality_left _ _ _ f])
-      homEquiv_naturality_right :=
-        sheafifyHomEquivOfIsEquivalence_naturality_right F J₀ J }
-
-include F J₀ in
-lemma hasWeakSheafify_of_isEquivalence :
-    HasWeakSheafify J A := ⟨_, ⟨sheafifyAdjunctionOfIsEquivalence F J₀ J A⟩⟩
-
-end
-
-include F in
-lemma hasSheafify_of_isEquivalence [HasSheafify J₀ A] [HasFiniteLimits A] :
-    HasSheafify J A := by
-  have : PreservesFiniteLimits (presheafToSheaf J₀ A ⋙
-    (F.sheafPushforwardContinuous A J₀ J).inv) := by
-    apply comp_preservesFiniteLimits
-  have : PreservesFiniteLimits (F.sheafifyOfIsEquivalence J₀ J A) := by
-    apply comp_preservesFiniteLimits
-  exact HasSheafify.mk' _ _ (sheafifyAdjunctionOfIsEquivalence F J₀ J A)
 
 end Functor
 
