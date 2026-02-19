@@ -653,10 +653,8 @@ variable (X₀)
 noncomputable def inv : G₀.val.obj (op X₀) ⟶ (presheaf data G₀).obj (op (F.obj X₀)) :=
   Multiequalizer.lift _ _
     (fun i ↦ IsDenseSubsite.mapPreimage J F G₀ ((data (F.obj X₀)).f i)) (by
-      rintro ⟨⟨i, i'⟩, j⟩
-      dsimp
-      rw [IsDenseSubsite.mapPreimage_comp_map, IsDenseSubsite.mapPreimage_comp_map,
-        (data (F.obj X₀)).w j])
+      intro ⟨⟨i, i'⟩, j⟩
+      simp [IsDenseSubsite.mapPreimage_comp_map, (data (F.obj X₀)).w j])
 
 @[reassoc (attr := simp)]
 lemma inv_π (i : (data (F.obj X₀)).I₀) :
