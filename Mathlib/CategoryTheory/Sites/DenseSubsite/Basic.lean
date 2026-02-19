@@ -33,7 +33,7 @@ that factors through images of the functor for each object in `D`.
   locally fully-faithful, and `S` is a cover of `C` iff the image of `S` in `D` is a cover.
 - `CategoryTheory.Functor.IsDenseSubsite.sheafEquiv`: the equivalence of
   categories `Sheaf J A ≌ Sheaf K A` when `(C, J)` is a dense subsite of `(D, K)` and
-  the pushforward functor `Sheaf K A ⥤ Sheaf J A` is an equivalence, which we show hold
+  the pushforward functor `Sheaf K A ⥤ Sheaf J A` is an equivalence, which we show
   in two situations:
   * the sites are small and `A` has suitable limits (see the file
     `Mathlib/CategoryTheory/Sites/DenseSubsite/SheafEquiv.lean`).
