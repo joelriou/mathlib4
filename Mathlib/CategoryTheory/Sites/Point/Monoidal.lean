@@ -158,18 +158,21 @@ lemma toPresheafFiber_δ_app_app (X : C) (x : Φ.fiber.obj X) (G₁ G₂ : Cᵒ�
       Φ.toPresheafFiber X x G₁ ⊗ₘ Φ.toPresheafFiber X x G₂ := by
   cat_disch
 
-noncomputable def ε : Φ.presheafFiber.obj (𝟙_ (Cᵒᵖ ⥤ A)) ⟶ 𝟙_ A :=
+noncomputable def η : Φ.presheafFiber.obj (𝟙_ (Cᵒᵖ ⥤ A)) ⟶ 𝟙_ A :=
   Φ.presheafFiberDesc (fun _ _ ↦ 𝟙 _)
 
 @[reassoc (attr := simp)]
-lemma toPresheafFiber_ε (X : C) (x : Φ.fiber.obj X) :
-    Φ.toPresheafFiber X x (𝟙_ (Cᵒᵖ ⥤ A)) ≫ Φ.ε (A := A) = 𝟙 (𝟙_ A) := by
-  simp [ε]
+lemma toPresheafFiber_η (X : C) (x : Φ.fiber.obj X) :
+    Φ.toPresheafFiber X x (𝟙_ (Cᵒᵖ ⥤ A)) ≫ Φ.η (A := A) = 𝟙 (𝟙_ A) := by
+  simp [η]
 
-instance : IsIso (Φ.ε (A := A)) := sorry
+attribute [local instance] IsFiltered.isConnected in
+instance : IsIso (Φ.η (A := A)) :=
+  (IsColimit.coconePointUniqueUpToIso (colimit.isColimit _)
+    (isColimitConstCocone _ (𝟙_ A))).isIso_hom
 
 noncomputable instance : (Φ.presheafFiber (A := A)).OplaxMonoidal :=
-  .ofBifunctor Φ.ε Φ.δ (by
+  .ofBifunctor Φ.η Φ.δ (by
     ext G₁ G₂ G₃
     refine Φ.presheafFiber_hom_ext (fun X x ↦ ?_)
     dsimp
@@ -182,6 +185,10 @@ noncomputable instance : (Φ.presheafFiber (A := A)).OplaxMonoidal :=
     dsimp)
     (by ext; simp [tensorHom_def', ← comp_whiskerRight])
     (by ext; simp [tensorHom_def, ← MonoidalCategory.whiskerLeft_comp])
+
+instance :
+    IsIso (Functor.OplaxMonoidal.η (Φ.presheafFiber (A := A))) :=
+  inferInstanceAs (IsIso Φ.η)
 
 variable [LocallySmall.{w} C]
   [∀ (X : A), PreservesFilteredColimitsOfSize.{w, w} (tensorLeft X)]
@@ -209,10 +216,6 @@ instance : IsIso (Φ.δ (A := A)) := by
 instance (G₁ G₂ : Cᵒᵖ ⥤ A) :
     IsIso (Functor.OplaxMonoidal.δ (Φ.presheafFiber) G₁ G₂) :=
   inferInstanceAs (IsIso ((Φ.δ.app G₁).app G₂))
-
-instance :
-    IsIso (Functor.OplaxMonoidal.η (Φ.presheafFiber (A := A))) := by
-  sorry
 
 noncomputable instance : (Φ.presheafFiber (A := A)).Monoidal :=
   .ofOplaxMonoidal _
