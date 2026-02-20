@@ -5,29 +5,29 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.CategoryTheory.Sites.Point.Basic
 public import Mathlib.CategoryTheory.Limits.Preserves.Bifunctor
-public import Mathlib.CategoryTheory.Monoidal.Multifunctor
+public import Mathlib.CategoryTheory.Localization.Monoidal.Functor
+public import Mathlib.CategoryTheory.Sites.Point.Basic
+public import Mathlib.CategoryTheory.Sites.Monoidal
 
 /-!
 # Fiber functors are monoidal
 
 Let `Φ` be a point of a site `(C, J)`. Let `A` be a monoidal category where
 the tensor product commutes with filtered colimits in both variables.
-We show that the fiber functor `Φ.presheafFiber : (Cᵒᵖ ⥤ A) ⥤ A`
-is monoidal.
+We show that the fiber functors `Φ.presheafFiber : (Cᵒᵖ ⥤ A) ⥤ A`
+and `Φ.sheafFiber : Sheaf J A ⥤ A` are monoidal.
 
 ## TODO (@joelriou)
 * for sites that have enough points, use this to give an alternative
   proof of the assumption to `Sheaf.monoidalCategory` in the file
   `Mathlib/CategoryTheory/Sites/Monoidal`
-* show that `Φ.sheafFiber` is also monoidal
 
 -/
 
 @[expose] public section
 
-universe w v v' u u'
+universe w w' v v' u u'
 
 namespace CategoryTheory.GrothendieckTopology.Point
 
@@ -115,5 +115,23 @@ instance (P₁ P₂ : Cᵒᵖ ⥤ A) :
 
 noncomputable instance : (Φ.presheafFiber (A := A)).Monoidal :=
   .ofOplaxMonoidal _
+
+attribute [local instance] Sheaf.monoidalCategory
+
+variable {FC : A → A → Type*} {CC : A → Type w'}
+  [∀ (X Y : A), FunLike (FC X Y) (CC X) (CC Y)]
+  [ConcreteCategory.{w'} A FC]
+  [PreservesFilteredColimitsOfSize.{w, w} (forget A)]
+  [(forget A).ReflectsIsomorphisms]
+  [HasWeakSheafify J A] [J.WEqualsLocallyBijective A]
+  [(J.W (A := A)).IsMonoidal]
+
+noncomputable instance : (Φ.sheafFiber (A := A)).Monoidal :=
+  Localization.Monoidal.functorMonoidalOfComp (presheafToSheaf J A) J.W
+    Φ.sheafFiber Φ.presheafFiber
+
+instance : NatTrans.IsMonoidal (Φ.presheafToSheafCompSheafFiber A).hom :=
+  Localization.Monoidal.lifting_isMonoidal (presheafToSheaf J A) J.W
+    Φ.sheafFiber Φ.presheafFiber
 
 end CategoryTheory.GrothendieckTopology.Point

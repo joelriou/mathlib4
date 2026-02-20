@@ -253,6 +253,13 @@ noncomputable def presheafToSheafCompSheafFiber [HasWeakSheafify J A]
     (fun P ↦ asIso ((Φ.presheafFiber (A := A)).map (CategoryTheory.toSheafify J P) :))
       (by simp [← Functor.map_comp])).symm
 
+noncomputable instance [HasWeakSheafify J A]
+    [PreservesFilteredColimitsOfSize.{w, w} (forget A)] [LocallySmall.{w} C]
+    [J.WEqualsLocallyBijective A] [(forget A).ReflectsIsomorphisms] :
+    Localization.Lifting (presheafToSheaf J A) J.W
+        Φ.presheafFiber Φ.sheafFiber where
+  iso := Φ.presheafToSheafCompSheafFiber A
+
 instance [LocallySmall.{w} C] [HasFiniteLimits A] [AB5OfSize.{w, w} A] :
     PreservesFiniteLimits (Φ.presheafFiber (A := A)) :=
   comp_preservesFiniteLimits _ _
