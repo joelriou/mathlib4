@@ -31,12 +31,10 @@ universe w v v' u u'
 
 namespace CategoryTheory.GrothendieckTopology.Point
 
-open Limits Opposite MonoidalCategory Functor
+open Limits MonoidalCategory Functor
 
-variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
-  (Φ : Point.{w} J)
-  {A : Type u'} [Category.{v'} A] [HasColimitsOfSize.{w, w} A]
-  [MonoidalCategory A]
+variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C} (Φ : Point.{w} J)
+  {A : Type u'} [Category.{v'} A] [MonoidalCategory A] [HasColimitsOfSize.{w, w} A]
 
 noncomputable instance :
     (Φ.presheafFiber (A := A)).OplaxMonoidal where
@@ -76,7 +74,7 @@ lemma toPresheafFiber_η (X : C) (x : Φ.fiber.obj X) :
   toPresheafFiber_presheafFiberDesc _ _ _ _ _
 
 @[reassoc (attr := simp)]
-lemma toPresheafFiber_δ_app_app (X : C) (x : Φ.fiber.obj X) (G₁ G₂ : Cᵒᵖ ⥤ A) :
+lemma toPresheafFiber_δ (X : C) (x : Φ.fiber.obj X) (G₁ G₂ : Cᵒᵖ ⥤ A) :
     Φ.toPresheafFiber X x (G₁ ⊗ G₂) ≫ OplaxMonoidal.δ Φ.presheafFiber G₁ G₂ =
       Φ.toPresheafFiber X x G₁ ⊗ₘ Φ.toPresheafFiber X x G₂ :=
   toPresheafFiber_presheafFiberDesc _ _ _ _ _
@@ -87,11 +85,11 @@ variable [LocallySmall.{w} C]
 
 instance (M : A) :
     PreservesColimitsOfShape Φ.fiber.Elementsᵒᵖ ((curriedTensor A).flip.obj M) :=
-  Functor.Final.preservesColimitsOfShape_of_final (FinallySmall.fromFilteredFinalModel.{w} _) _
+  Final.preservesColimitsOfShape_of_final (FinallySmall.fromFilteredFinalModel.{w} _) _
 
 instance (M : A) :
     PreservesColimitsOfShape Φ.fiber.Elementsᵒᵖ ((curriedTensor A).obj M) :=
-  Functor.Final.preservesColimitsOfShape_of_final (FinallySmall.fromFilteredFinalModel.{w} _) _
+  Final.preservesColimitsOfShape_of_final (FinallySmall.fromFilteredFinalModel.{w} _) _
 
 attribute [local instance] IsFiltered.isConnected in
 instance : IsIso (OplaxMonoidal.η (Φ.presheafFiber (A := A))) :=
@@ -102,7 +100,7 @@ attribute [local simp] tensorHom_def toPresheafFiber OplaxMonoidal.δ presheafFi
 instance (P₁ P₂ : Cᵒᵖ ⥤ A) :
     IsIso (OplaxMonoidal.δ Φ.presheafFiber P₁ P₂) := by
   let e := IsColimit.coconePointUniqueUpToIso (colimit.isColimit _)
-    ((Final.isColimitWhiskerEquiv (Functor.diag _) _ ).2
+    ((Final.isColimitWhiskerEquiv (diag _) _ ).2
       (isColimitOfPreserves₂ (curriedTensor A)
       (colimit.isColimit ((CategoryOfElements.π Φ.fiber).op ⋙ P₁))
       (colimit.isColimit ((CategoryOfElements.π Φ.fiber).op ⋙ P₂))))
