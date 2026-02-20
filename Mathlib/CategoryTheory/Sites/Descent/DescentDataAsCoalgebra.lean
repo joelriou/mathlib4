@@ -136,7 +136,8 @@ variable (F) in
 over the comonoad corresponding to the adjunction
 `(F.map f.op.toLoc).adj`. -/
 @[simps! functor_obj_A functor_obj_a functor_map_f inverse_obj_obj inverse_obj_hom
-  inverse_map_hom counitIso, simps! -isSimp unitIso_hom_app_hom unitIso_inv_app_hom]
+  inverse_map_hom counitIso_hom_app_f counitIso_inv_app_f,
+  simps! -isSimp unitIso_hom_app_hom unitIso_inv_app_hom]
 def coalgebraEquivalence (ι : Type*) [Unique ι] {X S : C} (f : X ⟶ S) :
     F.DescentDataAsCoalgebra (fun (_ : ι) ↦ f) ≌
     (Adjunction.ofCat (F.map f.op.toLoc).adj).toComonad.Coalgebra where
