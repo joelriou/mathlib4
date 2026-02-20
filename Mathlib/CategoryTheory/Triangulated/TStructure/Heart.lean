@@ -17,11 +17,11 @@ the heart is usually identified to a particular category in the applications
 (e.g. the heart of the canonical t-structure on the derived category of
 an abelian category `A` identifies to `A`), instead of working
 with the full subcategory defined by `t.heart`, we introduce a typeclass
-`t.HasHeart` which contains the data of a preadditive category that
-is equivalent to it: this heart can be accessed as `t.Heart`.
+`t.Heart H` which says that the additive category `H` identifies to
+the full subcategory `t.heart`.
 
 ## TODO (@joelriou)
-* Show that `t.Heart` is an abelian category.
+* Show that the heart is an abelian category.
 
 ## References
 * [Beilinson, Bernstein, Deligne, Gabber, *Faisceaux pervers*][bbd-1982]
@@ -49,66 +49,55 @@ lemma mem_heart_iff (X : C) :
     t.heart X ↔ t.IsLE X 0 ∧ t.IsGE X 0 := by
   simp [heart]
 
-/-- Given `t : TStructure C`, a `t.HasHeart` instance consists of a choice
-of a preadditive category which identifies to the fullsubcategory of `C`
-consisting of the objects satisfying the property `t.heart`. This
-category can be accessed as `t.Heart`. -/
-@[nolint checkUnivs]
-class HasHeart where
-  /-- A preadditive category which is equivalent to the fullsubcategory defined by
-  the property `t.heart`. -/
-  H : Type u'
-  /-- The category structure on the heart. -/
-  [category : Category.{v'} H]
-  /-- The heart is a preadditive category. -/
-  [preadditive : Preadditive H]
+
+variable (H : Type u') [Category.{v'} H] [Preadditive H]
+
+/-- Given `t : TStructure C` and a preadditive category `H`, this typeclass
+contains the data of a fully faithful additive functor `H ⥤ C` which identifies
+`H` to the full subcategory of `C` consisting of the objects satisfying
+the property `t.heart`. -/
+class Heart where
   /-- The inclusion functor. -/
   ι : H ⥤ C
   additive_ι : ι.Additive := by infer_instance
-  fullι : ι.Full := by infer_instance
+  full_ι : ι.Full := by infer_instance
   faithful_ι : ι.Faithful := by infer_instance
   essImage_eq_heart : ι.essImage = t.heart := by simp
 
+
 /-- Unless a better candidate category is available, the full subcategory
 of objects satisfying `t.heart` can be chosen as the heart of a t-structure `t`. -/
-def hasHeartFullSubcategory : t.HasHeart where
-  H := t.heart.FullSubcategory
+def hasHeartFullSubcategory : t.Heart t.heart.FullSubcategory where
   ι := t.heart.ι
   essImage_eq_heart := by
     ext X
     exact ⟨fun ⟨⟨Y, hY⟩, ⟨e⟩⟩ ↦ t.heart.prop_of_iso e hY,
       fun hX ↦ ⟨⟨X, hX⟩, ⟨Iso.refl _⟩⟩⟩
 
-variable [t.HasHeart]
+variable [t.Heart H]
 
-/-- The heart of a t-structure, when an instance `t.HasHeart` is available. -/
-def Heart := HasHeart.H (t := t)
+variable {H} in
+/-- The inclusion `H ⥤ C` when `H` is the heart of a t-structure `t` on `C`. -/
+def ιHeart : H ⥤ C := Heart.ι t
 
-instance : Category t.Heart := HasHeart.category
-
-instance : Preadditive t.Heart := HasHeart.preadditive
-
-/-- The inclusion functor `t.Heart ⥤ C` of the heart of
-a t-structure `t : TStructure C`. -/
-def ιHeart : t.Heart ⥤ C := HasHeart.ι
-
-instance : t.ιHeart.Full := HasHeart.fullι
-instance : t.ιHeart.Faithful := HasHeart.faithful_ι
-instance : t.ιHeart.Additive := HasHeart.additive_ι
+instance : (t.ιHeart (H := H)).Additive := Heart.additive_ι
+instance : (t.ιHeart (H := H)).Full := Heart.full_ι
+instance : (t.ιHeart (H := H)).Faithful := Heart.faithful_ι
 
 @[simp]
 lemma essImage_ιHeart :
-    t.ιHeart.essImage = t.heart :=
-  HasHeart.essImage_eq_heart
+    (t.ιHeart (H := H)).essImage = t.heart :=
+  Heart.essImage_eq_heart
 
-lemma ιHeart_obj_mem (X : t.Heart) : t.heart (t.ιHeart.obj X) := by
-  rw [← t.essImage_ιHeart]
+variable {H} in
+lemma ιHeart_obj_mem (X : H) : t.heart (t.ιHeart.obj X) := by
+  rw [← t.essImage_ιHeart H]
   exact t.ιHeart.obj_mem_essImage X
 
-instance (X : t.Heart) : t.IsLE (t.ιHeart.obj X) 0 :=
+instance (X : H) : t.IsLE (t.ιHeart.obj X) 0 :=
   ⟨(t.ιHeart_obj_mem X).1⟩
 
-instance (X : t.Heart) : t.IsGE (t.ιHeart.obj X) 0 :=
+instance (X : H) : t.IsGE (t.ιHeart.obj X) 0 :=
   ⟨(t.ιHeart_obj_mem X).2⟩
 
 end CategoryTheory.Triangulated.TStructure
