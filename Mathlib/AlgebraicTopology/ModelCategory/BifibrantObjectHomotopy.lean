@@ -518,12 +518,12 @@ instance {D : Type*} [Category* D] (L : C ⥤ D)
     (ι ⋙ L).IsLocalization (weakEquivalences (BifibrantObject C)) :=
   inferInstanceAs (((localizerMorphism C).functor ⋙ L).IsLocalization _)
 
-instance : (ιFibrantObjectLocalizerMorphism C).IsLocalizedEquivalence := by
+instance : (ιFibrantObjectLocalizerMorphism C).IsLocalizedEquivalence :=
   let L := FibrantObject.ι ⋙ (weakEquivalences C).Q
   have : ((ιFibrantObjectLocalizerMorphism C).functor ⋙ L).IsLocalization
     (weakEquivalences _) :=
     inferInstanceAs ((ι ⋙ (weakEquivalences C).Q).IsLocalization (weakEquivalences _))
-  exact LocalizerMorphism.IsLocalizedEquivalence.of_isLocalization_of_isLocalization _ L
+  LocalizerMorphism.IsLocalizedEquivalence.of_isLocalization_of_isLocalization _ L
 
 instance {D : Type*} [Category D] (L : FibrantObject C ⥤ D)
     [L.IsLocalization (weakEquivalences _)] :
