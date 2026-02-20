@@ -86,6 +86,11 @@ instance [Limits.HasTerminal J] : FinallySmall.{w} J :=
   have := Functor.final_const_terminal (C := PUnit.{w + 1}) (D := J)
   .mk' ((Functor.const PUnit.{w + 1}).obj (⊤_ J))
 
+instance {J' : Type*} [Category* J'] [FinallySmall.{w} J] [FinallySmall.{w} J'] :
+    FinallySmall.{w} (J × J') :=
+  finallySmall_of_final_of_essentiallySmall
+    ((fromFinalModel.{w} J).prod (fromFinalModel.{w} J'))
+
 end FinallySmall
 
 section InitiallySmall
