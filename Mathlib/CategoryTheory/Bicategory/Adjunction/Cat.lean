@@ -6,7 +6,6 @@ Authors: Joël Riou
 module
 
 public import Mathlib.CategoryTheory.Adjunction.Mates
-public import Mathlib.CategoryTheory.Bicategory.Adjunction.Mate
 public import Mathlib.CategoryTheory.Bicategory.Adjunction.Adj
 
 /-!
