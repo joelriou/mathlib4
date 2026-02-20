@@ -63,7 +63,6 @@ class Heart where
   faithful_ι : ι.Faithful := by infer_instance
   essImage_eq_heart : ι.essImage = t.heart := by simp
 
-
 /-- Unless a better candidate category is available, the full subcategory
 of objects satisfying `t.heart` can be chosen as the heart of a t-structure `t`. -/
 def hasHeartFullSubcategory : t.Heart t.heart.FullSubcategory where
