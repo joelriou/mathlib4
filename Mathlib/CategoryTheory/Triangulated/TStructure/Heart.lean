@@ -49,7 +49,6 @@ lemma mem_heart_iff (X : C) :
     t.heart X ↔ t.IsLE X 0 ∧ t.IsGE X 0 := by
   simp [heart]
 
-
 variable (H : Type u') [Category.{v'} H] [Preadditive H]
 
 /-- Given `t : TStructure C` and a preadditive category `H`, this typeclass
