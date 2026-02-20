@@ -19,7 +19,7 @@ is monoidal.
 
 ## TODO (@joelriou)
 * for sites that have enough points, use this to give an alternative
-  proof of the assumption to `Sheaf.monoidalCategory` in the site
+  proof of the assumption to `Sheaf.monoidalCategory` in the file
   `Mathlib/CategoryTheory/Sites/Monoidal`
 * show that `Φ.sheafFiber` is also monoidal
 
