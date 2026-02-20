@@ -96,6 +96,16 @@ lemma jointlyFaithful [AB5OfSize.{w, w} A] [HasFiniteLimits A] :
       (fun (Φ : P.FullSubcategory) ↦ Φ.obj.sheafFiber (A := A)) :=
   (hP.jointlyReflectIsomorphisms A).jointlyFaithful
 
+variable {A} in
+lemma W_iff {F G : Cᵒᵖ ⥤ A} (f : F ⟶ G) [HasWeakSheafify J A]
+    [J.WEqualsLocallyBijective A] :
+    J.W f ↔ ∀ (Φ : P.FullSubcategory), IsIso (Φ.obj.presheafFiber.map f) := by
+  rw [GrothendieckTopology.W_iff, (hP.jointlyReflectIsomorphisms A).isIso_iff]
+  exact forall_congr'
+    (fun Φ ↦ (MorphismProperty.isomorphisms A).arrow_mk_iso_iff
+      (((Functor.mapArrowFunctor _ _).mapIso
+        (Φ.obj.presheafToSheafCompSheafFiber A)).app (Arrow.mk f)))
+
 end IsConservativeFamilyOfPoints
 
 end ObjectProperty
