@@ -55,7 +55,7 @@ noncomputable def cechIsoCechNerveApp (n : SimplexCategoryᵒᵖ) :
     (U.isLimitPowerFan (ToType n.unop)) (isTerminalIncl _ hT)) (limit.isLimit _)
 
 @[reassoc (attr := simp)]
-lemma cechIsoCechNerveApp_π (n : SimplexCategoryᵒᵖ) (i : ToType n.unop) :
+lemma cechIsoCechNerveApp_hom_π (n : SimplexCategoryᵒᵖ) (i : ToType n.unop) :
     (U.cechIsoCechNerveApp hT n).hom ≫
       WidePullback.π (fun _ ↦ (isTerminalIncl T hT).from U) i = U.powerπ i :=
   IsLimit.conePointUniqueUpToIso_hom_comp _ _ _
