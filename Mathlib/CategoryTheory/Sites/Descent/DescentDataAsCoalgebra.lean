@@ -5,7 +5,6 @@ Authors: Joël Riou, Christian Merten
 -/
 module
 
-public import Mathlib.CategoryTheory.Bicategory.Adjunction.Adj
 public import Mathlib.CategoryTheory.Bicategory.Adjunction.Cat
 public import Mathlib.CategoryTheory.Bicategory.LocallyDiscrete
 public import Mathlib.CategoryTheory.Monad.Adjunction
