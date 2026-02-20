@@ -899,7 +899,7 @@ theorem augment_hom_zero (X : CosimplicialObject C) (X₀ : C) (f : X₀ ⟶ X.o
 an initial object. -/
 @[simps!]
 def augmentOfIsInitial (X : CosimplicialObject C) {T : C} (hT : IsInitial T) :
-    CosimplicialObject.Augmented C where
+    Augmented C where
   right := X
   left := T
   hom := { app _ := hT.to _ }
