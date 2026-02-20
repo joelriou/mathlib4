@@ -23,11 +23,6 @@ namespace CategoryTheory.Limits
 
 open Functor
 
-instance isIso_colimMap {J C : Type*} [Category* J] [Category* C] {F G : J ⥤ C}
-    [HasColimit F] [HasColimit G] (τ : F ⟶ G) [IsIso τ] :
-    IsIso (colimMap τ) :=
-  ⟨colimMap (inv τ), by cat_disch, by cat_disch⟩
-
 variable
   {C₁ C₂ C : Type*} [Category* C₁] [Category* C₂] [Category* C]
   (F : C₁ ⥤ C₂ ⥤ C)
