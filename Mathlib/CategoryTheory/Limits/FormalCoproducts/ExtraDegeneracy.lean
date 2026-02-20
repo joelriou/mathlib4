@@ -73,6 +73,7 @@ noncomputable def cechIsoCechNerve :
 /-- The Cech construction for `FormalCoproduct` is isomorphic
 to the general `Arrow.augmentedCechNerve` construction applied to the morphism
 to the terminal object. -/
+@[simps! hom_left inv_left hom_right inv_left]
 noncomputable def cechIsoAugmentedCechNerve :
     U.cech.augmentOfIsTerminal (isTerminalIncl _ hT) ≅
       Arrow.augmentedCechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) :=
