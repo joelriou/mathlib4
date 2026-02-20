@@ -130,10 +130,10 @@ lemma jointlyReflectEpimorphisms (h : JointlyFaithful F) :
 
 lemma jointlyReflectsIsomorphisms [Balanced C] (h : JointlyFaithful F) :
     JointlyReflectIsomorphisms F where
-  isIso {X Y} f _ := by
+  isIso f _ :=
     have := h.jointlyReflectMonomorphisms.mono f
     have := h.jointlyReflectEpimorphisms.epi f
-    exact Balanced.isIso_of_mono_of_epi f
+    Balanced.isIso_of_mono_of_epi f
 
 end JointlyFaithful
 
