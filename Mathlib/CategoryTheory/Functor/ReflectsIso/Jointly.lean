@@ -55,13 +55,13 @@ lemma JointlyFaithful.of_jointly_reflects_isIso_of_mono [HasEqualizers C]
     (hF : ∀ ⦃X Y : C⦄ (f : X ⟶ Y) [Mono f],
       (∀ i, IsIso ((F i).map f)) → IsIso f) :
     JointlyFaithful F where
-  map_injective {X Y} f g hfg := by
+  map_injective {X Y} f g hfg :=
     have :=
       hF (equalizer.ι f g) (fun i ↦ by
         let hc := isLimitForkMapOfIsLimit (F i) _ (equalizerIsEqualizer f g)
         obtain ⟨l, hl⟩ := Fork.IsLimit.lift' hc (𝟙 _) (by simpa using hfg i)
         exact ⟨l, Fork.IsLimit.hom_ext hc (by cat_disch), by cat_disch⟩)
-    exact eq_of_epi_equalizer
+    eq_of_epi_equalizer
 
 namespace JointlyReflectIsomorphisms
 
