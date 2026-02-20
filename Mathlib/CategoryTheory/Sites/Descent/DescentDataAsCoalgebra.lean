@@ -135,6 +135,8 @@ variable (F) in
 `DescentDataAsCoalgebra` identifies to the category of coalgebras
 over the comonoad corresponding to the adjunction
 `(F.map f.op.toLoc).adj`. -/
+@[simps! functor_obj_A functor_obj_a functor_map_f inverse_obj_obj inverse_obj_hom
+  inverse_map_hom counitIso, simps! -isSimp unitIso_hom_app_hom unitIso_inv_app_hom]
 def coalgebraEquivalence (ι : Type*) [Unique ι] {X S : C} (f : X ⟶ S) :
     F.DescentDataAsCoalgebra (fun (_ : ι) ↦ f) ≌
     (Adjunction.ofCat (F.map f.op.toLoc).adj).toComonad.Coalgebra where
@@ -167,6 +169,7 @@ end DescentDataAsCoalgebra
 variable (F) in
 /-- The functor `(F.obj (.mk (op S))).obj ⥤ F.DescentDataAsCoalgebra f`
 when `f i : X i ⟶ S` is a family of morphisms. -/
+@[simps]
 def toDescentDataAsCoalgebra
     {ι : Type t} {S : C} {X : ι → C} (f : ∀ i, X i ⟶ S) :
     (F.obj (.mk (op S))).obj ⥤ F.DescentDataAsCoalgebra f where
@@ -191,6 +194,7 @@ and the functor of the equivalence
 `DescentDataAsCoalgebra.coalgebraEquivalence F ι f` identifies to
 `Comonad.comparison` applied to the adjunction corresponding to
 `F.map f.op.toLoc`. -/
+@[simps!]
 def toDescentDataAsCoalgebraCompCoalgebraEquivalenceFunctorIso
     (ι : Type*) [Unique ι] {X S : C} (f : X ⟶ S) :
     F.toDescentDataAsCoalgebra (fun (_ : ι) ↦ f) ⋙
