@@ -24,7 +24,7 @@ category structure on `Sheaf J A`.
 
 @[expose] public section
 
-universe w w' v v' u u'
+universe w v v' u u'
 
 namespace CategoryTheory
 
