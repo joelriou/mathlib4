@@ -895,6 +895,15 @@ def augment (X : CosimplicialObject C) (X₀ : C) (f : X₀ ⟶ X.obj ⦋0⦌)
 theorem augment_hom_zero (X : CosimplicialObject C) (X₀ : C) (f : X₀ ⟶ X.obj ⦋0⦌) (w) :
     (X.augment X₀ f w).hom.app ⦋0⦌ = f := by simp
 
+/-- The coaugmented cosimplicial object that is deduced from a cosimplicial object and
+an initial object. -/
+@[simps!]
+def augmentOfIsInitial (X : CosimplicialObject C) {T : C} (hT : IsInitial T) :
+    CosimplicialObject.Augmented C where
+  right := X
+  left := T
+  hom := { app _ := hT.to _ }
+
 end CosimplicialObject
 
 /-- The anti-equivalence between simplicial objects and cosimplicial objects. -/

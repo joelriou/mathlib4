@@ -60,6 +60,12 @@ lemma cechIsoCechNerveApp_hom_π (n : SimplexCategoryᵒᵖ) (i : ToType n.unop)
       WidePullback.π (fun _ ↦ (isTerminalIncl T hT).from U) i = U.powerπ i :=
   IsLimit.conePointUniqueUpToIso_hom_comp _ _ _
 
+@[reassoc (attr := simp)]
+lemma cechIsoCechNerveApp_inv_π (n : SimplexCategoryᵒᵖ) (i : ToType n.unop) :
+    (U.cechIsoCechNerveApp hT n).inv ≫ U.powerπ i =
+      WidePullback.π (fun _ ↦ (isTerminalIncl T hT).from U) i := by
+  rw [← U.cechIsoCechNerveApp_hom_π hT, Iso.inv_hom_id_assoc]
+
 set_option backward.isDefEq.respectTransparency false in
 /-- The Cech construction for `FormalCoproduct` is isomorphic
 to the general `Arrow.cechNerve` construction applied to the morphism
