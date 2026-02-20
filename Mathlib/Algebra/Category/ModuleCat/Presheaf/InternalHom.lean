@@ -17,13 +17,15 @@ public import Mathlib.Algebra.Category.ModuleCat.Presheaf.Pushforward
 
 open CategoryTheory Category Opposite
 
-universe v u v₁ u₁
+universe w v u v₁ u₁
 
 variable {C : Type u₁} [Category.{v₁} C] {R : Cᵒᵖ ⥤ CommRingCat.{u}}
 
 namespace PresheafOfModules
 
-instance (U : Cᵒᵖ) (F G : (PresheafOfModules ((Over.forget U.unop).op ⋙ R ⋙ forget₂ _ _))) :
+@[simps -isSimp]
+instance smulOver (U : Cᵒᵖ)
+    (F G : (PresheafOfModules ((Over.forget U.unop).op ⋙ R ⋙ forget₂ _ _))) :
     SMul (R.obj U) (F ⟶ G) where
   smul a φ :=
     { app V := ModuleCat.ofHom
@@ -41,13 +43,15 @@ instance (U : Cᵒᵖ) (F G : (PresheafOfModules ((Over.forget U.unop).op ⋙ R 
           ← ConcreteCategory.comp_apply, ← R.map_comp, ← op_comp, Over.w] }
 
 lemma over_smul_app_apply
-    {U : Cᵒᵖ} {F G : (PresheafOfModules ((Over.forget U.unop).op ⋙ R ⋙ forget₂ _ _))}
+    {U : Cᵒᵖ} {F G : (PresheafOfModules.{w} ((Over.forget U.unop).op ⋙ R ⋙ forget₂ _ _))}
     (a : R.obj U) (φ : F ⟶ G) {V : (Over U.unop)ᵒᵖ} (s : F.obj V) :
     (a • φ).app V s =
       letI b : ((Over.forget (unop U)).op ⋙ R ⋙ forget₂ CommRingCat RingCat).obj V :=
         R.map V.unop.hom.op a
       b • φ.app _ s :=
   rfl
+
+attribute [local simp] smulOver_smul_app
 
 instance (U : Cᵒᵖ) :
     Linear (R.obj U)
@@ -64,18 +68,16 @@ instance (U : Cᵒᵖ) :
       mul_smul _ _ _ := by
         ext
         dsimp
-        erw [over_smul_app_apply, over_smul_app_apply, over_smul_app_apply]
-        rw [map_mul]
+        erw [map_mul]
         apply mul_smul
       add_smul _ _ _ := by
         ext
         dsimp
-        erw [over_smul_app_apply, over_smul_app_apply, over_smul_app_apply]
-        rw [map_add]
+        erw [map_add]
         apply add_smul
       smul_zero _ := by
         ext
-        erw [over_smul_app_apply]
+        dsimp
         apply smul_zero
       smul_add _ _ _ := by
         ext
@@ -85,14 +87,14 @@ instance (U : Cᵒᵖ) :
     dsimp
     rw [comp_app]
     dsimp
-    erw [over_smul_app_apply, over_smul_app_apply]
     rw [map_smul]
     rfl
   comp_smul _ _ _ _ _ _ := by
     ext
     dsimp
     rw [comp_app]
-    apply over_smul_app_apply
+    sorry
+    --apply over_smul_app_apply
 
 variable (F G : PresheafOfModules.{max u u₁ v₁} (R ⋙ forget₂ _ _))
 
@@ -111,24 +113,19 @@ noncomputable def internalHom : PresheafOfModules.{max u u₁ v₁} (R ⋙ forge
       map_add' _ _ := rfl
       map_smul' _ _ := PresheafOfModules.hom_ext (fun _ ↦ by
         ext
-        dsimp [internalHomMap]
+        dsimp
         erw [over_smul_app_apply, over_smul_app_apply]
         dsimp
         rw [Functor.map_comp]
         rfl ) }
   map_id _ := by
     ext
-    dsimp [internalHomMap]
     refine PresheafOfModules.hom_ext (fun _ ↦ ?_)
     dsimp
-    ext
-    dsimp
-    rw [ModuleCat.restrictScalarsId'App_inv_apply]
     congr
     simp [Over.mapId_eq]
   map_comp {X₁ X₂ X₃} f g := by
     ext
-    dsimp [internalHomMap]
     refine PresheafOfModules.hom_ext (fun _ ↦ ?_)
     dsimp
     congr 2
