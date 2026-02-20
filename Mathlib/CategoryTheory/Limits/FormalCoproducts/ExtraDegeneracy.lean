@@ -64,6 +64,7 @@ set_option backward.isDefEq.respectTransparency false in
 /-- The Cech construction for `FormalCoproduct` is isomorphic
 to the general `Arrow.cechNerve` construction applied to the morphism
 to the terminal object. -/
+@[simps! hom_app inv_app]
 noncomputable def cechIsoCechNerve :
     U.cech ≅ Arrow.cechNerve (Arrow.mk ((isTerminalIncl _ hT).from U)) :=
   NatIso.ofComponents (fun _ ↦ cechIsoCechNerveApp _ _ _)
