@@ -57,10 +57,16 @@ lemma isPullback : IsPullback h.p₁ h.p₂ f₁ f₂ where
   w := h.condition
   isLimit' := ⟨h.isLimit⟩
 
-attribute [reassoc (attr := simp)] hp₁
+attribute [reassoc (attr := simp, grind =)] hp₁
 
-@[reassoc (attr := simp)]
+@[reassoc (attr := simp, grind =)]
 lemma hp₂ : h.p₂ ≫ f₂ = h.p := by rw [← h.condition, hp₁]
+
+@[ext]
+lemma hom_ext {Y : C} {f g : Y ⟶ h.pullback}
+    (h₁ : f ≫ h.p₁ = g ≫ h.p₁) (h₂ : f ≫ h.p₂ = g ≫ h.p₂) :
+    f = g :=
+  h.isPullback.hom_ext h₁ h₂
 
 /-- Given `f₁ : X₁ ⟶ S`, `f₂ : X₂ ⟶ S`, `h : ChosenPullback f₁ f₂` and morphisms
 `g₁ : Y ⟶ X₁`, `g₂ : Y ⟶ X₂` and `b : Y ⟶ S`, this structure contains a morphism
@@ -69,28 +75,24 @@ lemma hp₂ : h.p₂ ≫ f₂ = h.p := by rw [← h.condition, hp₁]
 structure LiftStruct {Y : C} (g₁ : Y ⟶ X₁) (g₂ : Y ⟶ X₂) (b : Y ⟶ S) where
   /-- a lifting to the pullback -/
   f : Y ⟶ h.pullback
-  f_p₁ : f ≫ h.p₁ = g₁
-  f_p₂ : f ≫ h.p₂ = g₂
-  f_p : f ≫ h.p = b
+  f_p₁ : f ≫ h.p₁ = g₁ := by cat_disch
+  f_p₂ : f ≫ h.p₂ = g₂ := by cat_disch
+  f_p : f ≫ h.p = b := by cat_disch
 
 namespace LiftStruct
 
-attribute [reassoc (attr := simp)] f_p₁ f_p₂ f_p
+attribute [reassoc (attr := simp, grind =)] f_p₁ f_p₂ f_p
 
-variable {h} {Y : C} {g₁ : Y ⟶ X₁} {g₂ : Y ⟶ X₂} {b : Y ⟶ S} (l : h.LiftStruct g₁ g₂ b)
+variable {h} {Y : C} {g₁ : Y ⟶ X₁} {g₂ : Y ⟶ X₂} {b : Y ⟶ S}
 
-include l in
 @[reassoc]
-lemma w : g₁ ≫ f₁ = g₂ ≫ f₂ := by
+lemma w (l : h.LiftStruct g₁ g₂ b) : g₁ ≫ f₁ = g₂ ≫ f₂ := by
   simp only [← l.f_p₁, ← l.f_p₂, Category.assoc, h.condition]
 
 instance : Subsingleton (h.LiftStruct g₁ g₂ b) where
   allEq := by
     rintro ⟨f, f_p₁, f_p₂, _⟩ ⟨f', f'_p₁, f'_p₂, _⟩
-    obtain rfl : f = f' := by
-      apply h.isPullback.hom_ext
-      · rw [f_p₁, f'_p₁]
-      · rw [f_p₂, f'_p₂]
+    obtain rfl : f = f' := by cat_disch
     rfl
 
 lemma nonempty (w : g₁ ≫ f₁ = g₂ ≫ f₂) (hf₁ : g₁ ≫ f₁ = b) :
@@ -100,8 +102,7 @@ lemma nonempty (w : g₁ ≫ f₁ = g₂ ≫ f₂) (hf₁ : g₁ ≫ f₁ = b) :
     f := l
     f_p₁ := h₁
     f_p₂ := h₂
-    f_p := by rw [← h.hp₁, ← hf₁, reassoc_of% h₁]
-  }⟩
+    f_p := by rw [← h.hp₁, ← hf₁, reassoc_of% h₁] }⟩
 
 end LiftStruct
 
@@ -200,13 +201,13 @@ lemma p₁₃_p : h.p₁₃ ≫ h₁₃.p = h.p := by
   rw [← h₁₃.hp₁, p₁₃_p₁_assoc, w₁]
 
 lemma p₁₂_eq_lift : h.p₁₂ = h₁₂.isPullback.lift h.p₁ h.p₂ (by simp) := by
-  apply h₁₂.isPullback.hom_ext <;> simp
+  cat_disch
 
 lemma p₂₃_eq_lift : h.p₂₃ = h₂₃.isPullback.lift h.p₂ h.p₃ (by simp) := by
-  apply h₂₃.isPullback.hom_ext <;> simp
+  cat_disch
 
 lemma p₁₃_eq_lift : h.p₁₃ = h₁₃.isPullback.lift h.p₁ h.p₃ (by simp) := by
-  apply h₁₃.isPullback.hom_ext <;> simp
+  cat_disch
 
 lemma exists_lift {Y : C} (g₁ : Y ⟶ X₁) (g₂ : Y ⟶ X₂) (g₃ : Y ⟶ X₃) (b : Y ⟶ S)
     (hg₁ : g₁ ≫ f₁ = b) (hg₂ : g₂ ≫ f₂ = b) (hg₃ : g₃ ≫ f₃ = b) :
@@ -221,12 +222,11 @@ lemma exists_lift {Y : C} (g₁ : Y ⟶ X₁) (g₂ : Y ⟶ X₂) (g₃ : Y ⟶ 
 
 lemma isPullback₂ : IsPullback h.p₁₂ h.p₂₃ h₁₂.p₂ h₂₃.p₁ := h.chosenPullback.isPullback
 
+@[ext]
 lemma hom_ext {Y : C} {φ φ' : Y ⟶ h.pullback}
     (h₁ : φ ≫ h.p₁ = φ' ≫ h.p₁) (h₂ : φ ≫ h.p₂ = φ' ≫ h.p₂)
     (h₃ : φ ≫ h.p₃ = φ' ≫ h.p₃) : φ = φ' := by
-  apply h.isPullback₂.hom_ext
-  · apply h₁₂.isPullback.hom_ext <;> simpa
-  · apply h₂₃.isPullback.hom_ext <;> simpa
+  apply h.isPullback₂.hom_ext <;> cat_disch
 
 lemma isPullback₁ : IsPullback h.p₁₂ h.p₁₃ h₁₂.p₁ h₁₃.p₁ :=
   .mk' (by simp) (fun _ _ _ h₁ h₂ ↦ h.hom_ext (by simpa using h₁ =≫ h₁₂.p₁)
@@ -235,9 +235,7 @@ lemma isPullback₁ : IsPullback h.p₁₂ h.p₁₃ h₁₂.p₁ h₁₃.p₁ :
       obtain ⟨φ, hφ₁, hφ₂, hφ₃⟩ :=
         h.exists_lift (a ≫ h₁₂.p₁) (a ≫ h₁₂.p₂) (b ≫ h₁₃.p₂) _ rfl
           (by simp) (by simpa using w.symm =≫ f₁)
-      refine ⟨φ, ?_, ?_⟩
-      · apply h₁₂.isPullback.hom_ext <;> simpa
-      · apply h₁₃.isPullback.hom_ext <;> cat_disch)
+      exact ⟨φ, by cat_disch, by cat_disch⟩)
 
 lemma isPullback₃ : IsPullback h.p₁₃ h.p₂₃ h₁₃.p₂ h₂₃.p₂ :=
   .mk' (by simp) (fun _ _ _ h₁ h₂ ↦ h.hom_ext (by simpa using h₁ =≫ h₁₃.p₁)
@@ -246,9 +244,7 @@ lemma isPullback₃ : IsPullback h.p₁₃ h.p₂₃ h₁₃.p₂ h₂₃.p₂ :
       obtain ⟨φ, hφ₁, hφ₂, hφ₃⟩ :=
         h.exists_lift (a ≫ h₁₃.p₁) (b ≫ h₂₃.p₁) (a ≫ h₁₃.p₂) _ rfl
           (by simpa using w.symm =≫ f₃) (by simp)
-      refine ⟨φ, ?_, ?_⟩
-      · apply h₁₃.isPullback.hom_ext <;> simpa
-      · apply h₂₃.isPullback.hom_ext <;> cat_disch)
+      exact ⟨φ, by cat_disch, by cat_disch⟩)
 
 end ChosenPullback₃
 
