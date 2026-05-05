@@ -37,7 +37,7 @@ It computes the simplicial homology of a simplicial sets with coefficients
 in `R`. One can recover the ordinary simplicial chain complex when `C := Ab`
 and `X := ℤ`.
 -/
-noncomputable def chainComplexFunctor : C ⥤ SSet.{w} ⥤ ChainComplex C ℕ :=
+noncomputable abbrev chainComplexFunctor : C ⥤ SSet.{w} ⥤ ChainComplex C ℕ :=
   (Functor.postcompose₂.obj (AlgebraicTopology.alternatingFaceMapComplex _)).obj
     (sigmaConst ⋙ SimplicialObject.whiskering _ _)
 
@@ -81,7 +81,7 @@ noncomputable abbrev chainComplexMap : X.chainComplex R ⟶ Y.chainComplex R :=
 variable {R} in
 /-- The inclusion `R ⟶ (X.chainComplex R).X n` of the summand
 corresponding to a `n`-simplex `x : X _⦋n⦌`. -/
-noncomputable def ιChainComplex {n : ℕ} (x : X _⦋n⦌) : R ⟶ (X.chainComplex R).X n :=
+noncomputable abbrev ιChainComplex {n : ℕ} (x : X _⦋n⦌) : R ⟶ (X.chainComplex R).X n :=
   Sigma.ι (fun (_ : X _⦋n⦌) ↦ R) x
 
 set_option backward.isDefEq.respectTransparency false in
@@ -132,11 +132,13 @@ protected noncomputable abbrev homologyMap (n : ℕ) : X.homology R n ⟶ Y.homo
 @[simp]
 lemma homologyMap_id (n : ℕ) : SSet.homologyMap (𝟙 X) R n = 𝟙 _ := by
   simp [SSet.homologyMap]
+  rfl
 
 @[reassoc]
 lemma homologyMap_comp (n : ℕ) :
     SSet.homologyMap (f ≫ g) R n = SSet.homologyMap f R n ≫ SSet.homologyMap g R n := by
   simp [SSet.homologyMap, HomologicalComplex.homologyMap_comp]
+  rfl
 
 attribute [local simp] homologyMap_comp in
 /-- The simplicial homology functor in degree `n` with coefficients in `R : C`. -/

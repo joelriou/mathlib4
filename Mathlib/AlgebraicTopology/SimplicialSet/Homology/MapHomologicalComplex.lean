@@ -65,6 +65,6 @@ lemma map_ιChainComplex_chainComplexFunctorObjCompMapIso_hom_app_f
    dsimp% F.map (X.ιChainComplex x) ≫
       ((chainComplexFunctorObjCompMapIso F R).hom.app X).f n =
     X.ιChainComplex x := by
-  simpa [chainComplexFunctorObjCompMapIso] using map_ι_sigmaConstObjCompIso_hom_app F R x
+  simp [chainComplexFunctorObjCompMapIso]
 
 end SSet
