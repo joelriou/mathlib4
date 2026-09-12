@@ -83,6 +83,13 @@ namespace End
 @[simps!]
 instance [Preadditive C] (X : C) : AddCommGroup (End X) := (End.homEquiv (X := X)).addCommGroup
 
+/-- The additive bijection `End X ≃+ (X ⟶ X)`
+when `X` is an object in a preadditive category. -/
+@[implicit_reducible, simps!]
+def addEquiv [Preadditive C] {X : C} : End X ≃+ (X ⟶ X) where
+  toEquiv := homEquiv
+  map_add' := by cat_disch
+
 end End
 
 end CategoryTheory

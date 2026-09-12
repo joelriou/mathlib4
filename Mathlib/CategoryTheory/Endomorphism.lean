@@ -158,7 +158,7 @@ instance : Group (Aut X) where
 
 /-- The inclusion of `Aut X` to `End X` as a monoid homomorphism. -/
 @[simps!]
-def toEnd (X : C) : Aut X →* End X where
+def toEnd {X : C} : Aut X →* End X where
   toFun e := .of e.asIso.hom
   map_one' := by cat_disch
   map_mul' := by cat_disch
