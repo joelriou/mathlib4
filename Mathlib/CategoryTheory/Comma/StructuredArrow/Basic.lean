@@ -1243,8 +1243,7 @@ def costructuredArrowSndProj (b : B) :
   obj X := CostructuredArrow.mk (X.left.hom ≫ R.map X.hom)
   map f := CostructuredArrow.homMk f.left.left <| by
     dsimp
-    simp only [CommaMorphism.w_assoc, ← Functor.map_comp,
-      dsimp% [snd] CostructuredArrow.w f]
+    rw [reassoc_of% f.left.w, ← R.map_comp, dsimp% CostructuredArrow.w f]
 
 /-- The functor from the costructured arrow category on `L` over `R.obj b` to the costructured
 arrow category on `snd L R` over `b : B`. -/
@@ -1252,17 +1251,14 @@ arrow category on `snd L R` over `b : B`. -/
 def costructuredArrowSndInclusion (b : B) :
     CostructuredArrow L (R.obj b) ⥤ CostructuredArrow (snd L R) b where
   obj X := CostructuredArrow.mk (Y := Comma.mk _ _ X.hom) (𝟙 b)
-  map f := CostructuredArrow.homMk ⟨f.left, 𝟙 b, by simp⟩ (by simp [snd])
+  map f := CostructuredArrow.homMk ⟨f.left, 𝟙 b, by simp⟩
 
 /-- The functor `costructuredArrowSndProj` is left adjoint to `costructuredArrowSndInclusion`. -/
 @[simps]
 def costructuredArrowSndAdjunction (b : B) :
     costructuredArrowSndProj L R b ⊣ costructuredArrowSndInclusion L R b where
-  unit.app X := CostructuredArrow.homMk ⟨𝟙 X.left.left, X.hom, by simp⟩ (by simp [snd])
-  unit.naturality _ _ f := by
-    ext
-    · simp
-    · simpa using CostructuredArrow.w f
+  unit.app X := CostructuredArrow.homMk ⟨𝟙 X.left.left, X.hom, by simp⟩
+  unit.naturality _ _ f := by ext <;> simp [← CostructuredArrow.w f]
   counit.app X := CostructuredArrow.homMk (𝟙 X.left)
 
 end Comma
