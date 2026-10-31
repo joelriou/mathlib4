@@ -79,18 +79,31 @@ lemma isCardinalContinuous_precomp_iff {C' : Type u''} [Category.{v''} C']
       Functor.isoWhiskerRight G.asEquivalence.counitIso _ ≪≫ F.leftUnitor
   exact preservesLimitsOfShape_of_natIso e
 
-/-- If two categories `C` and `C'` are equivalent, then the categories
-of `κ`-continuous functors in `C ⥤ D` and `C' ⥤ D` are also equivalent. -/
-@[implicit_reducible, simps!]
-def isCardinalContinuousCongrLeft {C' : Type u'} [Category.{v'} C']
-    (e : C ≌ C') (D : Type u'') [Category.{v''} D] (κ : Cardinal.{w}) :
-    (isCardinalContinuous C D κ).FullSubcategory ≌
-      (isCardinalContinuous C' D κ).FullSubcategory :=
-  e.congrLeft.congrFullSubcategory (by aesop)
-
 end
 
 end Functor
+
+section
+
+variable (C D : Type*) [Category* C] [Category* D]
+  (κ : Cardinal.{w})
+
+abbrev CardinalContinuousFunctor : Type _ :=
+    (Functor.isCardinalContinuous C D κ).FullSubcategory
+
+abbrev CardinalContinuousFunctor.ι : CardinalContinuousFunctor C D κ ⥤ C ⥤ D :=
+  ObjectProperty.ι _
+
+variable {C} in
+/-- If two categories `C` and `C'` are equivalent, then the categories
+of `κ`-continuous functors in `C ⥤ D` and `C' ⥤ D` are also equivalent. -/
+@[implicit_reducible, simps!]
+def CardinalContinuousFunctor.congrLeft {C' : Type*} [Category* C']
+    (e : C ≌ C') (D : Type*) [Category* D] (κ : Cardinal.{w}) :
+    CardinalContinuousFunctor C D κ ≌ CardinalContinuousFunctor C' D κ :=
+  e.congrLeft.congrFullSubcategory (by aesop)
+
+end
 
 namespace Presheaf
 
@@ -217,8 +230,8 @@ section EssentiallySmall
 variable {C : Type u} [Category.{v} C] [EssentiallySmall.{w} C]
   {κ : Cardinal.{w}} [Fact κ.IsRegular]
 
-instance : IsCardinalLocallyPresentable (isCardinalContinuous C (Type w) κ).FullSubcategory κ :=
-  (isCardinalContinuousCongrLeft ((equivSmallModel.{w} Cᵒᵖ).op.symm.trans
+instance : IsCardinalLocallyPresentable (CardinalContinuousFunctor C (Type w) κ) κ :=
+  (CardinalContinuousFunctor.congrLeft ((equivSmallModel.{w} Cᵒᵖ).op.symm.trans
     (opOpEquivalence C)) (Type w) κ).isCardinalLocallyPresentable κ
 
 instance : IsLocallyPresentable.{w} (isCardinalContinuous C (Type w) κ).FullSubcategory where
@@ -226,7 +239,7 @@ instance : IsLocallyPresentable.{w} (isCardinalContinuous C (Type w) κ).FullSub
 
 instance : (isCardinalContinuous C (Type w) κ).ι.IsRightAdjoint := by
   let e := ((equivSmallModel.{w} Cᵒᵖ).op.symm.trans (opOpEquivalence C))
-  let e' := isCardinalContinuousCongrLeft e (Type w) κ
+  let e' := CardinalContinuousFunctor.congrLeft e (Type w) κ
   let iso : (isCardinalContinuous C (Type w) κ).ι ≅
     e'.inverse ⋙
       (isCardinalContinuous (SmallModel.{w} Cᵒᵖ)ᵒᵖ (Type w) κ).ι ⋙ e.congrLeft.functor := by
@@ -237,7 +250,7 @@ instance : (isCardinalContinuous C (Type w) κ).ι.IsRightAdjoint := by
 instance :
     HasLimitsOfSize.{w, w} (isCardinalContinuous C (Type w) κ).FullSubcategory :=
   Adjunction.has_limits_of_equivalence
-    ((isCardinalContinuousCongrLeft ((equivSmallModel.{w} Cᵒᵖ).op.symm.trans
+    ((CardinalContinuousFunctor.congrLeft ((equivSmallModel.{w} Cᵒᵖ).op.symm.trans
       (opOpEquivalence C)) (Type w) κ).inverse)
 
 set_option backward.isDefEq.respectTransparency false in
@@ -288,8 +301,8 @@ lemma exists_presentation_of_isCardinalContinuous
       (G : J ⥤ C) (ι : G ⋙ shrinkYoneda.{w} ⟶ (Functor.const _).obj F),
         Nonempty (IsColimit (Cocone.mk _ ι)) := by
   let e := equivSmallModel.{w} (CostructuredArrow shrinkYoneda.{w} F)
-  refine ⟨SmallModel.{w} (CostructuredArrow shrinkYoneda.{w} F), inferInstance,
-    ?_, e.inverse ⋙ CostructuredArrow.proj shrinkYoneda.{w} F,
+  refine ⟨SmallModel.{w} (CostructuredArrow shrinkYoneda.{w} F), inferInstance, ?_,
+    e.inverse ⋙ CostructuredArrow.proj shrinkYoneda.{w} F,
     Functor.whiskerLeft e.inverse (CostructuredArrow.ι shrinkYoneda.{w} F),
       ⟨IsColimit.whiskerEquivalence  (denseAtShrinkYoneda F) e.symm⟩⟩
   have := isCardinalFiltered_costructuredArrow_shrinkYoneda hF hC

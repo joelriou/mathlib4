@@ -334,12 +334,33 @@ instance (F : C ⥤ D) (X : C) [F.Full] [F.Faithful] :
     ((Functor.FullyFaithful.ofFullyFaithful F).homEquiv.trans
       shrinkYonedaObjObjEquiv.symm)).bijective
 
-/-- The natural isomorphism `shrinkYoneda.obj X ≅ F.op ⋙ shrinkYoneda.obj (F.obj X)`
-when `F : C ⥤ D` is a fully faithful functor and `X : C`. -/
-@[simps! hom]
-noncomputable def shrinkYonedaMapIso (F : C ⥤ D) [F.Full] [F.Faithful] (X : C) :
-    shrinkYoneda.{w}.obj X ≅ F.op ⋙ shrinkYoneda.{w}.obj (F.obj X) :=
-  asIso (shrinkYonedaMap F X)
+@[reassoc]
+lemma shrinkYonedaMap_naturality_app (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) (Z : Cᵒᵖ) :
+    (shrinkYoneda.{w}.map f).app Z ≫ (shrinkYonedaMap F Y).app Z =
+      (shrinkYonedaMap F X).app Z ≫ (shrinkYoneda.map (F.map f)).app (op (F.obj Z.unop)) := by
+  dsimp
+  ext x
+  obtain ⟨x, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective x
+  simp [shrinkYonedaMap_app_shrinkYonedaObjObjEquiv_symm.{w},
+    shrinkYoneda_map_app_shrinkYonedaObjObjEquiv_symm.{w}]
+
+@[reassoc]
+lemma shrinkYonedaMap_naturality (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) :
+    shrinkYoneda.{w}.map f ≫ shrinkYonedaMap F Y =
+      shrinkYonedaMap F X ≫ Functor.whiskerLeft _ (shrinkYoneda.map (F.map f)) := by
+  ext Z : 2
+  simp [shrinkYonedaMap_naturality_app F f]
+
+@[simps]
+noncomputable def shrinkYonedaMap₂ (F : C ⥤ D) :
+    shrinkYoneda.{w} ⟶ F ⋙ shrinkYoneda.{w} ⋙ (Functor.whiskeringLeft ..).obj F.op where
+  app := shrinkYonedaMap F
+  naturality := by simp [shrinkYonedaMap_naturality]
+
+instance (F : C ⥤ D) [F.Full] [F.Faithful] :
+    IsIso (shrinkYonedaMap₂.{w} F) := by
+  simp only [NatTrans.isIso_iff_isIso_app, shrinkYonedaMap₂_app]
+  infer_instance
 
 end
 
@@ -549,6 +570,30 @@ def shrinkCoyonedaCorepresentableBy (X : Cᵒᵖ) :
 
 instance (X : Cᵒᵖ) : (shrinkCoyoneda.{w}.obj X).IsCorepresentable :=
   (shrinkCoyonedaCorepresentableBy X).isCorepresentable
+
+section
+
+variable {D : Type*} [Category* D] [LocallySmall.{w} D]
+
+noncomputable def shrinkCoyonedaMap (F : C ⥤ D) (X : Cᵒᵖ) :
+    shrinkCoyoneda.{w}.obj X ⟶ F ⋙ shrinkCoyoneda.{w}.obj (F.op.obj X) :=
+  ((flipFunctor ..).map (shrinkYonedaMap₂ F)).app _
+
+lemma shrinkCoyonedaMap_app_shrinkCoyonedaObjObjEquiv_symm (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) :
+    (shrinkCoyonedaMap.{w} F (op X)).app _ (shrinkYonedaObjObjEquiv.symm f) =
+      shrinkYonedaObjObjEquiv.symm (F.map f) := by
+  simp [shrinkCoyonedaMap, shrinkYonedaMap_app_shrinkYonedaObjObjEquiv_symm.{w}]
+
+lemma shrinkCoyonedaMap_app (F : C ⥤ D) (X : Cᵒᵖ) (Y : C) :
+    (shrinkCoyonedaMap.{w} F X).app Y =
+      (shrinkYonedaMap.{w} F Y).app X := rfl
+
+instance (F : C ⥤ D) [F.Full] [F.Faithful] (X : Cᵒᵖ) :
+    IsIso (shrinkCoyonedaMap.{w} F X) := by
+  dsimp [shrinkCoyonedaMap]
+  infer_instance
+
+end
 
 end Coyoneda
 
