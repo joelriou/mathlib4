@@ -263,11 +263,6 @@ noncomputable def _root_.CategoryTheory.Equivalence.shrinkYonedaIsoConjugateYone
   NatIso.ofComponents (fun X ↦ NatIso.ofComponents (fun Y ↦
     ((equivShrink _).symm.trans e.fullyFaithfulFunctor.homEquiv).toIso))
 
--- to be moved?
-instance (F : Cᵒᵖ ⥤ Type w) :
-    EssentiallySmall.{w} (CostructuredArrow shrinkYoneda.{w} F) :=
-  CostructuredArrow.essentiallySmall' ..
-
 lemma isCardinalFiltered_costructuredArrow_shrinkYoneda
     {P : Cᵒᵖ ⥤ Type w} (hP : isCardinalContinuous Cᵒᵖ (Type w) κ P)
     (hC : ∀ (J : Type w) [SmallCategory J] (_ : HasCardinalLT (Arrow J) κ),
