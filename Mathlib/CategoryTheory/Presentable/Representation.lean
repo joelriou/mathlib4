@@ -73,9 +73,9 @@ instance (X : C) [IsCardinalPresentable X κ] :
 instance : (toCardinalContinuousFunctor C κ).EssSurj where
   mem_essImage := fun F ↦ by
     obtain ⟨J, _, hJ, G, ι, ⟨h⟩⟩ :=
-      Presheaf.exists_presentation_of_isCardinalContinuous.{w} (fun J _ hJ ↦ by
+      Presheaf.exists_presentation_of_isCardinalContinuous.{w} κ (fun J _ hJ ↦ by
         have := isClosedUnderColimitsOfShape_isCardinalPresentable C hJ
-        infer_instance) F.property
+        infer_instance) F.obj
     let c' : Cocone (G ⋙ shrinkYoneda.{w}) :=
       { pt :=
           (isCardinalPresentable C κ).ι.op ⋙
