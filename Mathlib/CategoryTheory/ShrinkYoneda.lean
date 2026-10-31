@@ -278,23 +278,6 @@ lemma uliftYonedaIsoShrinkYoneda_hom_app_comp_shrinkYoneda_symm
   simp [← cancel_epi (uliftYonedaIsoShrinkYoneda.{w'}.inv.app X.unop),
     uliftYonedaIsoShrinkYoneda_inv_app_comp_uliftYonedaEquiv_symm.{w'}]
 
-set_option backward.defeqAttrib.useBackward true in
-/-- For `X : C`, the functor `shrinkYoneda.{w}.flip.obj (op X)` followed by
-`uliftFunctor.{v}` identifies to `coyoneda.obj Y` followed by `uliftFunctor.{w}`. -/
-noncomputable def shrinkYonedaFlipObjCompUliftFunctorIso (X : C) :
-    shrinkYoneda.{w}.flip.obj (op X) ⋙ uliftFunctor.{v} ≅
-      coyoneda.obj (op X) ⋙ uliftFunctor.{w} :=
-  NatIso.ofComponents
-    (fun Y ↦ Equiv.toIso (Equiv.ulift.trans (shrinkYonedaObjObjEquiv.trans Equiv.ulift.symm)))
-    (fun _ ↦ by
-      ext ⟨g⟩
-      obtain ⟨g, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective g
-      simp [shrinkYonedaObjObjEquiv, shrinkYoneda])
-
-@[deprecated (since := "2026-06-25")]
-alias shrinkYonedaCompEvaluationCompUliftFunctorIsoUliftFunctor :=
-  shrinkYonedaFlipObjCompUliftFunctorIso
-
 /-- `shrinkYoneda.obj X` is represented by `X`. -/
 @[simps]
 noncomputable
@@ -547,18 +530,36 @@ noncomputable def uliftYonedaIsoShrinkCoyoneda :
       ext
       exact (shrinkCoyoneda_map_app_shrinkCoyonedaObjObjEquiv_symm _ _).symm)
 
-set_option backward.defeqAttrib.useBackward true in
-/-- The functor `shrinkCoyoneda.{w}` followed by the evaluation
-at `Y : C` and `uliftFunctor.{v}` identifies to `yoneda.obj Y` followed
-by `uliftFunctor.{w}`. -/
-noncomputable def shrinkCoyonedaCompEvaluationCompUliftFunctorIsoUliftFunctor (Y : C) :
-    shrinkCoyoneda.{w} ⋙ (evaluation C _).obj Y ⋙ uliftFunctor.{v} ≅
+/-- For `X : Cᵒᵖ`, the functor `shrinkCoyoneda.{w}.obj X` followed by
+`uliftFunctor.{v}` identifies to `coyoneda.obj X` followed by `uliftFunctor.{w}`. -/
+noncomputable def shrinkCoyonedaObjCompUliftFunctorIso (X : Cᵒᵖ) :
+    shrinkCoyoneda.{w}.obj X ⋙ uliftFunctor.{v} ≅
+      coyoneda.obj X ⋙ uliftFunctor.{w} :=
+  NatIso.ofComponents
+    (fun Y ↦ Equiv.toIso (Equiv.ulift.trans (shrinkYonedaObjObjEquiv.trans Equiv.ulift.symm)))
+    (fun _ ↦ by
+      ext ⟨g⟩
+      obtain ⟨g, rfl⟩ := shrinkYonedaObjObjEquiv.symm.surjective g
+      simp [shrinkYonedaObjObjEquiv, shrinkYoneda])
+
+@[deprecated (since := "2026-06-25")]
+alias shrinkYonedaCompEvaluationCompUliftFunctorIsoUliftFunctor :=
+  shrinkCoyonedaObjCompUliftFunctorIso
+
+/-- For `Y : C`, the functor `shrinkYoneda.{w}.obj Y` followed by
+`uliftFunctor.{v}` identifies to `yoneda.obj Y` followed by `uliftFunctor.{w}`. -/
+noncomputable def shrinkYonedaObjCompUliftFunctorIso (Y : C) :
+    shrinkYoneda.{w}.obj Y ⋙ uliftFunctor.{v} ≅
       yoneda.obj Y ⋙ uliftFunctor.{w} :=
   NatIso.ofComponents (fun X ↦ (Equiv.ulift.trans
     (shrinkCoyonedaObjObjEquiv.trans Equiv.ulift.symm)).toIso) (fun f ↦ by
       ext ⟨g⟩
       obtain ⟨g, rfl⟩ := shrinkCoyonedaObjObjEquiv.symm.surjective g
       simp [shrinkYoneda, shrinkYonedaObjObjEquiv])
+
+@[deprecated (since := "2026-10-31")]
+alias shrinkCoyonedaCompEvaluationCompUliftFunctorIsoUliftFunctor :=
+  shrinkYonedaObjCompUliftFunctorIso
 
 /-- `shrinkCoyoneda.obj X` is corepresented by `X`. -/
 @[simps]

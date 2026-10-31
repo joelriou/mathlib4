@@ -110,6 +110,9 @@ instance [IsLocallyPresentable.{w} C] : HasColimitsOfSize.{w, w} C := by
   obtain ⟨κ, _, _⟩ := IsLocallyPresentable.exists_cardinal.{w} C
   infer_instance
 
+instance [IsLocallyPresentable.{w} C] : HasFiniteColimits C :=
+  hasFiniteColimits_of_hasColimitsOfSize.{w, w} _
+
 end
 
 lemma ObjectProperty.le_isCardinalPresentable

@@ -21,7 +21,7 @@ the full subcategory of `κ`-presentable objects of `C`.
 
 @[expose] public section
 
-universe w v v' u u'
+universe w
 
 namespace CategoryTheory
 
@@ -29,7 +29,7 @@ open Limits Opposite
 
 namespace IsCardinalLocallyPresentable
 
-variable (C : Type u) [Category.{v} C] (κ : Cardinal.{w}) [Fact κ.IsRegular]
+variable (C : Type*) [Category* C] (κ : Cardinal.{w}) [Fact κ.IsRegular]
   [IsCardinalLocallyPresentable C κ]
 
 instance (X : C) :
@@ -45,33 +45,32 @@ instance (X : C) :
 
 open CategoryTheory.Functor in
 @[implicit_reducible]
-noncomputable def toCardinalContinuous :
-    C ⥤ (Functor.isCardinalContinuous
-      (isCardinalPresentable C κ).FullSubcategoryᵒᵖ (Type w) κ).FullSubcategory :=
+noncomputable def toCardinalContinuousFunctor :
+    C ⥤ CardinalContinuousFunctor (isCardinalPresentable C κ).FullSubcategoryᵒᵖ (Type w) κ :=
   ObjectProperty.lift _ (Presheaf.restrictedShrinkYoneda.{w} (ObjectProperty.ι _))
     inferInstance
 
-noncomputable def toCardinalContinuousCompIso :
-    toCardinalContinuous C κ ⋙ ObjectProperty.ι _ ≅
+noncomputable def toCardinalContinuousFunctorCompIso :
+    toCardinalContinuousFunctor C κ ⋙ ObjectProperty.ι _ ≅
       Presheaf.restrictedShrinkYoneda.{w} (ObjectProperty.ι _) := Iso.refl _
 
-instance : (toCardinalContinuous C κ).Faithful := by
-  have := Functor.Faithful.of_iso (toCardinalContinuousCompIso C κ).symm
+instance : (toCardinalContinuousFunctor C κ).Faithful := by
+  have := Functor.Faithful.of_iso (toCardinalContinuousFunctorCompIso C κ).symm
   exact Functor.Faithful.of_comp _ (ObjectProperty.ι _)
 
-instance : (toCardinalContinuous C κ).Full := by
-  have := Functor.Full.of_iso (toCardinalContinuousCompIso C κ).symm
+instance : (toCardinalContinuousFunctor C κ).Full := by
+  have := Functor.Full.of_iso (toCardinalContinuousFunctorCompIso C κ).symm
   exact Functor.Full.of_comp_faithful _ (ObjectProperty.ι _)
 
 instance (X : C) [IsCardinalPresentable X κ] :
-    (shrinkYoneda.{w}.flip.obj (op X)).IsCardinalAccessible κ where
+    (shrinkCoyoneda.{w}.obj (op X)).IsCardinalAccessible κ where
   preservesColimitOfShape J _ _ := by
     have := preservesColimitsOfShape_of_isCardinalPresentable_of_essentiallySmall X κ J
     have := preservesColimitsOfShape_of_natIso (J := J)
-      (shrinkYonedaFlipObjCompUliftFunctorIso X).symm
-    exact preservesColimitsOfShape_of_reflects_of_preserves _ uliftFunctor.{v}
+      (shrinkCoyonedaObjCompUliftFunctorIso (op X)).symm
+    exact preservesColimitsOfShape_of_reflects_of_preserves _ uliftFunctor
 
-instance : (toCardinalContinuous C κ).EssSurj where
+instance : (toCardinalContinuousFunctor C κ).EssSurj where
   mem_essImage := fun F ↦ by
     obtain ⟨J, _, hJ, G, ι, ⟨h⟩⟩ :=
       Presheaf.exists_presentation_of_isCardinalContinuous.{w} (fun J _ hJ ↦ by
@@ -102,26 +101,25 @@ instance : (toCardinalContinuous C κ).EssSurj where
     exact ⟨colimit (G ⋙ ObjectProperty.ι _),
       ⟨ObjectProperty.isoMk _ (IsColimit.coconePointUniqueUpToIso h' h)⟩⟩
 
-instance : (toCardinalContinuous C κ).IsEquivalence where
+instance : (toCardinalContinuousFunctor C κ).IsEquivalence where
 
-@[simps! functor]
-noncomputable def toCardinalContinuousEquivalence :
-    C ≌ (Functor.isCardinalContinuous
-      (isCardinalPresentable C κ).FullSubcategoryᵒᵖ (Type w) κ).FullSubcategory :=
-  (toCardinalContinuous C κ).asEquivalence
+@[simps! functor, implicit_reducible]
+noncomputable def toCardinalContinuousFunctorEquivalence :
+    C ≌ CardinalContinuousFunctor (isCardinalPresentable C κ).FullSubcategoryᵒᵖ (Type w) κ :=
+  (toCardinalContinuousFunctor C κ).asEquivalence
 
 include κ in
 lemma hasLimitsOfSize : HasLimitsOfSize.{w, w} C :=
   Adjunction.has_limits_of_equivalence
-    (IsCardinalLocallyPresentable.toCardinalContinuousEquivalence C κ).functor
+    (IsCardinalLocallyPresentable.toCardinalContinuousFunctorEquivalence C κ).functor
 
 include κ in
 lemma hasFiniteLimits : HasFiniteLimits C := by
   have := hasLimitsOfSize C κ
   exact hasFiniteLimits_of_hasLimitsOfSize.{w, w} C
 
-instance (J : Type w) [SmallCategory J] :
-    IsCardinalLocallyPresentable (Jᵒᵖ ⥤ C) κ := by
+instance (J : Type*) [Category* J] [EssentiallySmall.{w} J] :
+    IsCardinalLocallyPresentable (J ⥤ C) κ := by
   have := IsCardinalLocallyPresentable.hasFiniteLimits C κ
   infer_instance
 
@@ -129,14 +127,19 @@ end IsCardinalLocallyPresentable
 
 namespace IsCardinalPresentable
 
-instance (C : Type u) [Category.{v} C] [IsLocallyPresentable.{w} C] :
+instance (C : Type*) [Category* C] [IsLocallyPresentable.{w} C] :
     HasLimitsOfSize.{w, w} C := by
   obtain ⟨κ, _, _⟩ := IsLocallyPresentable.exists_cardinal.{w} C
   exact IsCardinalLocallyPresentable.hasLimitsOfSize C κ
 
-instance (C : Type u) [Category.{v} C] [IsLocallyPresentable.{w} C] :
+instance (C : Type*) [Category* C] [IsLocallyPresentable.{w} C] :
     HasFiniteLimits C :=
   hasFiniteLimits_of_hasLimitsOfSize.{w, w} C
+
+example (C J : Type*) [Category* C] [Category* J] [EssentiallySmall.{w} J]
+    [IsLocallyPresentable.{w} C] :
+    IsLocallyPresentable.{w} (J ⥤ C) := by
+  infer_instance
 
 end IsCardinalPresentable
 
