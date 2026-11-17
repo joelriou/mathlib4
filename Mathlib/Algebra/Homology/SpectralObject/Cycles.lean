@@ -59,7 +59,7 @@ this may be shortened as `Z^n(f, g)` -/
 @[implicit_reducible]
 noncomputable def cycles : C := kernel (X.δ f g n (n + 1))
 
-/-- The cokernel of `δ : H^{n-1}(g) ⟶ H^n(g)`. In the documentation,
+/-- The cokernel of `δ : H^{n-1}(g) ⟶ H^n(f)`. In the documentation,
 this may be shortened as `opZ^n₁(f, g)`. -/
 @[implicit_reducible]
 noncomputable def opcycles : C := cokernel (X.δ f g (n - 1) n)
