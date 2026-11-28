@@ -2856,6 +2856,7 @@ public import Mathlib.CategoryTheory.Filtered.OfColimitCommutesFiniteLimit
 public import Mathlib.CategoryTheory.Filtered.Small
 public import Mathlib.CategoryTheory.Filtration.Basic
 public import Mathlib.CategoryTheory.Filtration.Convergence
+public import Mathlib.CategoryTheory.Filtration.Quotients
 public import Mathlib.CategoryTheory.FinCategory.AsType
 public import Mathlib.CategoryTheory.FinCategory.Basic
 public import Mathlib.CategoryTheory.FintypeCat

@@ -186,6 +186,22 @@ def forget : FilteredObject C I ⥤ C where
   obj A := A.X
   map f := f.hom
 
+instance {F G : FilteredObject C I} (f : F ⟶ G) [IsIso f] : IsIso f.hom :=
+  inferInstanceAs (IsIso (forget.map f))
+
+@[implicit_reducible, simps]
+def diagramFunctor : FilteredObject C I ⥤ I ⥤ C where
+  obj F := F.filtration.diagram
+  map f := f.natTrans
+
+instance {F G : FilteredObject C I} (f : F ⟶ G) [IsIso f] : IsIso f.natTrans :=
+  inferInstanceAs (IsIso (diagramFunctor.map f))
+
+lemma Hom.isIso_iff {F G : FilteredObject C I} (f : F ⟶ G) :
+    IsIso f ↔ IsIso f.hom ∧ IsIso f.natTrans :=
+  ⟨fun _ ↦ ⟨inferInstance, inferInstance⟩,
+    fun ⟨_, _⟩ ↦ (isoMk (asIso f.hom) (asIso f.natTrans).app).isIso_hom⟩
+
 end FilteredObject
 
 end CategoryTheory

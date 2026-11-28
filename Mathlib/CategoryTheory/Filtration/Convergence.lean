@@ -6,7 +6,8 @@ Authors: Joël Riou
 
 module
 
-public import Mathlib.CategoryTheory.Filtration.Basic
+public import Mathlib.CategoryTheory.Abelian.Basic
+public import Mathlib.CategoryTheory.Filtration.Quotients
 public import Mathlib.CategoryTheory.Limits.Constructions.EventuallyConstant
 public import Mathlib.CategoryTheory.Limits.FunctorCategory.Shapes.Kernels
 
@@ -22,7 +23,7 @@ namespace CategoryTheory
 
 open Limits ZeroObject
 
-variable {C I J : Type*} [Category* C] [Category* I]
+variable {C I : Type*} [Category* C] [Category* I]
 
 namespace Filtration
 
@@ -65,16 +66,12 @@ section
 
 variable [HasZeroMorphisms C] [HasCokernels C] (F : Filtration X I)
 
-@[expose, simps, implicit_reducible]
-noncomputable def coneCokernelι : Cone (cokernel F.ι) where
-  pt := X
-  π := (cokernel.π F.ι)
-
 class IsStronglyConvergent (F : Filtration X I) : Prop
     extends F.IsWeaklyConvergent where
-  nonempty_isLimit : Nonempty (IsLimit F.coneCokernelι)
+  nonempty_isLimit : Nonempty (IsLimit F.coneCokernelιAppFunctor)
 
-noncomputable def isLimitConeCokernelι [F.IsStronglyConvergent] : IsLimit F.coneCokernelι :=
+noncomputable def isLimitConeCokernelι [F.IsStronglyConvergent] :
+    IsLimit F.coneCokernelιAppFunctor :=
   IsStronglyConvergent.nonempty_isLimit.some
 
 open IsCofiltered in
@@ -83,10 +80,18 @@ instance [IsCofiltered I] [F.IsStronglyConvergent] : F.IsConvergent where
     ext i
     rw [← cancel_mono (F.ι.app i)]
     refine F.isLimitConeCokernelι.hom_ext (fun j ↦ ?_)
-    dsimp
     rw [Category.assoc, ← c.w_assoc (minToLeft i j)]
-    simp [F.w_assoc (minToLeft i j), ← F.w_assoc (minToRight i j),
-      ← NatTrans.comp_app]
+    simp [F.w_assoc (minToLeft i j), ← F.w_assoc (minToRight i j)]
+
+end
+
+section
+
+variable [Abelian C] (F : Filtration X I)
+
+def isLimitConeCokernelDiagramMapFunctor [F.IsStronglyConvergent] (i : I) :
+    IsLimit (F.coneCokernelDiagramMapFunctor i) := by
+  sorry
 
 end
 
@@ -106,10 +111,10 @@ lemma isEventuallyConstantFrom_diagram_of_isIso
   have := F.isIso_ι_app_of_hom f
   exact IsIso.of_isIso_fac_right (F.w f)
 
-lemma isEventuallyConstantTo_cokernel_of_isZero
+lemma isEventuallyConstantTo_cokernelιAppFunctor_of_isZero
     [HasZeroMorphisms C] [HasCokernels C]
     (F : Filtration X I) (i : I) (hi : IsZero (F.obj i)) :
-    (cokernel F.ι).IsEventuallyConstantTo i := by
+    (F.cokernelιAppFunctor).IsEventuallyConstantTo i := by
   intro j f
   have hj : IsZero (F.obj j) := IsZero.of_mono (F.diagram.map f) hi
   let e : F.diagram.obj j ≅ F.diagram.obj i :=
@@ -117,8 +122,7 @@ lemma isEventuallyConstantTo_cokernel_of_isZero
       inv := 0
       hom_inv_id := hj.eq_of_src ..
       inv_hom_id := hi.eq_of_src .. }
-  exact ((MorphismProperty.isomorphisms _).arrow_mk_iso_iff (cokernelMapArrowIso F.ι f)).2
-    (cokernel.mapIso (F.ι.app j) (F.ι.app i) e (Iso.refl _) (hj.eq_of_src ..)).isIso_hom
+  exact (cokernel.mapIso (F.ι.app j) (F.ι.app i) e (Iso.refl _) (hj.eq_of_src ..)).isIso_hom
 
 class IsBounded (F : Filtration X I) : Prop where
   exists_isZero_obj (F) : ∃ (i : I), IsZero (F.obj i)
@@ -137,12 +141,60 @@ instance [IsFiltered I] [IsCofiltered I] [HasZeroMorphisms C] [HasCokernels C]
     F.IsStronglyConvergent where
   nonempty_isLimit := by
     obtain ⟨i, hi⟩ := F.exists_isZero_obj
-    have : IsIso (F.coneCokernelι.π.app i) :=
-      ((MorphismProperty.isomorphisms _).arrow_mk_iso_iff
-        (cokernelπAppArrowIso F.ι i)).2 (cokernel.π_of_zero (hi.eq_of_src ..))
-    have := F.isEventuallyConstantTo_cokernel_of_isZero i hi
-    exact ⟨(F.isEventuallyConstantTo_cokernel_of_isZero i hi).isLimitOfIsIso _⟩
+    have : IsIso (F.coneCokernelιAppFunctor.π.app i) :=
+      cokernel.π_of_zero (hi.eq_of_src ..)
+    exact ⟨(F.isEventuallyConstantTo_cokernelιAppFunctor_of_isZero i hi).isLimitOfIsIso _⟩
 
 end Filtration
+
+namespace FilteredObject
+
+abbrev IsWeaklyConvergent (F : FilteredObject C I) : Prop :=
+  F.filtration.IsWeaklyConvergent
+
+abbrev IsConvergent [HasZeroMorphisms C] (F : FilteredObject C I) : Prop :=
+  F.filtration.IsConvergent
+
+abbrev IsStronglyConvergent [HasZeroMorphisms C] [HasCokernels C] (F : FilteredObject C I) : Prop :=
+  F.filtration.IsStronglyConvergent
+
+abbrev IsBounded (F : FilteredObject C I) : Prop :=
+  F.filtration.IsBounded
+
+namespace Hom
+
+variable {F G : FilteredObject C I} (f : F ⟶ G)
+
+lemma isIso_hom_of_isIso_natTrans [F.IsWeaklyConvergent] [G.IsWeaklyConvergent]
+    (hf : IsIso f.natTrans := by infer_instance) :
+    IsIso f.hom := by
+  have :
+      (IsColimit.coconePointUniqueUpToIso F.filtration.isColimitCoconeDiagram
+        (((IsColimit.precomposeHomEquiv (asIso f.natTrans) _).symm
+          (G.filtration.isColimitCoconeDiagram)))).hom = f.hom :=
+    F.filtration.isColimitCoconeDiagram.hom_ext (fun i ↦ by
+      simp [dsimp% F.filtration.isColimitCoconeDiagram.comp_coconePointUniqueUpToIso_hom])
+  rw [← this]
+  infer_instance
+
+lemma isIso_of_isIso_natTrans [F.IsWeaklyConvergent] [G.IsWeaklyConvergent]
+    (hf : IsIso f.natTrans := by infer_instance) : IsIso f := by
+  rw [isIso_iff]
+  exact ⟨f.isIso_hom_of_isIso_natTrans, hf⟩
+
+lemma isIso_natTrans_app [Abelian C] [F.IsStronglyConvergent] [G.IsStronglyConvergent] (i : I)
+    (h : IsIso (f.mapCokernelDiagramMapFunctor i) := by infer_instance) :
+    IsIso (f.natTrans.app i) := by
+  let hF := (IsLimit.postcomposeHomEquiv (asIso ((f.mapCokernelDiagramMapFunctor i))) _).symm
+          (F.filtration.isLimitConeCokernelDiagramMapFunctor i)
+  let hG := G.filtration.isLimitConeCokernelDiagramMapFunctor i
+  have : (IsLimit.conePointUniqueUpToIso hF hG).hom = f.natTrans.app i :=
+    hG.hom_ext (fun g ↦ by simp [dsimp% IsLimit.conePointUniqueUpToIso_hom_comp hF hG])
+  rw [← this]
+  infer_instance
+
+end Hom
+
+end FilteredObject
 
 end CategoryTheory
