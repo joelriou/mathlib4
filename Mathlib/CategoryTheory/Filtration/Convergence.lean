@@ -7,6 +7,7 @@ Authors: Joël Riou
 module
 
 public import Mathlib.CategoryTheory.Abelian.Basic
+public import Mathlib.CategoryTheory.Filtered.Final
 public import Mathlib.CategoryTheory.Filtration.Quotients
 public import Mathlib.CategoryTheory.Limits.Constructions.EventuallyConstant
 public import Mathlib.CategoryTheory.Limits.FunctorCategory.Shapes.Kernels
@@ -20,6 +21,37 @@ public import Mathlib.CategoryTheory.Limits.FunctorCategory.Shapes.Kernels
 public section
 
 namespace CategoryTheory
+
+-- to be moved
+
+namespace Limits.KernelFork
+
+def isLimitConeOfIsLimit {J C : Type*} [Category* J] [Category* C] [HasZeroMorphisms C]
+    {F₁ F₂ : J ⥤ C} {φ : F₁ ⟶ F₂} (kf : KernelFork φ)
+    (c₁ : Cone F₁) (c₂ : Cone F₂) (c : Cone kf.pt)
+    (hc₁ : IsLimit c₁) (hc₂ : IsLimit c₂)
+    (hkf : ∀ j : J, IsLimit (kf.map ((evaluation _ _).obj j)))
+    (f : c.pt ⟶ c₁.pt) (g : c₁.pt ⟶ c₂.pt) (hfg : f ≫ g = 0)
+    (hpt : IsLimit (KernelFork.ofι f hfg))
+    (commf : ∀ (j : J), f ≫ c₁.π.app j = c.π.app j ≫ kf.ι.app j := by cat_disch)
+    (commg : ∀ (j : J), g ≫ c₂.π.app j = c₁.π.app j ≫ φ.app j := by cat_disch)  :
+    IsLimit c := by
+  let kf' (s : Cone kf.pt) : KernelFork g :=
+    (KernelFork.ofι (hc₁.lift (Cone.mk s.pt (s.π ≫ kf.ι)))
+      (hc₂.hom_ext (fun j ↦ by
+        simp [commg, dsimp% congr($(kf.condition).app j)])))
+  have (j : J) : Mono (kf.ι.app j) := Fork.IsLimit.mono (hkf j)
+  have fac (s : Cone kf.pt) (j : J) :
+      hpt.lift (kf' s) ≫ c.π.app j = s.π.app j := by
+    simp [← cancel_mono (kf.ι.app j), ← commf, dsimp% hpt.fac_assoc (kf' s) .zero, kf']
+  exact {
+    lift s := hpt.lift (kf' s)
+    uniq s m hm :=
+      Fork.IsLimit.hom_ext hpt (hc₁.hom_ext (fun j ↦ by
+        simp [commf, reassoc_of% hm, reassoc_of% fac]))
+  }
+
+end Limits.KernelFork
 
 open Limits ZeroObject
 
@@ -70,7 +102,7 @@ class IsStronglyConvergent (F : Filtration X I) : Prop
     extends F.IsWeaklyConvergent where
   nonempty_isLimit : Nonempty (IsLimit F.coneCokernelιAppFunctor)
 
-noncomputable def isLimitConeCokernelι [F.IsStronglyConvergent] :
+noncomputable def isLimitConeCokernelιAppFunctor [F.IsStronglyConvergent] :
     IsLimit F.coneCokernelιAppFunctor :=
   IsStronglyConvergent.nonempty_isLimit.some
 
@@ -79,7 +111,7 @@ instance [IsCofiltered I] [F.IsStronglyConvergent] : F.IsConvergent where
   π_eq_zero c := by
     ext i
     rw [← cancel_mono (F.ι.app i)]
-    refine F.isLimitConeCokernelι.hom_ext (fun j ↦ ?_)
+    refine F.isLimitConeCokernelιAppFunctor.hom_ext (fun j ↦ ?_)
     rw [Category.assoc, ← c.w_assoc (minToLeft i j)]
     simp [F.w_assoc (minToLeft i j), ← F.w_assoc (minToRight i j)]
 
@@ -89,8 +121,17 @@ section
 
 variable [Abelian C] (F : Filtration X I)
 
-def isLimitConeCokernelDiagramMapFunctor [F.IsStronglyConvergent] (i : I) :
+attribute [local instance] IsCofiltered.isConnected in
+noncomputable def isLimitConeCokernelDiagramMapFunctor
+    [IsCofiltered I] [F.IsStronglyConvergent] (i : I) :
     IsLimit (F.coneCokernelDiagramMapFunctor i) := by
+  have hc₁ := (Functor.Initial.isLimitWhiskerEquiv (Over.forget i) _).symm
+      F.isLimitConeCokernelιAppFunctor
+  refine KernelFork.isLimitConeOfIsLimit
+    (F.kernelForkCokernelιAppFunctorToConstObjCokernel i)
+    _ _ (F.coneCokernelDiagramMapFunctor i) hc₁ (isLimitConstCone _ _)
+    F.isLimitKernelForkCokernelιAppFunctorToConstObjCokernelMapEvaluationObj
+    (F.ι.app i) (cokernel.π _) (by simp) ?_
   sorry
 
 end
@@ -182,7 +223,8 @@ lemma isIso_of_isIso_natTrans [F.IsWeaklyConvergent] [G.IsWeaklyConvergent]
   rw [isIso_iff]
   exact ⟨f.isIso_hom_of_isIso_natTrans, hf⟩
 
-lemma isIso_natTrans_app [Abelian C] [F.IsStronglyConvergent] [G.IsStronglyConvergent] (i : I)
+lemma isIso_natTrans_app_of_isIso_mapCokernelDiagramMapFunctor
+    [IsCofiltered I] [Abelian C] [F.IsStronglyConvergent] [G.IsStronglyConvergent] (i : I)
     (h : IsIso (f.mapCokernelDiagramMapFunctor i) := by infer_instance) :
     IsIso (f.natTrans.app i) := by
   let hF := (IsLimit.postcomposeHomEquiv (asIso ((f.mapCokernelDiagramMapFunctor i))) _).symm

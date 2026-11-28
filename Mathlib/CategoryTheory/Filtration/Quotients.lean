@@ -49,6 +49,37 @@ noncomputable def coneCokernelDiagramMapFunctor (i : I) :
   pt := F.obj i
   π.app _ := cokernel.π _
 
+@[expose, simps]
+noncomputable def cokernelDiagramMapFunctorToCokernelιAppFunctor (i : I) :
+    F.cokernelDiagramMapFunctor i ⟶ Over.forget i ⋙ F.cokernelιAppFunctor where
+  app j := cokernel.map _ _ (𝟙 _) (F.ι.app i) (by simp)
+
+@[expose, simps]
+noncomputable def cokernelιAppFunctorToConstObjCokernel (i : I) :
+    Over.forget i ⋙ F.cokernelιAppFunctor ⟶ (Functor.const _).obj (cokernel (F.ι.app i)) where
+  app j := cokernel.map _ _ (F.diagram.map j.hom) (𝟙 _) (by simp)
+
+@[reassoc (attr := simp)]
+lemma cokernelDiagramMapFunctorToCokernelιAppFunctor_cokernelιAppFunctorToConstObjCokernel (i : I) :
+    F.cokernelDiagramMapFunctorToCokernelιAppFunctor i ≫
+      F.cokernelιAppFunctorToConstObjCokernel i = 0 := by
+  cat_disch
+
+noncomputable abbrev kernelForkCokernelιAppFunctorToConstObjCokernel (i : I) :
+    KernelFork (F.cokernelιAppFunctorToConstObjCokernel i) :=
+  KernelFork.ofι _
+    (F.cokernelDiagramMapFunctorToCokernelιAppFunctor_cokernelιAppFunctorToConstObjCokernel i)
+
+def isLimitKernelForkCokernelιAppFunctorToConstObjCokernelMapEvaluationObj {i : I} (j : Over i) :
+    IsLimit ((F.kernelForkCokernelιAppFunctorToConstObjCokernel i).map ((evaluation _ _).obj j)) :=
+  sorry
+
+noncomputable def isLimitKernelForkCokernelιAppFunctorToConstObjCokernel (i : I) :
+    IsLimit (F.kernelForkCokernelιAppFunctorToConstObjCokernel i) :=
+  evaluationJointlyReflectsLimits _
+    (fun j ↦ (KernelFork.isLimitMapConeEquiv _ _).symm
+      (F.isLimitKernelForkCokernelιAppFunctorToConstObjCokernelMapEvaluationObj j))
+
 end Filtration
 
 namespace FilteredObject
